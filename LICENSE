@@ -1,0 +1,157 @@
+Reciprocal Public License Version 1.1
+
+Copyright (C) 2026 Daniel Vallstrom
+
+PREAMBLE
+
+This Preamble is intended to describe, in plain English, the nature, intent
+and scope of this License. However, this Preamble is not a part of this
+License. The legal effect of this License is dependent only upon the terms of
+the License and not this Preamble.
+
+This License is based on the concept of reciprocity. In exchange for being
+granted certain rights under the terms of this License to Licensor's
+Software, whose Source Code You have access to, You are required to
+reciprocate by providing equal access and rights to all third parties to the
+Source Code of any Modifications, Derivative Works, and Required Components
+for execution of same (collectively defined as Extensions) that You Deploy by
+Deploying Your Extensions under the terms of this License. In this fashion,
+the available Source Code related to the original Licensed Software is
+enlarged for the benefit of everyone.
+
+TERMS AND CONDITIONS
+
+1. DEFINITIONS.
+
+a. "Licensor" means the copyright owner of the Licensed Software.
+
+b. "Licensed Software" means the original work of authorship made available
+under this License, as indicated by a copyright notice embedded in the
+Licensed Software.
+
+c. "You" means an individual or a legal entity exercising rights under this
+License. For legal entities, "You" includes any entity that controls, is
+controlled by, or is under common control with You. For the purposes of this
+definition, "control" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or otherwise, or
+(ii) ownership of fifty percent (50%) or more of the outstanding shares, or
+(iii) beneficial ownership of such entity.
+
+d. "License" means this Reciprocal Public License, which incorporates and is
+governed by the Preamble and these Terms and Conditions.
+
+e. "Source Code" means the preferred form of a work for making modifications
+to it, and includes all modules it contains, plus any associated interface
+definition files, scripts used to control compilation and installation of an
+executable, or a list of source code differential comparisons against either
+the Licensed Software or another well known, available work at Licensor's
+choice.
+
+f. "Deploy" means to use, operate, execute, install, configure, integrate,
+host, or otherwise make available to any party the Licensed Software or
+Extensions, whether for internal or external purposes.
+
+g. "Extensions" means Modifications, Derivative Works, and Required
+Components.
+
+h. "Modification" means any alteration of the Licensed Software, including
+but not limited to the addition, deletion, or change of the source code or
+documentation of the Licensed Software.
+
+i. "Derivative Work" means any work, whether in Source Code or other form,
+that is based on (or derived from) the Licensed Software, for which the
+editorial revisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship.
+
+j. "Required Components" means any software or hardware required for the
+execution of the Licensed Software or Extensions that is not independently
+licensed under a compatible license.
+
+2. GRANT OF RIGHTS.
+
+Subject to the terms and conditions of this License, Licensor hereby grants
+You a worldwide, royalty-free, non-exclusive, sublicensable license:
+
+a. to use the Licensed Software for any purpose;
+
+b. to reproduce and distribute exact copies of the Licensed Software as You
+receive it, in any medium, with or without modifications, provided that You
+meet the conditions in Section 3;
+
+c. to create Extensions of the Licensed Software;
+
+d. to Deploy the Licensed Software and Your Extensions.
+
+3. CONDITIONS.
+
+a. Deployment of Extensions. If You Deploy any Extensions, You must make the
+Source Code for those Extensions available to all third parties under the
+terms of this License. The Source Code must be provided either:
+
+   (i) by including the Source Code with Your Deployment, or
+   (ii) by publishing the Source Code at a publicly accessible network
+   location for at least as long as You Deploy the Extensions.
+
+b. Notice Preservation. You must retain, in the Source Code that You Deploy,
+all copyright notices, license notices, and disclaimers that are present in
+the Licensed Software. You must not remove or alter any such notices.
+
+c. License Identification. You must include a copy of this License with every
+copy of the Source Code of the Licensed Software or Extensions that You
+Distribute.
+
+d. No Additional Restrictions. You may not apply any legal terms or
+technological measures that legally restrict others from doing anything this
+License permits.
+
+4. DISTRIBUTION OF LICENSED SOFTWARE.
+
+You may Distribute copies of the Licensed Software in any medium without
+modification, provided that You conspicuously publish on each copy an
+appropriate copyright notice and disclaimer of warranty, keep intact all the
+notices that refer to this License, and give any other recipients of the
+Licensed Software a copy of this License along with the Licensed Software.
+
+5. DISCLAIMER OF WARRANTIES.
+
+THE LICENSED SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE LICENSED SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+LICENSED SOFTWARE.
+
+6. LIMITATION OF LIABILITY.
+
+IN NO EVENT AND UNDER NO LEGAL THEORY, WHETHER IN TORT (INCLUDING NEGLIGENCE),
+CONTRACT, OR OTHERWISE, UNLESS REQUIRED BY APPLICABLE LAW (SUCH AS DELIBERATE
+AND GROSSLY NEGLIGENT ACTS) OR AGREED TO IN WRITING, SHALL ANY LICENSOR BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING AS A RESULT OF THIS LICENSE
+OR OUT OF THE USE OR INABILITY TO USE THE LICENSED SOFTWARE (INCLUDING BUT NOT
+LIMITED TO DAMAGES FOR LOSS OF GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR
+MALFUNCTION, OR ALL OTHER COMMERCIAL DAMAGES OR LOSSES), EVEN IF SUCH
+LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7. TERMINATION.
+
+This License and the rights granted hereunder will terminate automatically if
+You fail to comply with the terms herein and fail to cure such breach within
+thirty (30) days of becoming aware of the breach. All sublicenses to the
+Licensed Software that are properly granted shall survive any termination of
+this License. Provisions which, by their nature, must remain in effect beyond
+the termination of this License shall survive.
+
+8. MISCELLANEOUS.
+
+This License constitutes the entire agreement between the parties with respect
+to the Licensed Software licensed here. If any provision of this License is
+held to be unenforceable, such provision shall be reformed only to the extent
+necessary to make it enforceable. No term or condition of this License shall
+be deemed waived and no breach consented to unless such waiver or consent
+shall be in writing and signed by the party to be charged with such waiver or
+consent.
+
+For information about the Reciprocal Public License, see:
+https://opensource.org/licenses/RPL-1.1
