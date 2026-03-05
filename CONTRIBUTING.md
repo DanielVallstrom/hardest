@@ -37,8 +37,8 @@ The following information is critical for reproducibility. These values are prin
 ```
 Problem: 1-6-2 (1 false, 6 true, 2 random gods)
 E[Qs]: 8.273810
-Solver version: 0.12.3
-Reproduction: ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174
+Solver version: 0.12.4
+Reproduction: ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
 ```
 
 ## Status Markers
