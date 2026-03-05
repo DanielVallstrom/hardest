@@ -72,9 +72,9 @@ stdout,
 "\nExamples:\n" 
 "  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0 -s 4  reproduces optimal solution, with questions\n"
 "  ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731\n"
-"    -u 8.299603174603174  reproduces a current upper bound.\n"
+"    -u 8.299603174603174 -N 2  reproduces a current upper bound.\n"
 "  ./hardest -f 1 -t 5 -r 4 -i 2000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13210365863729163090\n"
-"    -u 12.363476562500001 -B 6:1  reproduces an other current upper bound.\n"
+"    -u 12.363476562500001 -B 6:1 -N 2  reproduces an other current upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
 "    and why all solver solutions to problems with just one random god are optimal.\n"           );
 
