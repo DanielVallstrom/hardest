@@ -174,9 +174,9 @@ stdout,
 "                          1 means positive side will always have one more disjunct\n"
 "                            when there is an odd number of disjuncts.\n"
 "                          2 means negative side will always have one more disjunct\n"
-"                            when there is an odd number of disjuncts.\n"
-"                          There are indications that positive sides have higher question\n"
-"                          averages, indicating that option 2 might be good, to balance sides. [%u]\n",
+"                            when there is an odd number of disjuncts. [%u]\n",
+//"                          There are indications that positive sides have higher question\n"
+//"                          averages, indicating that option 2 might be good, to balance sides. [%u]\n",
 s->resumeAbortedLeeway,
 s->oddBias
            );
