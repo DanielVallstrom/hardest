@@ -22,7 +22,7 @@ These values are printed together with a solution, so they should be easy to fin
 
 **Example:**
 ```sh
-./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174
+./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
 ```
 
 ## Note on Symmetry
@@ -166,4 +166,4 @@ These values are printed together with a solution, so they should be easy to fin
 | 0 | 150 | 1 | **7.311258** | **Optimal** | |
 | 0 | 200 | 1 | **7.731343** | **Optimal** | |
 | 0 | 250 | 1 | **7.984064** | **Optimal** | |
-| 0 | 254 | 1 | **8.0** | **Optimal** | |
+| 0 | 254 | 1 | **8.0** | **Optimal** |
