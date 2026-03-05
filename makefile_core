@@ -1,0 +1,429 @@
+# Core makefile for hardest.
+
+
+# The current version.
+version = 0.12.4
+
+
+# If CC or MODE are not defined the following defaults will be used:
+
+CC ?= gcc
+MODE ?= release
+DYNMODE ?= dynamic
+
+
+# Determine the platform. I'm not sure that OS is used anywhere though.
+
+ifeq ($(shell uname),Linux)
+    OS = Linux
+    LINKFLAGS += -lm
+else 
+ifeq ($(shell uname),WindowsNT)
+    OS = WindowsNT
+else 
+ifeq ($(shell uname),SunOS)
+    OS = SunOS
+    LINKFLAGS += -lm
+endif 
+endif 
+endif
+
+
+# Set the common C flags.
+
+ifeq ($(CC),gcc)
+
+CFLAGS +=                            \
+	-std=c2x -pedantic               \
+	-fstrict-aliasing                \
+	-Wall                            \
+	-Wno-parentheses                 \
+	-Wformat-nonliteral              \
+	-Wformat-security                \
+	-Wformat=2                       \
+	-Wunknown-pragmas                \
+	-W                               \
+	-Wundef                          \
+	-Wshadow                         \
+	-Wpointer-arith                  \
+	-Wbad-function-cast              \
+	-Wcast-qual                      \
+	-Wcast-align                     \
+	-Wno-sign-compare                \
+	-Waggregate-return               \
+	-Wstrict-prototypes              \
+	-Wmissing-prototypes             \
+	-Wmissing-declarations           \
+	-Wredundant-decls                \
+	-Wnested-externs                 \
+	-Wdisabled-optimization          \
+	-Wno-implicit-fallthrough        \
+	-D hardestOS_$(OS)                \
+	-D 'hardestVersion="$(version)"'
+
+# The annoying gcc flag -Wparentheses is included in the -Wall flag, resulting
+# in warnings about e.g. standard use of && and || precedence. Hence it is
+# turned of explicitly, with -Wno-parentheses. However, -Wparentheses also 
+# includes some sensible warnings so it might be good to occasionally turn it
+# on.
+#   Beg the gcc people to fix their broken warnings! This issue seems fixed.
+
+#	-Winline
+#	-Wwrite-strings
+# -Wconversion gives weird warnings!
+
+else
+ifeq ($(CC),icc)
+
+CFLAGS +=                             \
+	-std=c99 -w2 -Wall -wd810         \
+	-D 'hardestVersion="$(version)"'
+
+
+# You might be drowned in
+# #810 warnings from icc if that particular warning isn't turned off.
+
+else
+
+endif
+endif
+
+
+# Set different flags for different compile modes. Only one mode is built.
+
+# Release flags.
+
+ifeq ($(CC),gcc)
+
+CRELEASEFLAGS +=                \
+	-O3                         \
+	-fstrict-aliasing           \
+	-ffast-math                 \
+	-fgcse                      \
+	-fexpensive-optimizations   \
+	-finline-functions          \
+	-fomit-frame-pointer        \
+	-fschedule-insns            \
+	-fschedule-insns2           \
+	-D NDEBUG                  
+	
+#	-D OpenMP -fopenmp
+# OpenMP might slow down the program a lot on things
+# that should be to some extent embarrassingly parallelizable.
+
+# What about these flags?
+#	-march=??
+#	-march=AMD???
+#	-funroll-all-loops
+#	-fsingle-precision-constant
+#	-fargument-noalias
+#	-fargument-noalias-global
+
+#	-g
+
+#	-fbranch-probabilities
+#	-fprofile-arcs
+
+# To enable profiling do:
+#   1) Compile with -fprofile-arcs.
+#   2) Run the program on a sample.
+#   3) Compile with -fbranch-probabilities.
+
+# -g is used together with e.g. cachegrind.
+
+else
+ifeq ($(CC),icc)
+
+CRELEASEFLAGS +=          \
+	-O3                   \
+	-D NDEBUG
+
+else
+
+endif
+endif
+
+
+
+# Debug flags.
+
+ifeq ($(CC),gcc)
+
+#-O
+CDEBUGFLAGS += -Og -g -fsanitize=undefined
+
+
+else
+ifeq ($(CC),icc)
+
+CDEBUGFLAGS += -O -g
+
+
+else
+
+endif
+endif
+
+
+
+# Profiling flags.
+#   To see the result, do "gprof hardest gmon.out > profile.txt".
+
+ifeq ($(CC),gcc)
+
+CPROFILEFLAGS +=                \
+	-Og -pg                     \
+	-D NDEBUG                   \
+	-fstrict-aliasing           \
+	-ffast-math                 \
+	-fgcse                      \
+	-fexpensive-optimizations   \
+	-fschedule-insns            \
+	-fschedule-insns2
+
+#	-fprofile-arcs -ftest-coverage
+
+
+else
+ifeq ($(CC),icc)
+
+CPROFILEFLAGS +=          \
+	-O2 -p -g             \
+	-prof_genx
+
+else
+
+endif
+endif
+
+
+
+# Set flags depending on the compiling mode.
+
+ifeq ($(MODE),debug)
+    CFLAGS += $(CDEBUGFLAGS)
+else
+ifeq ($(MODE),profile)
+    CFLAGS += $(CPROFILEFLAGS)
+else
+ifeq ($(MODE),release)
+    CFLAGS += $(CRELEASEFLAGS)
+endif
+endif
+endif
+
+
+
+# Set flags depending on the static/dynamic flag.
+ifeq ($(DYNMODE),static)
+ifeq ($(CC),icc)
+    # What is the icc flag???
+    CFLAGS += -static
+else
+    CFLAGS += -static
+endif
+endif
+
+
+
+# AssertionLevel determines how expensive assertions are made. At 0, no
+# assertions are made and NDEBUG will be defined. At 1, NDEBUG will not be
+# defined and ordinary assertions made by assert() are made. At 2, assert2()
+# assertions, which are more expensive to perform than plain assertions, will
+# be made in addition to assert() assertions. At 3, assert3() assertions and
+# all level 2 assertions will be made. And so on...
+#   If NDEBUG is defined, no assertions will be made regardless of assertLevel
+# and AssertionLevel.
+assertLevel = 4
+
+ifeq ($(assertLevel),0)
+    CFLAGS += -D NDEBUG
+endif
+
+CFLAGS += -D AssertionLevel=$(assertLevel)
+
+# If you don't want to use getopt, uncomment the line below.
+#CFLAGS += -D NoGetopt
+
+
+
+# The directory where the object files are.
+objDir = objects
+
+# API (or non-main) library objects.
+objNames = hard.o options.o common.o conjHash.o
+objs = $(foreach f, $(objNames), $(objDir)/$(f))
+
+# hardest objects.
+objects = $(objDir)/hardest.o $(objs)
+
+
+# Fix the default rule.
+$(objDir)/%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+
+# Files included in a distribution.
+distFiles =     *.[ch]                                     \
+	            Makefile makefile_core                     \
+	            makefile_gcc_debug makefile_gcc_profile    \
+	            makefile_gcc_release                       \
+	            makefile_gcc_debug_static                  \
+	            makefile_gcc_profile_static                \
+	            makefile_gcc_release_static                \
+	            makefile_icc_debug makefile_icc_profile    \
+	            makefile_icc_release                       \
+	            makefile_icc_debug_static                  \
+	            makefile_icc_profile_static                \
+	            makefile_icc_release_static                \
+	            README INSTALL LICENSE                     \
+	            configure
+
+
+.PHONY: clean
+
+all: hardest ;
+
+hardest: $(objects)
+		$(CC) -o hardest $(CFLAGS) $(objects)  \
+                                      $(LINKFLAGS)
+	            ar -rc $(objDir)/libhardest.a $(objs)
+
+api: $(objs)
+	ar -rc $(objDir)/libhardest.a $(objs)
+
+clean:
+	rm -f $(objDir)/*.o $(objDir)/libhardest.a hardest  \
+              hardestOneFile
+
+
+#dirs
+#	mkdir objects
+
+
+# Make a gzipped tar distribution with a hardest parent directory.
+# I.e. the files are packed under a hardest directory.
+dist:
+	rm -rf hardest_$(version)
+	mkdir hardest_$(version)
+	mkdir hardest_$(version)/objects
+	cp -a $(distFiles) hardest_$(version)
+	tar -cf hardest_$(version).tar          \
+                hardest_$(version)
+	gzip -f hardest_$(version).tar
+	rm -rf hardest_$(version)
+	cp -p hardest_$(version).tar.gz hardest.tar.gz
+
+# Make a gzipped tar distribution with a hardest parent directory.
+# I.e. the files are packed under a hardest directory.
+# With a fixed tar name.
+dst:
+	rm -rf hardest_$(version)
+	mkdir hardest_$(version)
+	mkdir hardest_$(version)/objects
+	cp -a $(distFiles) hardest_$(version)
+	tar -cf hardest.tar          \
+                hardest_$(version)
+	gzip -f hardest.tar
+	rm -rf hardest_$(version)
+
+# Make a gzipped flat tar distribution with no hardest parent
+# directory. I.e. the files are packed at top level under no
+# hardest directory.
+#   Pack the files under a hardest directory instead???!!
+flatdist:
+	tar -cf hardest.tar $(distFiles)
+	gzip -f hardest.tar
+
+# Make a backup.
+backup: flatdist
+	mount /mnt/floppy
+	cp -p hardest.tar.gz /mnt/floppy/
+
+# Make a temporary backup.
+tmpbackup:
+	tar -cf tmpivse.tar *.[ch] makefile_core
+	gzip -f tmpivse.tar
+	mount /mnt/floppy
+	cp -p tmpivse.tar.gz /mnt/floppy
+
+# Make and mail a dist.
+distmail: dist
+	echo "hardest_$(version)" |                    \
+          mutt -a hardest_$(version).tar.gz -s     \
+            "hardest_$(version)" daniel.vallstrom@gmail.com
+
+
+# Make a freak hardest version where all the c-files are put into one big file.
+onefile:
+	$(CC) $(CFLAGS) -o hardestOneFile  \
+                           hardestPutInOneFile.c $(LINKFLAGS)
+
+
+# Do a diff of a file $ and its backup version.
+# How to do this??? Is is possible to use a variable argument $?
+#diff:
+#	tar -xzf hardest.tar.gz $ -O | diff --minimal $ -
+
+
+# Create references.
+tags:
+	 ctags *.[ch]
+
+
+# Shortcut commands bringing everything into this file for reference:
+
+gccdebug:
+	make -f makefile_gcc_debug
+
+gccprint:
+	make -f makefile_gcc_release_print
+
+gccprofile:
+	make -f makefile_gcc_profile
+
+gccrelease:
+	make -f makefile_gcc_release
+
+iccdebug:
+	make -f makefile_icc_debug
+
+iccprofile:
+	make -f makefile_icc_profile
+
+iccrelease:
+	make -f makefile_icc_release
+
+
+# Installs hardest. Fix this!!
+install:
+	mkdir -p /usr/local/lib
+	cp -pu $(objDir)/libhardest.a /usr/local/lib/libhardest.a
+	mkdir -p /usr/local/include
+	cp -pu hard.h /usr/local/include/hard.h
+	mkdir -p /usr/local/bin
+	cp -pu hardest /usr/local/bin/hardest
+
+uninstall:
+	rm -f /usr/local/lib/libhardest.a
+	rm -f /usr/local/include/hard.h
+	rm -f /usr/local/bin/hardest
+
+
+# Generate dependencies. Use "make -s deps", at least if gcc is the default.
+# Otherwise use any gcc make file, e.g. "make -s deps -f makefile_gcc_debug".
+deps:
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/hardest.o'  hardest.c
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/hard.o'     hard.c
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/options.o'  options.c
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/common.o'   common.c
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/conjHash.o' conjHash.c
+
+# Dependencies. Dependencies can be generated with "make -s deps" or something
+# like that. See deps above.
+$(objDir)/hardest.o: hardest.c hard.h conjHash.h options.h common.h
+$(objDir)/hard.o: hard.c hard.h conjHash.h common.h compilerMacros.h
+$(objDir)/options.o: options.c options.h hard.h conjHash.h common.h
+$(objDir)/common.o: common.c common.h compilerMacros.h
+$(objDir)/conjHash.o: conjHash.c conjHash.h hard.h common.h
+
