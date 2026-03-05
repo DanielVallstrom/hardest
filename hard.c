@@ -95,7 +95,7 @@ HardInstance * hard_newInstance(void)
     hi->settings->resumeAbortedLeeway = 1.0001;  // ?? Good if >0, atm.
     hi->settings->catchAbortsN = 8000;  // ??
     hi->settings->maxCatchDepth = 1;  // ??
-    hi->settings->oddBias = 2;  // ??
+    hi->settings->oddBias = 0;  // ??
     hi->settings->indent = 2;  // ??
     hi->settings->bestLvl0PosEst = DBL_MAX;
     hi->settings->estimateHeuristic = 0;  // ??
