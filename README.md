@@ -24,7 +24,7 @@ Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`
 
 Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`
 
-Current version: **0.12.4** — Default compiler: `gcc`
+Current version: **0.13.2** — Default compiler: `gcc`
 
 ## Usage
 
@@ -52,8 +52,6 @@ Run `./hardest --help` for the full list of options.
 | `-v`   | Verbose — show the questions in the solution |
 | `-s`   | Seed for reproducibility |
 | `-u`   | Upper bound on expected number of questions |
-| `-E`   | Best lvl 0 pos estimate |
-| `-N`   | Node limit |
 | `-i`   | Number of iterations |
 | `-b`   | Number of sub-search iterations |
 | `-B`   | Level-specific sub-search iterations (e.g. `-B 0:4`) |
