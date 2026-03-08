@@ -228,7 +228,7 @@ typedef uint32_t HardVerbosityVector;
 #define DefaultReps 2
 
 // Default repeats from this level and below will be 0.
-#define ZeroRepsFromLvl 3
+#define ZeroRepsFromLvl 256
 
 
 
@@ -317,7 +317,8 @@ typedef struct Settings_
     // Catch this many aborts.
     uint64_t catchAbortsN;
 
-    // The maximal depth where aborts are caught. Starting at 0.
+    // The maximal depth where aborts are caught. Or rather the 
+    // number of levels that are caught. Starting at 0.
     uint8_t maxCatchDepth;
 
     // Take best result of this many tries (+1), for each level.
@@ -336,6 +337,10 @@ typedef struct Settings_
     // Best positive level 0 estimate. Only used to set the initial
     // bestPositiveEstimates[0], once.
     double bestLvl0PosEst;
+
+    // At what level should we switch from global hash reset to a
+    // local reset.
+    uint8_t topLocalResetLevel;
 
     // If true, we'll use the upper bound globaly. If false,
     // we'll use local bounds.

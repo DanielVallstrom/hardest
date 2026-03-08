@@ -100,6 +100,7 @@ HardInstance * hard_newInstance(void)
     hi->settings->bestLvl0PosEst = DBL_MAX;
     hi->settings->estimateHeuristic = 0;  // ??
     hi->settings->globalBound = true;
+    hi->settings->topLocalResetLevel = 2;  // ??
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -2630,10 +2631,23 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
     // Mark and save state, if there are randoms.
     if ( giRs != 0  &&  s->lvlReps[qs] != 0 )
     {
-        if ( conjHash_markState(h) )
-        { 
-            return Hard_outOfMemory;
+        // We'll do either a local or a global mark.
+        if ( qs >= s->topLocalResetLevel )
+        {
+            // Mark only locally.
+            if ( conjHash_markStateLocally( h, start, end ) )
+            { 
+                return Hard_outOfMemory;
+            }
         }
+        else
+        {
+            if ( conjHash_markState(h) )
+            { 
+                return Hard_outOfMemory;
+            }
+        }
+
 
         markCounter++;
 
@@ -2659,7 +2673,16 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         {
             assert( markCounter == 1 );
 
-            conjHash_removeLastMark(h);
+            // State is marked either locally or globally.
+            if ( qs >= s->topLocalResetLevel )
+            {
+                // Undo only locally.
+                conjHash_removeLastLocalMark( h, start, end );
+            }
+            else
+            {
+                conjHash_removeLastMark(h);
+            }
         }
 
         return Hard_aborted;
@@ -2677,9 +2700,21 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         double bestSubResSum = h->subresSum;
         double bestAbortLeeway = h->abortLeeway;
 
-        if ( conjHash_markState(h) )
-        { 
-            return Hard_outOfMemory;
+        // State is marked either locally or globally.
+        if ( qs >= s->topLocalResetLevel )
+        {
+            // Mark only locally.
+            if ( conjHash_markStateLocally( h, start, end ) )
+            { 
+                return Hard_outOfMemory;
+            }
+        }
+        else
+        {
+            if ( conjHash_markState(h) )
+            { 
+                return Hard_outOfMemory;
+            }
         }
 
         markCounter++;
@@ -2704,11 +2739,26 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
                  (double)h->subresSum / h->subresultsFound  <
                  (double)bestSubResSum / bestSubResN )
             {
-                conjHash_undo2(h);
+                // State is marked either locally or globally.
+                if ( qs >= s->topLocalResetLevel )
+                {
+                    // Undo only locally.
+                    conjHash_undo2Locally( h, start, end );
 
-                if ( conjHash_markState(h) )  // should be done in undo2!!vvv
-                { 
-                    return Hard_outOfMemory;
+                    // should be done in undo2Locally!!vvv
+                    if ( conjHash_markStateLocally( h, start, end) )
+                    { 
+                        return Hard_outOfMemory;
+                    }
+                }
+                else
+                {                    
+                    conjHash_undo2(h);
+
+                    if ( conjHash_markState(h) )  // should be done in undo2!!vvv
+                    { 
+                        return Hard_outOfMemory;
+                    }
                 }
 
                 bestSubResN = h->subresultsFound;
@@ -2717,7 +2767,16 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
             }
             else
             {
-                conjHash_undo(h);
+                // State is marked either locally or globally.
+                if ( qs >= s->topLocalResetLevel )
+                {
+                    // Undo only locally.
+                    conjHash_undoLocally( h, start, end );
+                }
+                else
+                {
+                    conjHash_undo(h);
+                }
             }
         }        
 
@@ -2776,9 +2835,21 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
 
     if ( !stateIsMarked  &&  gjRs != 0  &&  s->lvlReps[qs] != 0 )
     {
-        if ( conjHash_markState( h ) )
-        { 
-            return Hard_outOfMemory;
+        // State is marked either locally or globally.
+        if ( qs >= s->topLocalResetLevel )
+        {
+            // Mark only locally.
+            if ( conjHash_markStateLocally( h, start, end ) )
+            { 
+                return Hard_outOfMemory;
+            }
+        }
+        else
+        {
+            if ( conjHash_markState( h ) )
+            { 
+                return Hard_outOfMemory;
+            }
         }
 
         stateIsMarked = true;
@@ -2806,7 +2877,16 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         // Remove recent marks.
         for ( ; markCounter != 0; markCounter-- )
         {
-            conjHash_removeLastMark(h);
+            // State is marked either locally or globally.
+            if ( qs >= s->topLocalResetLevel )
+            {
+                // Undo only locally.
+                conjHash_removeLastLocalMark( h, start, end );
+            }
+            else
+            {
+                conjHash_removeLastMark(h);
+            }
         }
 
         return Hard_aborted;
@@ -2823,9 +2903,21 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
 
         if ( !stateIsMarked )
         {
-            if ( conjHash_markState(h) )
-            { 
-                return Hard_outOfMemory;
+            // State is marked either locally or globally.
+            if ( qs >= s->topLocalResetLevel )
+            {
+                // Mark only locally.
+                if ( conjHash_markStateLocally( h, start, end ) )
+                { 
+                    return Hard_outOfMemory;
+                }
+            }
+            else
+            {
+                if ( conjHash_markState(h) )
+                { 
+                    return Hard_outOfMemory;
+                }
             }
 
             markCounter++;
@@ -2851,20 +2943,44 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
                  (double)h->subresSum / h->subresultsFound  <
                  (double)bestSubResSum / bestSubResN )
             {
-                conjHash_undo2(h);
+                // State is marked either locally or globally.
+                if ( qs >= s->topLocalResetLevel )
+                {
+                    // Undo only locally.
+                    conjHash_undo2Locally( h, start, end );
 
-                if ( conjHash_markState(h) )  // should be done in undo2!!vvv
-                { 
-                    return Hard_outOfMemory;
+                    // should be done in undo2Locally!!vvv
+                    if ( conjHash_markStateLocally( h, start, end) )
+                    { 
+                        return Hard_outOfMemory;
+                    }
                 }
+                else
+                {                    
+                    conjHash_undo2(h);
 
+                    if ( conjHash_markState(h) )  // should be done in undo2!!vvv
+                    { 
+                        return Hard_outOfMemory;
+                    }
+                }
+                
                 bestSubResN = h->subresultsFound;
                 bestSubResSum = h->subresSum;
                 bestAbortLeeway = h->abortLeeway;
             }
             else
             {
-                conjHash_undo(h);
+                // State is marked either locally or globally.
+                if ( qs >= s->topLocalResetLevel )
+                {
+                    // Undo only locally.
+                    conjHash_undoLocally( h, start, end );
+                }
+                else
+                {
+                    conjHash_undo(h);
+                }
             }
         }        
 
@@ -2880,7 +2996,16 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
     // Remove recent marks.
     for ( ; markCounter != 0; markCounter-- )
     {
-        conjHash_removeLastMark(h);
+        // State is marked either locally or globally.
+        if ( qs >= s->topLocalResetLevel )
+        {
+            // Undo only locally.
+            conjHash_removeLastLocalMark( h, start, end );
+        }
+        else
+        {
+            conjHash_removeLastMark(h);
+        }
     }
 
 

@@ -292,6 +292,27 @@ PathList * conjHash_lookup( uint64_t c, Hard * h )
 #endif
 
 
+// We'll assume that c is in the table.
+static HashList * conjHash_lookupFast( uint64_t c, Hard * h )
+{
+    ConjHash * ht = h->ht;
+
+    HashList * hl = ht->tab[ hashFNV( c, h ) ];
+
+    // See if c already is in the table.
+    for ( ; hl != NULL; hl = hl->next )
+    {
+        if ( hl->next == NULL  ||  equalConj( c, h, hl->conj ) )
+        {
+            return hl;
+        }
+    }
+
+    return NULL;
+}
+
+
+
 
 // Returns a NULL initialized size 2^logSize table, or NULL if the
 // allocation fails.
@@ -976,6 +997,56 @@ bool conjHash_markState( Hard * h )
 }
 
 
+// Marks the current hash table state, so that the state can be recovered.
+// Returns true iff there wasn't enough memory.
+//   Only local conjunctions, from start to end, will be marked. 
+// Actually, the whole bucket of local conjunctions will be marked. Not!
+// We'll mark only paths, and if there is only one element in a bucket
+// we won't check the conjunction but just assume that it's the sought one.
+// There might be problems later on with e.g. undo2 if we mark whole buckets.
+// Because, with whole buckets marked, paths can be marked more than once,
+// if two or more local conjunctions are in the same bucket, which might
+// spell trouble for e.g. undo2Loc.
+bool conjHash_markStateLocally( Hard * h, uint64_t start, uint64_t end )
+{
+    ConjHash * ht = h->ht;
+
+    uint8_t n = h->godsN;
+
+    for ( uint64_t i = start; i != end; i += n )
+    {
+        HashList * hl = (ht->tab)[hashFNV( i, h )];
+
+        // Get the i node. This will be fast.
+        for ( ; hl->next != NULL  &&  !equalConj( i, h, hl->conj );
+                hl = hl->next )
+        {
+        }
+
+        assert3( equalConj( i, h, hl->conj ) );
+
+        // Make new path node.
+        PathList * pl = malloc( sizeof(PathList) );
+
+        if ( pl == NULL )
+        {
+            fprintf( stderr, "\nError: not enough memory.\n\n" );
+
+            return true;
+        }
+
+        pl->next = hl->path;
+        pl->qs = RQsUndef;
+        pl->rqs = RQsUndef;
+
+        // Insert node first.
+        hl->path = pl;
+    }
+
+    return false;
+}
+
+
 
 // Recovers the last marked state.
 //   Deletes all nodes up to but not including the first marked node
@@ -1048,6 +1119,93 @@ void conjHash_undo2( Hard * h )
 }
 
 
+// Recovers the last locally marked state.
+//   Deletes all nodes up to but not including the first marked node
+// for local conjunctions.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_undoLocally( Hard * h, uint64_t start, uint64_t end )
+{
+    ConjHash * ht = h->ht;
+
+    uint8_t n = h->godsN;
+
+    for ( uint64_t i = start; i != end; i += n )
+    {
+        HashList * hl = (ht->tab)[hashFNV( i, h )];
+
+        // Get the i node. This will be fast.
+        for ( ; hl->next != NULL  &&  !equalConj( i, h, hl->conj );
+                hl = hl->next )
+        {
+        }
+
+        assert3( equalConj( i, h, hl->conj ) );
+
+        PathList * pl = hl->path;
+
+        while ( pl->rqs != RQsUndef )
+        {
+            PathList * prevPL = pl;
+            pl = pl->next;
+            free(prevPL);
+        }
+
+        hl->path = pl;
+    }
+
+    return;
+}
+
+
+// Deletes all nodes from but not including the first mark up to and
+// including the second marked node, for local conjunctions.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_undo2Locally( Hard * h, uint64_t start, uint64_t end )
+{
+    ConjHash * ht = h->ht;
+
+    uint8_t n = h->godsN;
+
+    for ( uint64_t i = start; i != end; i += n )
+    {
+        HashList * hl = (ht->tab)[hashFNV( i, h )];
+
+        // Get the i node. This will be fast.
+        for ( ; hl->next != NULL  &&  !equalConj( i, h, hl->conj );
+                hl = hl->next )
+        {
+        }
+
+        assert3( equalConj( i, h, hl->conj ) );
+
+        PathList * pl = hl->path;
+
+        // Get first mark.
+        while ( pl->rqs != RQsUndef )
+        {
+            pl = pl->next;
+        }
+
+        // Delete segment.
+
+        PathList * pl2 = pl->next;
+
+        while ( pl2->rqs != RQsUndef )
+        {
+            PathList * prevPL = pl2;
+            pl2 = pl2->next;
+            free(prevPL);
+        }
+
+        // Delete second mark.
+        pl->next = pl2->next;
+        free(pl2);
+    }
+
+    return;
+}
+
+
 
 // Removes the last mark.
 void conjHash_removeLastMark( Hard * h )
@@ -1082,6 +1240,54 @@ void conjHash_removeLastMark( Hard * h )
                 prevPL->next = pl->next;
                 free(pl);
             }
+        }
+    }
+
+    return;
+}
+
+
+// Removes the last local mark.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_removeLastLocalMark( Hard * h, uint64_t start, uint64_t end )
+{
+    ConjHash * ht = h->ht;
+
+    uint8_t n = h->godsN;
+
+    for ( uint64_t i = start; i != end; i += n )
+    {
+        HashList * hl = (ht->tab)[hashFNV( i, h )];
+
+        // Get the i node. This will be fast.
+        for ( ; hl->next != NULL  &&  !equalConj( i, h, hl->conj );
+                hl = hl->next )
+        {
+        }
+
+        assert3( equalConj( i, h, hl->conj ) );
+
+        PathList * pl = hl->path;
+
+        if ( pl->rqs == RQsUndef )
+        {
+            // Handle case where mark is first.
+            hl->path = pl->next;
+            free(pl);
+        }
+        else
+        {
+            PathList * prevPL = pl;
+            pl = pl->next;
+
+            while ( pl->rqs != RQsUndef )
+            {
+                prevPL = pl;
+                pl = pl->next;
+            }
+
+            prevPL->next = pl->next;
+            free(pl);
         }
     }
 

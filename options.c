@@ -94,10 +94,7 @@ stdout,
 "                          results are found. [%lu]\n"
 "  -b --iterate-sub-search <unsigned integer>\n"
 "                          Set number of extra sub-searches; the best result\n"
-"                          will be used. Warning! Set to 0 for harder \n"
-"                          problems! Then use -B to allow some more.\n"
-"                          Repeats, as implemented, are only meant for the\n"
-"                          first few top levels; don't use -b other than -b 0.\n"
+"                          will be used.\n"
 "  -B --iterate-sub-search-lvl <unsigned integer>:<unsigned integer>\n"
 "                          Like -b but for a level. E.g. -B 1:7 sets lvl 1\n"
 "                          to 7. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n"
@@ -118,7 +115,7 @@ stdout,
 "  -E --best-lvl-0-pos-est <float>\n"
 "                          Set this value. It's used as a threshold for the positive\n"
 "                          side, but typically it's only supplied here to reproduce a\n"
-"                          search. [%g]\n"
+"                          search. Only used if -G 0 is set. [%g]\n"
 "  -f --false-gods <unsigned integer>\n"
 "                          Set number of false gods.\n",
 s->abortLeewayStart,
@@ -143,7 +140,7 @@ stdout,
 "                          which could be cubicish.\n"
 "                          Only 0 and 1 are implemented so far. >1 means 1.\n"
 "  -G --global-bound <unsigne integer>\n"
-"                          If 1, we'll use the upper bound globaly. Otherwise\n"
+"                          If 1, we'll use the upper bound globally. Otherwise\n"
 "                          local bounds will be used. [%u]\n"
 "  -h --help               Print this message.\n"
 "  -H --estimate-heuristic  <unsigned integer>\n"
@@ -166,6 +163,9 @@ stdout,
 "                          When the result estimate at a node is <\n"
 "                          resume-aborted-leeway * upperBound, aborts\n"
 "                          will be caught and search resumed. [%f]\n"
+"  -L --top-local-reset-level <unsigned integer>\n"
+"                          The top level where we'll switch from a global hash\n"
+"                          reset to a local reset. [%u]\n"
 "  -n --gods <unsigned integer>\n"
 "                          Set number of total gods.\n"
 "                          Only 3 of the 4 god numbers need to be set.\n"
@@ -175,9 +175,8 @@ stdout,
 "                            when there is an odd number of disjuncts.\n"
 "                          2 means negative side will always have one more disjunct\n"
 "                            when there is an odd number of disjuncts. [%u]\n",
-//"                          There are indications that positive sides have higher question\n"
-//"                          averages, indicating that option 2 might be good, to balance sides. [%u]\n",
 s->resumeAbortedLeeway,
+s->topLocalResetLevel,
 s->oddBias
            );
 
@@ -209,6 +208,7 @@ stdout,
 "                          To fine-tune the verbosity, run e.g.\n"
 "                          './hardest -v3 --print-options'\n"
 "                          and then tune the printed verbosity vector.\n"
+"                          Not very supported.\n"
 "  --print-more[=no|yes]   Print more info. [%s]\n"
 "  -q --quiet --silent     Run silently; only print error messages.\n",
 (s->verbosityVector & HardVerbosity_printInfo) ? "yes" : "no",
@@ -259,7 +259,7 @@ stdout,
 "                          abort-leeway times this -u value. But this -u\n"
 "                          value will be updated if a better result is\n"
 "                          found. [%g]\n"
-"  -v --verbose [level]    Set verbosity level (0-9). No arg means 8. [4]\n"
+"  -v --verbose [level]    Set verbosity level (0-9). No arg means 8. [6]\n"
 "  --verbosity-vector <unsigned integer>\n"
 "                          Set the verbosity vector. [%#llx]\n"
 "                          The integer can be bin (0b), hex (0x),\n"
@@ -392,6 +392,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "help",                   no_argument,       NULL, 'h' },
             { "iterate",                required_argument, NULL, 'i' },
             { "resume-aborted-leeway",  required_argument, NULL, 'l' },
+            { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "gods",                   required_argument, NULL, 'n' },
             { "outfile",                required_argument, NULL, 'o' },
             { "quiet",                  no_argument,       NULL, 'q' },
@@ -411,7 +412,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:N:O:P::R:S:T:a:b:c:e:f:g:hi:l:n:o:qr:s:t:u:v::",
+                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:a:b:c:e:f:g:hi:l:n:o:qr:s:t:u:v::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -558,6 +559,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->estimateHeuristic = n;
+                }
+
+                break;
+
+            case 'L':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -L and --top-local-reset-level must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->topLocalResetLevel = n;
                 }
 
                 break;

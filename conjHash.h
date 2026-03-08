@@ -184,17 +184,44 @@ double conjHash_questionAvg( Hard * h );
 // Returns true iff there wasn't enough memory.
 bool conjHash_markState( Hard * h );
 
+// Marks the current hash table state, so that the state can be recovered.
+// Returns true iff there wasn't enough memory.
+//   Only local conjunctions, from start to end, will be marked. 
+// Actually, the whole bucket of local conjuctions will be marked. Not!
+// We'll mark only paths, and if there is only one element in a bucket
+// we won't check the conjunction but just assume that it's the sought one.
+// There might be problems later on with e.g. undo2 if we mark whole buckets.
+// Because, with whole buckets marked, paths can be marked more than once,
+// if two or more local conjunctions are in the same bucket, which might
+// spell trouble for e.g. undo2Loc.
+bool conjHash_markStateLocally( Hard * h, uint64_t start, uint64_t end );
+
 // Recovers the last marked state.
 //   Deletes all nodes up to but not including the first marked node
 // in all paths.
 void conjHash_undo( Hard * h );
 
+// Recovers the last locally marked state.
+//   Deletes all nodes up to but not including the first marked node
+// for local conjunctions.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_undoLocally( Hard * h, uint64_t start, uint64_t end );
+
 // Deletes all nodes from but not including the first mark up to and
 // including the second marked node, in all paths.
 void conjHash_undo2( Hard * h );
 
+// Deletes all nodes from but not including the first mark up to and
+// including the second marked node, for local conjunctions.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_undo2Locally( Hard * h, uint64_t start, uint64_t end );
+
 // Removes the last mark.
 void conjHash_removeLastMark( Hard * h );
+
+// Removes the last local mark.
+//   Only local conjunctions, from start to end, will be undone. 
+void conjHash_removeLastLocalMark( Hard * h, uint64_t start, uint64_t end );
 
 #endif // conjHash_H
 
