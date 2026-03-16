@@ -24,7 +24,7 @@ Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`
 
 Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`
 
-Current version: **0.13.2** — Default compiler: `gcc`
+Current version: **0.15.5** — Default compiler: `gcc`
 
 ## Usage
 
@@ -55,23 +55,24 @@ Run `./hardest --help` for the full list of options.
 | `-i`   | Number of iterations |
 | `-b`   | Number of sub-search iterations |
 | `-B`   | Level-specific sub-search iterations (e.g. `-B 0:4`) |
+| `-H`   | Heuristic for estimating expected number of questions |
 | `--help` | Show full help |
 
 ### Examples
 
 Reproduce the optimal solution for the classic puzzle (with questions shown):
 ```sh
-./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0 -s 4
+./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0
 ```
 
-Reproduce a current upper bound (1 false, 6 true, 2 random gods):
+Reproduce a current upper bound (0 false, 6 true, 5 random gods):
 ```sh
-./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
+./hardest -f 0 -t 6 -r 5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.49 -i 200 -b 2 -i 0 -s 12443524816424922443 
 ```
 
 Reproduce another current upper bound (1 false, 5 true, 4 random gods):
 ```sh
-./hardest -f 1 -t 5 -r 4 -i 2000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13210365863729163090 -u 12.363476562500001 -B 6:1 -N 2
+./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0 -s 13683506237796025932
 ```
 
 Show why the optimal solution is optimal (1 false, 3 true, 1 random):
