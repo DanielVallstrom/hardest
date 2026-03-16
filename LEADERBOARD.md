@@ -24,7 +24,7 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 
 **Example:**
 ```sh
-./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
+./hardest -f 2 -t 5 -r 2 -b 8 -B 0:9 -H 1 -S 7 -a 1.02 -e 1.01 -u 9.91 -i 1000 -s 2318762516960874543 -i 0
 ```
 
 ## Note on Symmetry
