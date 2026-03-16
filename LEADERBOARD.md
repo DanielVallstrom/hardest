@@ -119,7 +119,7 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 | 0 | 8 | 3 | 7.927273 | Upper bound | |
 | 1 | 7 | 3 | 10.975000 | Upper bound | |
 | 2 | 6 | 3 | 12.769913 | Upper bound | |
-| 3 | 5 | 3 | 12.772294 | Upper bound | Replication info not available |
+| 3 | 5 | 3 | 13.773593 | Upper bound | |
 | 4 | 4 | 3 | 14.081667 | Upper bound | |
 | 0 | 7 | 4 | 9.292424 | Upper bound | |
 | 1 | 6 | 4 | 12.247592 | Upper bound | |
@@ -226,6 +226,7 @@ The `-u` value does not need updating when `-H 1` is used (it is biased low).
 | 0 | 8 | 3 | 7.927273 | 0.15.5 | `./hardest -f 0 -t 8 -r 3 -b 8 -B 0:9 -H 1 -S 7 -a 1.02 -e 1.01 -u 7.82 -i 440 -k 11 -s 14297119481458267428 -i 0` |
 | 1 | 7 | 3 | 10.975000 | 0.15.5 | `./hardest -f 1 -t 7 -r 3 -b 3 -B 0:4 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.868 -i 400 -k 11 -s 4106450522491929655 -i 0` |
 | 2 | 6 | 3 | 12.769913 | 0.15.5 | `./hardest -f 2 -t 6 -r 3 -b 3 -B 0:4 -H 1 -S 7 -a 1.02 -e 1.01 -u 12.642 -i 100 -k 11 -s 15883515624880776119 -i 0` |
+| 3 | 5 | 3 | 13.773593 | 0.15.5 | `./hardest -f 3 -t 5 -r 3 -b 1 -B 0:1 -H 1 -S 7 -a 1.02 -e 1.01 -u 13.634 -i 300 -k 11 -s 543823951367452778 -i 0`
 | 4 | 4 | 3 | 14.081667 | 0.15.5 | `./hardest -f 4 -t 4 -r 3 -b 3 -B 0:4 -H 1 -S 7 -a 1.02 -e 1.01 -u 13.948 -i 16 -k 11 -s 7124894593297389499 -i 0` |
 | 0 | 7 | 4 | 9.292424 | 0.15.5 | `./hardest -f 0 -t 7 -r 4 -b 1 -B 0:2 -H 1 -S 7 -a 1.02 -e 1.01 -u 9.214 -i 5000 -k 11 -s 14022505586819668448 -i 0` |
 | 1 | 6 | 4 | 12.247592 | 0.15.5 | `./hardest -f 1 -t 6 -r 4 -b 1 -B 0:2 -H 1 -S 7 -a 1.02 -e 1.01 -u 12.146 -i 250 -k 11 -s 3727540390642616461 -i 0` |
