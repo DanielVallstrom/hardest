@@ -132,6 +132,13 @@ uint64_t common_randomN( uint64_t n );
 //   Fast, but a bit biased.
 uint64_t common_randomNBiased( uint64_t n );
 
+// Returns a random number greater than or equal to 0, and less than n.
+//   Uses custom functions and you can get the current seed with
+// common_currentSeed.
+//   Fast, but a bit biased.
+//   Repeated common_randomN(2) will return 0, 1, 0, ... or 1, 0, 1, ...
+// This function will be more random.
+uint32_t common_randomNBiasedNonPeriodic( uint32_t n );
 
 // Converts s into a long long int which is placed in n. Returns true iff a 
 // parse error has occurred. Trailing non-number characters in s will result in

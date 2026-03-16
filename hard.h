@@ -201,6 +201,11 @@ typedef struct Hard_
     // +2^depth-1: <call sequence for the depth>
     double * bestPositiveEstimates;  // [2^(maxCatchDepth+1)-1]
 
+    // Arrays of good candidate gods to ask next. 
+    // [2*goodGodsCandN] [god0, value0, god1, value1, ...]
+    God * gGCandsPos;  // For the positive case. 
+    God * gGCandsNeg;  // For the negative case.
+
 } Hard;
 
 
@@ -261,14 +266,16 @@ typedef struct Settings_
                       // 6 means also "non-improving" swaps, to balance 
                       // sides, but not for 0 random sides.
                       // 7 means also balance always. 
+                      // 8 means 6 but also active "neutral" or "non-improving"
+                      // swaps that unbalance sides if they get a side to 0
+                      // randoms.
 
     // The greater the value, the harder we'll try to find promising
-    // gods to pursue.
+    // gods to pursue. >2 means 2.
     uint8_t findGoodGods;
     // 0 means random (by chance) gods.
     // 1 means a simple, linear search
-    // 2 means a quadratic search. 
-    // 3 means 2 with added virtual perfect swaps, which could be cubicish. 
+    // 2 means a quadratic-cubicish search. 
 
     // Do work to try to optimize case where a non-R god is found.
     uint8_t optimizeNonR;
@@ -345,6 +352,19 @@ typedef struct Settings_
     // If true, we'll use the upper bound globaly. If false,
     // we'll use local bounds.
     bool globalBound;
+
+    // Number of gods that will be considered in the search
+    // for good gods to ask.
+    GodsN goodGodsCandN;
+
+    // The sum of randoms can be at most this for unbalancing strategies to
+    // be deployed.
+    uint64_t maxUnbal;
+
+    // In estimate heuristic 1, factor for new results will get upped by this,
+    // and factor for old average will be lowered by this, when taking their
+    // average, when calculating a new estimate.
+    double estWeight;
 
 } Settings;
 

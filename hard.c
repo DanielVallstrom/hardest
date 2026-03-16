@@ -83,14 +83,14 @@ HardInstance * hard_newInstance(void)
     hi->settings->seed = time(NULL);
     common_srand(hi->settings->seed);
 
-    hi->settings->doSwaps = 6;  // ??
+    hi->settings->doSwaps = 7;  // ??
     hi->settings->findGoodGods = 5;  // ??
     hi->settings->optimizeNonR = 50;  // ??
     hi->settings->shuffleConjunctions = 7;  // ??
     hi->settings->iterate = 20;  // ??
-    hi->settings->abortLeewayStart = 1.15;  // ??
+    hi->settings->abortLeewayStart = 1.02;  // ??
     // End should maybe be smaller on easier problems. And larger on harder.
-    hi->settings->abortLeewayEnd = 1.03;  // ??
+    hi->settings->abortLeewayEnd = 1.01;  // ??
     hi->settings->dontAbortUntil = 10;  // ??
     hi->settings->resumeAbortedLeeway = 1.0001;  // ?? Good if >0, atm.
     hi->settings->catchAbortsN = 8000;  // ??
@@ -101,6 +101,9 @@ HardInstance * hard_newInstance(void)
     hi->settings->estimateHeuristic = 0;  // ??
     hi->settings->globalBound = true;
     hi->settings->topLocalResetLevel = 2;  // ??
+    hi->settings->goodGodsCandN = 250;  // ??
+    hi->settings->maxUnbal = 2;  // ???  // UINT64_MAX;  // ??
+    hi->settings->estWeight = 0.0;
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -148,7 +151,8 @@ HardInstance * hard_newInstance(void)
     hi->hard->prefix = NULL;
     hi->hard->qPath = NULL;
     hi->hard->ht = NULL;
-
+    hi->hard->gGCandsPos = NULL;
+    hi->hard->gGCandsNeg = NULL;
 
     return hi;
 }
@@ -359,7 +363,7 @@ bool hard_allocArrays( HardInstance * hi )
 
         return true;
     }
-    
+
 
     // Set conjuction sizes. In number of God slots (bytes).
     //h->conjSize = h->godsN / God_GodsPerSlot + 
@@ -370,6 +374,10 @@ bool hard_allocArrays( HardInstance * hi )
     GodsN fGodsN = h->fGodsN;
     GodsN tGodsN = h->tGodsN;
     //GodsN rGodsN = h->rGodsN;
+
+
+    s->goodGodsCandN = min( s->goodGodsCandN, godsN );
+    
 
     h->possN = possSafe( godsN, fGodsN, tGodsN );
 
@@ -417,8 +425,12 @@ bool hard_allocArrays( HardInstance * hi )
 
     h->bestPositiveEstimates = malloc( s->maxCatchDepth * sizeof(double) );
 
+    h->gGCandsPos = malloc( 2 * s->goodGodsCandN * sizeof(God) );
+    h->gGCandsNeg = malloc( 2 * s->goodGodsCandN * sizeof(God) );
+
     if ( h->gods == NULL  ||  h->prefix == NULL  ||  h->qPath == NULL  ||
-         h->ht == NULL  ||  h->bestPositiveEstimates == NULL )
+         h->ht == NULL  ||  h->bestPositiveEstimates == NULL  ||
+         h->gGCandsPos == NULL  ||  h->gGCandsNeg == NULL )
     {
         fprintf( stderr, "\nError: not enough memory.\n\n" );
 
@@ -908,6 +920,8 @@ static inline uint64_t countRs( Hard * h, uint64_t i, uint64_t n )
 
 
 
+// Not used.
+#if 0
 // Counts randoms in conjuctions starting at start. 
 //   rs is the number of special conjunctions at the top, where gq=R.
 //   posN is the number of conjunctions in the positive half, not counting
@@ -1035,122 +1049,7 @@ count2RsSkipgq( HardInstance * hi, uint64_t start, uint64_t rs,
 // todo vvv!!!
 
 }
-
-
-
-// Counts randoms in conjuctions starting at start. 
-//   rs is the number of special conjunctions at the top, where gq=R.
-//   posN is the number of conjunctions in the positive half, not counting
-// the rs block. negN is the number for the negative half. posN and negN might
-// be 0.
-//   Results for most promising gods will be placed in gi, giRs, gj, and gjRs.
-// giRs and gjRs will include randoms in the rs block.
-// God gq is not skipped.
-static inline void 
-count2Rs( HardInstance * hi, uint64_t start, uint64_t rs,
-                uint64_t posN, uint64_t negN,
-                GodsN * gi, uint64_t * giRs, 
-                GodsN * gj, uint64_t * gjRs /*, GodsN gq */ )
-{
-    Hard * h = hi->hard;
-    //God * g = h->gods;
-    GodsN n = h->godsN;
-    Settings * s = hi->settings;
-
-
-    if ( s->findGoodGods == 0 )
-    {
-        // Pick i and j at random. 
-
-        uint64_t k = common_randomNBiased(n);
-        *gi = k;
-
-        k = common_randomNBiased(n-1);  // One could repeat until different from i case.
-        *gj = k;
-
-        // Count random gods for i and j.
-        *giRs  = countRs( h, start + rs * n +            *gi, posN );
-        *gjRs  = countRs( h, start + rs * n + posN * n + *gj, negN );
-        *giRs += countRs( h, start + *gi, rs );
-        *gjRs += countRs( h, start + *gj, rs );
-
-        return;
-    }
-
-
-    if ( s->findGoodGods == 1      || /* temp disjunct */ s->findGoodGods > 1 )
-    {
-        // Do the i side.
-
-        God bestiGod;  // Best god found so far.
-        God sndBestiGod;  // Second best god so far. Not used atm.
-        uint64_t bestiGodRs = UINT64_MAX;  // Number of Rs for bestiGod.
-        uint64_t sndBestiGodRs = UINT64_MAX;  // Number of Rs for sndBestiGod.
-
-        for ( God i = 0; i != n; i++ )
-        {
-            uint64_t iRs = countRs( h, start + rs*n + i, posN );
-
-            iRs += countRs( h, start+i, rs );
-
-            if ( iRs < sndBestiGodRs )
-            {
-                if ( iRs < bestiGodRs )
-                {
-                    sndBestiGod = bestiGod;
-                    sndBestiGodRs = bestiGodRs;
-                    bestiGod = i;
-                    bestiGodRs = iRs;
-                }
-                else
-                {
-                    sndBestiGod = i;
-                    sndBestiGodRs = iRs;
-                }
-            }
-        }
-
-
-        // Do the j side.
-
-        God bestjGod;  // Best god found so far.
-        God sndBestjGod;  // Second best god so far. Not used atm.
-        uint64_t bestjGodRs = UINT64_MAX;  // Number of Rs for bestjGod.
-        uint64_t sndBestjGodRs = UINT64_MAX;  // Number of Rs for sndBestjGod.
-
-        for ( God j = 0; j != n; j++ )
-        {
-            uint64_t jRs = countRs( h, start + rs*n + posN*n + j, negN );
-
-            jRs += countRs( h, start+j, rs );
-
-            if ( jRs < sndBestjGodRs )
-            {
-                if ( jRs < bestjGodRs )
-                {
-                    sndBestjGod = bestjGod;
-                    sndBestjGodRs = bestjGodRs;
-                    bestjGod = j;
-                    bestjGodRs = jRs;
-                }
-                else
-                {
-                    sndBestjGod = j;
-                    sndBestjGodRs = jRs;
-                }
-            }
-        }
-
-        *gi = bestiGod;
-        *giRs = bestiGodRs;
-        *gj = bestjGod;
-        *gjRs = bestjGodRs;
-    }
-
-
-// todo vvv!!!
-
-}
+#endif
 
 
 
@@ -1710,7 +1609,7 @@ static void swapConjunctions1101( Hard * h, GodsN gi, uint64_t iStart,
 // the j block.
 //   The swaps will be non-improving "2" swaps, but they will balance
 // the sides. The lower, b (j) side will be favored (because it is supposed
-// to have more randoms in gj).
+// to have more randoms in gj, or because we are trying to get it to 0 randoms).
 //   No more than maxSwaps swaps will be made.
 //   Like swapConjunctions2b, but for arbitrary gi and gj.
 static void swapConjunctionsG2b( Hard * h, /* GodsN gi, */ uint64_t iStart,
@@ -1778,8 +1677,8 @@ static void swapConjunctionsG2b( Hard * h, /* GodsN gi, */ uint64_t iStart,
 // with the aim of minimizing randoms at gi in the i block, and at gj in
 // the j block.
 //   The swaps will be non-improving "2" swaps, but they will balance
-// the sides. The lower, b (j) side will be favored (because it is supposed
-// to have more randoms in gj).
+// the sides. The upper, a (i) side will be favored (because it is supposed
+// to have more randoms in gi, or because we are trying to get it to 0 randoms).
 //   No more than maxSwaps swaps will be made.
 //   Like swapConjunctions2a, but for arbitrary gi and gj.
 static void swapConjunctionsG2a( Hard * h, GodsN gi, uint64_t iStart,
@@ -1838,6 +1737,341 @@ static void swapConjunctionsG2a( Hard * h, GodsN gi, uint64_t iStart,
             }
         }
     }
+}
+
+
+
+// Counts randoms in conjuctions starting at start. 
+//   rs is the number of special conjunctions at the top, where gq=R.
+//   posN is the number of conjunctions in the positive half, not counting
+// the rs block. negN is the number for the negative half. posN and negN might
+// be 0.
+//   Results for most promising gods will be placed in gi, giRs, gj, and gjRs.
+// giRs and gjRs will include randoms in the rs block.
+//   God gq is not skipped.
+//   s->goodGodsCandN gods for each case will be considered, pairwise.
+static void 
+count2RsQuad( HardInstance * hi, uint64_t start, uint64_t rs,
+                uint64_t posN, uint64_t negN,
+                GodsN * gi, uint64_t * giRs, 
+                GodsN * gj, uint64_t * gjRs /*, GodsN gq */ )
+{
+    Hard * h = hi->hard;
+    GodsN n = h->godsN;
+    Settings * s = hi->settings;
+    GodsN candN = s->goodGodsCandN;
+    God * ggPos = h->gGCandsPos;
+    God * ggNeg = h->gGCandsNeg;
+
+    God worstCandIdx;  // The position for worst candidate in ggx.
+    uint64_t worstCandRs = 0;  // Number of Rs for worstCand.
+
+    
+    // Do the i side.
+
+    // These are guaranteed to be preliminary candidates.
+    for ( God i = 0; i != candN; i++ )
+    {
+        uint64_t iRs = countRs( h, start + rs*n + i, posN );
+
+        iRs += countRs( h, start+i, rs );
+
+        ggPos[2*i] = i;
+        ggPos[2*i+1] = iRs;
+
+        if ( iRs > worstCandRs )
+        {
+            worstCandRs = iRs;
+            worstCandIdx = 2*i;
+        }
+    }
+
+    for ( God i = candN; i != n; i++ )
+    {
+        uint64_t iRs = countRs( h, start + rs*n + i, posN );
+
+        iRs += countRs( h, start+i, rs );
+
+        if ( iRs < worstCandRs )
+        {
+            ggPos[worstCandIdx] = i;
+            ggPos[worstCandIdx+1] = iRs;
+
+            // Find new worst.
+            worstCandIdx = 0;
+            worstCandRs = ggPos[1];
+            for ( God k = 1; k != candN; k++ )
+            {
+                if ( ggPos[2*k+1] > worstCandRs )
+                {
+                    worstCandRs = ggPos[2*k+1];
+                    worstCandIdx = 2*k;
+                }
+            }
+        }
+    }
+
+
+    // Do the j side.
+
+    worstCandRs = 0;
+
+    // These are guaranteed to be preliminary candidates.
+    for ( God j = 0; j != candN; j++ )
+    {
+        uint64_t jRs = countRs( h, start + rs*n + posN*n + j, negN );
+
+        jRs += countRs( h, start+j, rs );
+
+        ggNeg[2*j] = j;
+        ggNeg[2*j+1] = jRs;
+
+        if ( jRs > worstCandRs )
+        {
+            worstCandRs = jRs;
+            worstCandIdx = 2*j;
+        }
+    }
+
+    for ( God j = candN; j != n; j++ )
+    {
+        uint64_t jRs = countRs( h, start + rs*n + posN*n + j, negN );
+
+        jRs += countRs( h, start+j, rs );
+
+        if ( jRs < worstCandRs )
+        {
+            ggNeg[worstCandIdx] = j;
+            ggNeg[worstCandIdx+1] = jRs;
+
+            // Find new worst.
+            worstCandIdx = 0;
+            worstCandRs = ggNeg[1];
+            for ( God k = 1; k != candN; k++ )
+            {
+                if ( ggNeg[2*k+1] > worstCandRs )
+                {
+                    worstCandRs = ggNeg[2*k+1];
+                    worstCandIdx = 2*k;
+                }
+            }
+        }
+    }
+
+
+    God bestiGod;  // Best pos. god found so far.
+    uint64_t bestiGodRs = UINT64_MAX;  // Number of Rs for bestiGod.
+    uint64_t bestiGodRsrs;  // Number of Rs in rs for bestiGod.
+    God bestjGod;  // Best neg. god found so far.
+    uint64_t bestjGodRs = UINT64_MAX;  // Number of Rs for bestjGod.
+    uint64_t bestjGodRsrs;  // Number of Rs in rs for bestjGod.
+
+    // Loop through all combinations and see which pair is best.
+    for ( GodsN k = 0; k != candN; k++ )
+    {
+        God i = ggPos[2*k];
+
+        for ( GodsN m = 0; m != candN; m++ )
+        {
+            God j = ggNeg[2*m];
+
+            // Try to swap conjunctions.
+            if ( s->doSwaps > 0 )
+            {
+                swapConjunctionsG( h, i, start + rs * n,        posN,
+                                      j, start + rs*n + posN*n, negN );
+
+                if ( s->doSwaps > 1 )
+                {
+                    swapConjunctionsG3a( h, i, start + rs * n,        posN,
+                                            j, start + rs*n + posN*n, negN );
+
+                }
+
+                if ( s->doSwaps > 2 )
+                {
+                    swapConjunctionsG3b( h, i, start + rs * n,        posN,
+                                            j, start + rs*n + posN*n, negN );
+                }                             
+
+                if ( s->doSwaps > 3 )
+                {
+                    swapConjunctions0111( h, i, start + rs * n,        posN,
+                                             j, start + rs*n + posN*n, negN );
+                }                             
+
+                if ( s->doSwaps > 4 )
+                {
+                    swapConjunctions1101( h, i, start + rs * n,        posN,
+                                             j, start + rs*n + posN*n, negN );
+                }                             
+
+                // Re-count randoms in conclusions at gi for positive case, and 
+                // gj for negative case, after the minimization.
+                uint64_t iRs = countRs( h, start + rs * n + i,        posN );
+                uint64_t jRs = countRs( h, start + rs*n + posN*n + j, negN );
+                uint64_t iRsrs = countRs( h, start+i, rs );
+                uint64_t jRsrs = countRs( h, start+j, rs );
+                iRs += iRsrs;
+                jRs += jRsrs;
+
+                // See if pair is best.
+                if ( iRs + jRs <= bestiGodRs + bestjGodRs )
+                {
+                    if ( iRs + jRs < bestiGodRs + bestjGodRs )
+                    {
+                        bestiGod = i;
+                        bestiGodRs = iRs;
+                        bestiGodRsrs = iRsrs;
+                        bestjGod = j;
+                        bestjGodRs = jRs;
+                        bestjGodRsrs = jRsrs;
+                    }
+                    // Pick pairs where one side may get to 0 randoms.
+                    else if ( s->doSwaps >= 8  &&  
+                              ( iRsrs == 0 || jRsrs == 0 )  &&
+                              bestiGodRsrs != 0  &&  bestjGodRsrs != 0 )
+                    {
+                        bestiGod = i;
+                        bestiGodRs = iRs;
+                        bestiGodRsrs = iRsrs;
+                        bestjGod = j;
+                        bestjGodRs = jRs;
+                        bestjGodRsrs = jRsrs;
+                    }
+                }
+            }
+        }
+    }
+
+
+    *gi = bestiGod;
+    *giRs = bestiGodRs;
+    *gj = bestjGod;
+    *gjRs = bestjGodRs;
+}
+
+
+
+// Counts randoms in conjuctions starting at start. 
+//   rs is the number of special conjunctions at the top, where gq=R.
+//   posN is the number of conjunctions in the positive half, not counting
+// the rs block. negN is the number for the negative half. posN and negN might
+// be 0.
+//   Results for most promising gods will be placed in gi, giRs, gj, and gjRs.
+// giRs and gjRs will include randoms in the rs block.
+//   God gq is not skipped.
+static void 
+count2Rs( HardInstance * hi, uint64_t start, uint64_t rs,
+                uint64_t posN, uint64_t negN,
+                GodsN * gi, uint64_t * giRs, 
+                GodsN * gj, uint64_t * gjRs /*, GodsN gq */ )
+{
+    Hard * h = hi->hard;
+    //God * g = h->gods;
+    GodsN n = h->godsN;
+    Settings * s = hi->settings;
+
+
+    if ( s->findGoodGods == 0 )
+    {
+        // Pick i and j at random. 
+
+        uint64_t k = common_randomNBiased(n);
+        *gi = k;
+
+        k = common_randomNBiased(n-1);  // One could repeat until different from i case.
+        *gj = k;
+
+        // Count random gods for i and j.
+        *giRs  = countRs( h, start + rs * n +            *gi, posN );
+        *gjRs  = countRs( h, start + rs * n + posN * n + *gj, negN );
+        *giRs += countRs( h, start + *gi, rs );
+        *gjRs += countRs( h, start + *gj, rs );
+
+        return;
+    }
+
+
+    if ( s->findGoodGods == 1  ||  s->goodGodsCandN <= 1 )
+    {
+        // Do the i side.
+
+        God bestiGod;  // Best god found so far.
+        //God sndBestiGod;  // Second best god so far. Not used atm.
+        uint64_t bestiGodRs = UINT64_MAX;  // Number of Rs for bestiGod.
+        //uint64_t sndBestiGodRs = UINT64_MAX;  // Number of Rs for sndBestiGod.
+
+        for ( God i = 0; i != n; i++ )
+        {
+            uint64_t iRs = countRs( h, start + rs*n + i, posN );
+
+            iRs += countRs( h, start+i, rs );
+
+            //if ( iRs < sndBestiGodRs )
+            {
+                if ( iRs < bestiGodRs )
+                {
+                    //sndBestiGod = bestiGod;
+                    //sndBestiGodRs = bestiGodRs;
+                    bestiGod = i;
+                    bestiGodRs = iRs;
+                }
+                else
+                {
+                    //sndBestiGod = i;
+                    //sndBestiGodRs = iRs;
+                }
+            }
+        }
+
+
+        // Do the j side.
+
+        God bestjGod;  // Best god found so far.
+        //God sndBestjGod;  // Second best god so far. Not used atm.
+        uint64_t bestjGodRs = UINT64_MAX;  // Number of Rs for bestjGod.
+        //uint64_t sndBestjGodRs = UINT64_MAX;  // Number of Rs for sndBestjGod.
+
+        for ( God j = 0; j != n; j++ )
+        {
+            uint64_t jRs = countRs( h, start + rs*n + posN*n + j, negN );
+
+            jRs += countRs( h, start+j, rs );
+
+            //if ( jRs < sndBestjGodRs )
+            {
+                if ( jRs < bestjGodRs )
+                {
+                    //sndBestjGod = bestjGod;
+                    //sndBestjGodRs = bestjGodRs;
+                    bestjGod = j;
+                    bestjGodRs = jRs;
+                }
+                else
+                {
+                    //sndBestjGod = j;
+                    //sndBestjGodRs = jRs;
+                }
+            }
+        }
+
+        *gi = bestiGod;
+        *giRs = bestiGodRs;
+        *gj = bestjGod;
+        *gjRs = bestjGodRs;
+
+        return;
+    }
+
+
+    if ( s->findGoodGods >= 2 )
+    {
+        count2RsQuad( hi, start, rs, posN, negN, gi, giRs, gj, gjRs );
+
+        return;
+    }
+
 }
 
 
@@ -2324,7 +2558,8 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
 
     if ( conjsN % 2 != 0 )
     {
-        if ( s->oddBias == 1 || s->oddBias == 0 && common_randomNBiased(2) )
+        if ( s->oddBias == 1  ||  s->oddBias == 0 &&
+             common_randomNBiasedNonPeriodic(2) )
         {
             fstHasOneMoreConj = true;
 
@@ -2453,6 +2688,8 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
                            qConjs + fstHasOneMoreConj );
         gjRs = countRs( h, midStart + gj, 
                            qConjs + sndHasOneMoreConj );
+        uint64_t giRsNonrs = giRs;  // For trying to get Rs to 0.
+        uint64_t gjRsNonrs = gjRs;  // For trying to get Rs to 0.
         giRs += countRs( h, start+gi, rs );
         gjRs += countRs( h, start+gj, rs );
 
@@ -2518,10 +2755,58 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         }
 
 
+        // Try to get a side to 0 randoms. We'll only try if there are
+        // no randoms in rs.
+        if ( s->doSwaps >= 8  &&  giRs + gjRs <= s->maxUnbal  &&
+             giRs != 0  &&  gjRs != 0  &&  
+             ( giRs == giRsNonrs  ||  gjRs == gjRsNonrs ) )
+        {
+            if ( giRs <= gjRs  &&  giRs == giRsNonrs  ||  gjRs != gjRsNonrs )
+            {
+                swapConjunctionsG2a( h,   gi,   start + rs * n, qConjs + fstHasOneMoreConj,
+                                        /*gj,*/ midStart,       qConjs + sndHasOneMoreConj,
+                                     giRs );
+                
+            }
+            else
+            {
+                swapConjunctionsG2b( h, /*gi,*/ start + rs * n, qConjs + fstHasOneMoreConj,
+                                          gj,   midStart,       qConjs + sndHasOneMoreConj,
+                                     gjRs );
+            }
+
+            // Re-count randoms in conclusions at gi for positive case, and gj for
+            // negative case, after the minimization.
+            //   Random starting conjunctions will not be ignored.
+            giRs = countRs( h, start + rs * n + gi, 
+                            qConjs + fstHasOneMoreConj );
+            gjRs = countRs( h, midStart + gj, 
+                            qConjs + sndHasOneMoreConj );
+            //giRsNonrs = giRs;  // For trying to get Rs to 0.
+            //gjRsNonrs = gjRs;  // For trying to get Rs to 0.
+            giRs += countRs( h, start+gi, rs );
+            gjRs += countRs( h, start+gj, rs );
+
+            // Print info.
+            if ( hi->settings->verbosityVector & HardVerbosity_printAll )
+            {
+                indent( s->indent * qs, s->outFile );
+                fprintf( s->outFile,
+                            "unbalancing... randoms at g%u for  q (counting g%u=R): %lu\n",
+                            gi, gq, giRs );
+                indent( s->indent * qs, s->outFile );
+                fprintf( s->outFile,
+                            "unbalancing... randoms at g%u for -q (counting g%u=R): %lu\n",
+                            gj, gq, gjRs );
+            }
+        }
+
+
         // Do "non-improving" swaps, to balance sides.
         //   (If all randoms are in rs, there is no point trying to swap.
         // This is not checked. It probably doesn't matter.)
-        if ( s->doSwaps > 6  ||  s->doSwaps == 6 && giRs != 0 && gjRs != 0 )
+        if ( s->doSwaps == 7  ||  ( s->doSwaps == 6 || s->doSwaps >= 8 ) &&
+                                  giRs != 0 && gjRs != 0 )
         {
             if ( giRs + 1 < gjRs )
             {
@@ -3201,7 +3486,8 @@ static uint8_t find1( HardInstance * hi )
 
     if ( conjsN % 2 != 0 )
     {
-        if ( s->oddBias == 1 || s->oddBias == 0 && common_randomNBiased(2) )
+        if ( s->oddBias == 1  ||  s->oddBias == 0 &&
+             common_randomNBiasedNonPeriodic(2) )
         {
             fstHasOneMoreConj = true;
 
@@ -3871,6 +4157,10 @@ uint8_t hard_solve( HardInstance * hi )
                         n, h->bestPositiveEstimates[n] );
             }
 
+            // Print estimate.
+            fprintf( s->outFile, "Estimated result: %f\n", 
+                     (double)(h->subresSum) / h->subresultsFound);
+
             fprintf( s->outFile, "number of aborts caught: %lu\n",
                      s->catchAbortsN - h->catchAbortsN );
 
@@ -3980,6 +4270,10 @@ uint8_t hard_solve( HardInstance * hi )
                                 "depth %u: %f\n", 
                                 n, h->bestPositiveEstimates[n] );
                     }
+
+                    // Print estimate.
+                    fprintf( s->outFile, "Estimated result: %f\n", 
+                             (double)(h->subresSum) / h->subresultsFound);
 
                     fprintf( s->outFile, "number of aborts caught: %lu\n",
                              s->catchAbortsN - h->catchAbortsN );

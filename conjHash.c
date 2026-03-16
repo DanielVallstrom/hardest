@@ -699,14 +699,21 @@ uint8_t conjHash_add( uint64_t c, uint8_t qs, HardInstance * hi, uint8_t qs0 )
         }
         else
         {
-            h->subresSum += (double)qs / powRs  +  
-                            ( ( h->subresSum / h->subresultsFound ) *
-                            ( (double)(powRs-1)/powRs) ); 
+            if ( powRs == 1 )
+            {
+                h->subresSum += qs; 
+            }
+            else
+            {
+                h->subresSum += (double)qs * (1+s->estWeight) / powRs  +  
+                                ( ( h->subresSum / h->subresultsFound ) *
+                                ( (double)(powRs-1-s->estWeight)/powRs) ); 
+            }
         }
         h->subresultsFound++;
     }
     else if ( s->estimateHeuristic == 2  ||  powRs == 1  ||
-              common_randomN(powRs) == 0 )
+              common_randomNBiased(powRs) == 0 )
     {
         h->subresSum += qs;
         h->subresultsFound++;
@@ -847,7 +854,7 @@ uint8_t conjHash_addIf( uint64_t c, uint8_t qs, HardInstance * hi,
         h->subresultsFound++;
     }
     else if ( s->estimateHeuristic == 2  ||  powRs == 1  || 
-              common_randomN(powRs) == 0 )
+              common_randomNBiased(powRs) == 0 )
     {
         h->subresSum += qs;
         h->subresultsFound++;

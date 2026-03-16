@@ -70,11 +70,11 @@ stdout,
     fprintf( 
 stdout, 
 "\nExamples:\n" 
-"  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0 -s 4  reproduces optimal solution, with questions\n"
-"  ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731\n"
-"    -u 8.299603174603174 -N 2  reproduces a current upper bound.\n"
-"  ./hardest -f 1 -t 5 -r 4 -i 2000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13210365863729163090\n"
-"    -u 12.363476562500001 -B 6:1 -N 2  reproduces an other current upper bound.\n"
+"  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0  reproduces optimal solution, with questions\n"
+"  ./hardest -f 0 -t 6 -r 5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.49 -i 200 -k 11 -b 2 -i 0\n"
+"    -s 12443524816424922443  reproduces a current upper bound.\n"
+"  ./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0\n"
+"    -s 13683506237796025932  reproduces an other current upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
 "    and why all solver solutions to problems with just one random god are optimal.\n"           );
 
@@ -108,10 +108,6 @@ stdout,
 "  -e --abort-leeway-end <float>\n"
 "                          abortLeeway becomes abort-leeway-end towards the\n"
 "                          end, and never less. [%f]\n"
-"                            Warning! Setting this low is risky and might very\n"
-"                          well abort tries that would have found an improvement.\n"
-"                          You can disable aborts by setting this to say\n"
-"                          1.4 or larger.\n"
 "  -E --best-lvl-0-pos-est <float>\n"
 "                          Set this value. It's used as a threshold for the positive\n"
 "                          side, but typically it's only supplied here to reproduce a\n"
@@ -135,17 +131,15 @@ stdout,
 "                          find promising gods to pursue. [%u]\n"
 "                          0 means random (by chance) gods.\n"
 "                          1 means a linear search.\n"
-"                          2 means a quadratic search.\n"
-"                          3 means 2 with added virtual perfect swaps,\n"
-"                          which could be cubicish.\n"
-"                          Only 0 and 1 are implemented so far. >1 means 1.\n"
+"                          2 means a search quadratic-cubicish in the -k value.\n"
+"                          >2 means 2.\n"
 "  -G --global-bound <unsigne integer>\n"
 "                          If 1, we'll use the upper bound globally. Otherwise\n"
 "                          local bounds will be used. [%u]\n"
 "  -h --help               Print this message.\n"
 "  -H --estimate-heuristic  <unsigned integer>\n"
 "                          Set the estimate heuristic used:\n"
-"                          0 means a probabilistic update. This might be best?\n"
+"                          0 means a probabilistic update.\n"
 "                          1 means an average weighing approach. This will be biased low.\n"
 "                          2 means counting weights with low probability fully, and\n"
 "                            repeatedly. This will be biased high. [%u]\n"
@@ -159,6 +153,9 @@ s->iterate
 
     fprintf(
 stdout,
+"  -k --good-gods-candidates <unsigned integer>\n"
+"                          Number of gods that will be (extra) considered in the search\n"
+"                          for good gods to ask. [%u]\n"
 "  -l --resume-aborted-leeway <float>\n"
 "                          When the result estimate at a node is <\n"
 "                          resume-aborted-leeway * upperBound, aborts\n"
@@ -175,6 +172,7 @@ stdout,
 "                            when there is an odd number of disjuncts.\n"
 "                          2 means negative side will always have one more disjunct\n"
 "                            when there is an odd number of disjuncts. [%u]\n",
+s->goodGodsCandN,
 s->resumeAbortedLeeway,
 s->topLocalResetLevel,
 s->oddBias
@@ -241,6 +239,8 @@ stdout,
 "                          6 means also \"non-improving\" swaps, to balance, \n"
 "                          but not for sides with no randoms.\n"
 "                          7 means also balancing always.\n"
+"                          8 means 6 but also active \"neutral\" or \"non-improving\"\n"
+"                          swaps that unbalance sides if they get a side to 0 randoms.\n"
 "  -t --true-gods <unsigned integer>\n"
 "                          Set number of true gods.\n"
 "  -T --indent <unsigned integer>\n"
@@ -259,14 +259,24 @@ stdout,
 "                          abort-leeway times this -u value. But this -u\n"
 "                          value will be updated if a better result is\n"
 "                          found. [%g]\n"
+"  -U --max-unbal <unsigned integer>\n"
+"                          The sum of randoms can be at most this for\n"
+"                          unbalancing strategies to be deployed. [%lu]\n"
 "  -v --verbose [level]    Set verbosity level (0-9). No arg means 8. [6]\n"
 "  --verbosity-vector <unsigned integer>\n"
 "                          Set the verbosity vector. [%#llx]\n"
 "                          The integer can be bin (0b), hex (0x),\n"
 "                          octal (0), or plain decimal.\n"
-"  --version               Print the version number.\n",
+"  --version               Print the version number.\n"
+"  -W --estimate-weight <float>\n"
+"                          In estimate heuristic 1, factor for new results will\n"
+"                          get upped by this, and factor for old average will be\n"
+"                          lowered by this, when taking their average, when\n"
+"                          calculating a new estimate. [%g]\n",
 hi->hard->upperBound,
-(unsigned long long int)s->verbosityVector
+s->maxUnbal,
+(unsigned long long int)s->verbosityVector,
+s->estWeight
            );
 
     fprintf(
@@ -383,6 +393,8 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "shuffle-conjunctions",   required_argument, NULL, 'R' },
             { "swap",                   required_argument, NULL, 'S' },
             { "indent",                 required_argument, NULL, 'T' },
+            { "max-unbal",              required_argument, NULL, 'U' },
+            { "estimate-weight",        required_argument, NULL, 'W' },
             { "abort-leeway-start",     required_argument, NULL, 'a' },
             { "iterate-sub-searches",   required_argument, NULL, 'b' },
             { "catch-aborts",           required_argument, NULL, 'c' },
@@ -391,6 +403,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "good-gods",              required_argument, NULL, 'g' },
             { "help",                   no_argument,       NULL, 'h' },
             { "iterate",                required_argument, NULL, 'i' },
+            { "good-gods-candidates",   required_argument, NULL, 'k' },
             { "resume-aborted-leeway",  required_argument, NULL, 'l' },
             { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "gods",                   required_argument, NULL, 'n' },
@@ -412,7 +425,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:a:b:c:e:f:g:hi:l:n:o:qr:s:t:u:v::",
+                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:qr:s:t:u:v::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -714,6 +727,46 @@ static int parseCommandLineOptions( HardInstance * hi,
 
                 break;
 
+            case 'U':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -U and --max-unbal must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->maxUnbal = n;
+                }
+
+                break;
+
+            case 'W':
+                {
+                    double r;
+
+                    if ( readReal( optarg, &r ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -W and --estimate-weight\n"
+                                 "must be a real on form '1.2', '3.' or '4'. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+ 
+                    hi->settings->estWeight = r;
+                }
+
+                break;
+
             case 'a':
                 {
                     double r;
@@ -858,6 +911,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->iterate = n;
+                }
+
+                break;
+
+            case 'k':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -k and --good-gods-candidates must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->goodGodsCandN = n;
                 }
 
                 break;

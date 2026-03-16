@@ -103,7 +103,7 @@ uint64_t common_currentSeed()
 // Returns a random number greater than or equal to 0, and less than n.
 //   Uses custom functions and you can get the current seed with
 // common_currentSeed.
-//   Simple, fast, but a bit biased on large ns.
+//   Simple, fast, but a bit biased on large n.
 uint64_t common_randomNBiased( uint64_t n )
 {
     return common_rand() % n;
@@ -130,6 +130,20 @@ uint64_t common_randomN( uint64_t n )
     return r % n;
 }
 
+
+// Returns a random number greater than or equal to 0, and less than n.
+//   Uses custom functions and you can get the current seed with
+// common_currentSeed.
+//   Fast, but a bit biased.
+//   Repeated common_randomN(2) will return 0, 1, 0, ... or 1, 0, 1, ...
+// This function will be more random.
+uint32_t common_randomNBiasedNonPeriodic( uint32_t n )
+{
+    // Shift away the more predictable lower 32 bits.
+    uint32_t r = common_rand() >> 32; 
+
+    return r % n;
+}
 
 
 // Returns a random number greater than or equal to 0, and less than n.

@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.13.2
+version = 0.15.5
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -58,7 +58,8 @@ CFLAGS +=                            \
 	-Wnested-externs                 \
 	-Wdisabled-optimization          \
 	-Wno-implicit-fallthrough        \
-	-D hardestOS_$(OS)                \
+	-Wno-maybe-uninitialized 		 \
+	-D hardestOS_$(OS)               \
 	-D 'hardestVersion="$(version)"'
 
 # The annoying gcc flag -Wparentheses is included in the -Wall flag, resulting
