@@ -54,55 +54,55 @@ These values are printed together with a solution, so they should be easy to fin
 | 3 | 3 | 1 | **7.314286** | **Optimal** | |
 | 0 | 5 | 2 | *4.904762* | *Conjectured* | |
 | 1 | 4 | 2 | *7.161905* | *Conjectured* | |
-| 2 | 3 | 2 | 8.180952 | Upper bound | |
-| 0 | 4 | 3 | 6.239286 | Upper bound | |
-| 1 | 3 | 3 | 8.521652 | Upper bound | |
-| 2 | 2 | 3 | 9.250930 | Upper bound | |
+| 2 | 3 | 2 | 8.161905 | Upper bound | |
+| 0 | 4 | 3 | 6.232143 | Upper bound | |
+| 1 | 3 | 3 | 8.393973 | Upper bound | |
+| 2 | 2 | 3 | 9.049702 | Upper bound | |
 | 0 | 7 | 1 | **3.1875** | **Optimal** | |
 | 1 | 6 | 1 | **5.982143** | **Optimal** | |
 | 2 | 5 | 1 | **7.601190** | **Optimal** | |
 | 3 | 4 | 1 | **8.296429** | **Optimal** | |
 | 0 | 6 | 2 | *5.178571* | *Conjectured* | |
 | 1 | 5 | 2 | *7.833333* | *Conjectured* | |
-| 2 | 4 | 2 | 9.130952 | Upper bound | could not be replicated; value may be slightly off |
-| 3 | 3 | 2 | 9.635714 | Upper bound | |
-| 0 | 5 | 3 | 6.6250 | Upper bound | |
-| 1 | 4 | 3 | 9.203181 | Upper bound | |
-| 2 | 3 | 3 | 10.386091 | Upper bound | |
+| 2 | 4 | 2 | 9.109524 | Upper bound | |
+| 3 | 3 | 2 | 9.535714 | Upper bound | |
+| 0 | 5 | 3 | 6.571429 | Upper bound | |
+| 1 | 4 | 3 | 9.058482 | Upper bound | |
+| 2 | 3 | 3 | 10.091741 | Upper bound | |
 | 0 | 8 | 1 | **3.333333** | **Optimal** | |
 | 1 | 7 | 1 | **6.333333** | **Optimal** | |
 | 2 | 6 | 1 | **8.095238** | **Optimal** | |
 | 3 | 5 | 1 | **9.095238** | **Optimal** | |
 | 4 | 4 | 1 | **9.485714** | **Optimal** | |
 | 0 | 7 | 2 | *5.527778* | *Conjectured* | |
-| 1 | 6 | 2 | 8.273810 | Upper bound | |
-| 2 | 5 | 2 | 10.013724 | Upper bound | |
-| 3 | 4 | 2 | 10.806349 | Upper bound | |
-| 0 | 6 | 3 | 7.089286 | Upper bound | |
-| 1 | 5 | 3 | 9.918403 | Upper bound | |
-| 2 | 4 | 3 | 11.515960 | Upper bound | |
-| 3 | 3 | 3 | 12.033743 | Upper bound | |
-| 0 | 5 | 4 | 8.708271 | Upper bound | |
-| 1 | 4 | 4 | 11.620140 | Upper bound | |
-| 2 | 3 | 4 | 13.089038 | Upper bound | |
+| 1 | 6 | 2 | *8.273810* | *Conjectured* | |
+| 2 | 5 | 2 | 9.957672 | Upper bound | |
+| 3 | 4 | 2 | 10.692857 | Upper bound | |
+| 0 | 6 | 3 | *7.059524* | *Conjectured* | |
+| 1 | 5 | 3 | 9.721230 | Upper bound | |
+| 2 | 4 | 3 | 11.076984 | Upper bound | |
+| 3 | 3 | 3 | 11.446726 | Upper bound | |
+| 0 | 5 | 4 | 8.470703 | Upper bound | |
+| 1 | 4 | 4 | 11.057425 | Upper bound | |
+| 2 | 3 | 4 | 12.136675 | Upper bound | |
 | 0 | 9 | 1 | **3.5** | **Optimal** | |
 | 1 | 8 | 1 | **6.677778** | **Optimal** | |
 | 2 | 7 | 1 | **8.677778** | **Optimal** | |
 | 3 | 6 | 1 | **9.880952** | **Optimal** | |
 | 4 | 5 | 1 | **10.474603** | **Optimal** | |
 | 0 | 8 | 2 | *5.844444* | *Conjectured* | |
-| 1 | 7 | 2 | 8.866667 | Upper bound | |
-| 2 | 6 | 2 | 10.748413 | Upper bound | |
-| 3 | 5 | 2 | 11.800620 | Upper bound | |
-| 4 | 4 | 2 | 12.067917 | Upper bound | |
-| 0 | 7 | 3 | 7.500000 | Upper bound | |
-| 1 | 6 | 3 | 10.618908 | Upper bound | |
-| 2 | 5 | 3 | 12.369026 | Upper bound | |
-| 3 | 4 | 3 | 13.259797 | Upper bound | |
-| 0 | 6 | 4 | 9.175000 | Upper bound | |
-| 1 | 5 | 4 | 12.324888 | Upper bound | |
-| 2 | 4 | 4 | 14.229663 | Upper bound | |
-| 3 | 3 | 4 | 14.773443 | Upper bound | |
+| 1 | 7 | 2 | *8.844444* | *Conjectured* | |
+| 2 | 6 | 2 | 10.650000 | Upper bound | |
+| 3 | 5 | 2 | 11.654365 | Upper bound | |
+| 4 | 4 | 2 | 11.978095 | Upper bound | |
+| 0 | 7 | 3 | *7.425000* | *Conjectured* | |
+| 1 | 6 | 3 | 10.298810 | Upper bound | |
+| 2 | 5 | 3 | 12.000992 | Upper bound | |
+| 3 | 4 | 3 | 12.698929 | Upper bound | |
+| 0 | 6 | 4 | 8.941220 | Upper bound | |
+| 1 | 5 | 4 | 11.646063 | Upper bound | |
+| 2 | 4 | 4 | 13.035486 | Upper bound | |
+| 3 | 3 | 4 | 13.419905 | Upper bound | |
 | 0 | 10 | 1 | **3.636364** | **Optimal** | |
 | 1 | 9 | 1 | **6.927273** | **Optimal** | |
 | 2 | 8 | 1 | **9.056566** | **Optimal** | |
@@ -110,23 +110,23 @@ These values are printed together with a solution, so they should be easy to fin
 | 4 | 6 | 1 | **11.317749** | **Optimal** | |
 | 5 | 5 | 1 | **11.613276** | **Optimal** | |
 | 0 | 9 | 2 | *6.054545* | *Conjectured* | |
-| 1 | 8 | 2 | 9.218182 | Upper bound | |
-| 2 | 7 | 2 | 11.315152 | Upper bound | |
+| 1 | 8 | 2 | 9.189899 | Upper bound | |
+| 2 | 7 | 2 | 11.220960 | Upper bound | |
 | 3 | 6 | 2 | 12.658550 | Upper bound | |
-| 4 | 5 | 2 | 13.163041 | Upper bound | |
-| 0 | 8 | 3 | 7.978788 | Upper bound | |
-| 1 | 7 | 3 | 11.162784 | Upper bound | |
-| 2 | 6 | 3 | 13.190896 | Upper bound | |
-| 3 | 5 | 3 | 14.366714 | Upper bound | |
-| 4 | 4 | 3 | 14.829191 | Upper bound | |
-| 0 | 7 | 4 | 9.612678 | Upper bound | |
-| 1 | 6 | 4 | 13.066018 | Upper bound | |
-| 2 | 5 | 4 | 15.257623 | Upper bound | |
-| 3 | 4 | 4 | 16.242179 | Upper bound | |
-| 0 | 6 | 5 | 11.581054 | Upper bound | |
-| 1 | 5 | 5 | 15.484930 | Upper bound | |
-| 2 | 4 | 5 | 17.597229 | Upper bound | |
-| 3 | 3 | 5 | 18.327874 | Upper bound | |
+| 4 | 5 | 2 | 13.051659 | Upper bound | |
+| 0 | 8 | 3 | 7.927273 | Upper bound | |
+| 1 | 7 | 3 | 10.975000 | Upper bound | |
+| 2 | 6 | 3 | 12.769913 | Upper bound | |
+| 3 | 5 | 3 | 12.772294 | Upper bound | |
+| 4 | 4 | 3 | 14.081667 | Upper bound | |
+| 0 | 7 | 4 | 9.292424 | Upper bound | |
+| 1 | 6 | 4 | 12.247592 | Upper bound | |
+| 2 | 5 | 4 | 13.924281 | Upper bound | |
+| 3 | 4 | 4 | 14.631212 | Upper bound | |
+| 0 | 6 | 5 | 10.905836 | Upper bound | |
+| 1 | 5 | 5 | 13.767661 | Upper bound | |
+| 2 | 4 | 5 | 15.170539 | Upper bound | |
+| 3 | 3 | 5 | 15.600163 | Upper bound | |
 | 0 | 11 | 1 | **3.750000** | **Optimal** | |
 | 1 | 10 | 1 | **7.143939** | **Optimal** | |
 | 2 | 9 | 1 | **9.531818** | **Optimal** | |
@@ -134,13 +134,13 @@ These values are printed together with a solution, so they should be easy to fin
 | 4 | 7 | 1 | **12.048990** | **Optimal** | |
 | 5 | 6 | 1 | **12.605700** | **Optimal** | |
 | 0 | 10 | 2 | *6.272727* | *Conjectured* | |
-| 1 | 9 | 2 | 9.709091 | Upper bound | |
-| 2 | 8 | 2 | 11.963810 | Upper bound | |
-| 3 | 7 | 2 | 13.319697 | Upper bound | |
-| 4 | 6 | 2 | 14.127805 | Upper bound | |
-| 5 | 5 | 2 | 14.438432 | Upper bound | |
-| 2 | 5 | 5 | 18.176580 | Upper bound | |
-| 3 | 4 | 5 | 19.274916 | Upper bound | |
+| 1 | 9 | 2 | 9.660606 | Upper bound | |
+| 2 | 8 | 2 | 11.839394 | Upper bound | |
+| 3 | 7 | 2 | 13.203157 | Upper bound | |
+| 4 | 6 | 2 | 14.030213 | Upper bound | |
+| 5 | 5 | 2 | 14.279161 | Upper bound | |
+| 2 | 5 | 5 | 15.933610 | Upper bound | |
+| 3 | 4 | 5 | 16.677641 | Upper bound | |
 | 0 | 12 | 1 | **3.846154** | **Optimal** | |
 | 0 | 13 | 1 | **3.928571** | **Optimal** | |
 | 0 | 14 | 1 | **4.0** | **Optimal** | |
@@ -166,4 +166,14 @@ These values are printed together with a solution, so they should be easy to fin
 | 0 | 150 | 1 | **7.311258** | **Optimal** | |
 | 0 | 200 | 1 | **7.731343** | **Optimal** | |
 | 0 | 250 | 1 | **7.984064** | **Optimal** | |
-| 0 | 254 | 1 | **8.0** | **Optimal** |
+| 0 | 254 | 1 | **8.0** | **Optimal** | |
+| 0 | 11 | 2 | *6.551282* | *Conjectured* | |
+| 0 | 12 | 2 | *6.769231* | *Conjectured* | |
+| 0 | 13 | 2 | *6.942857* | *Conjectured* | |
+| 0 | 14 | 2 | *7.075000* | *Conjectured* | |
+| 0 | 15 | 2 | *7.257353* | *Conjectured* | |
+| 0 | 16 | 2 | *7.457516* | *Conjectured* | |
+| 0 | 17 | 2 | *7.625731* | *Conjectured* | |
+| 0 | 18 | 2 | *7.768421* | *Conjectured* | |
+| 0 | 19 | 2 | *7.890476* | *Conjectured* | |
+| 0 | 20 | 2 | *7.995671* | *Conjectured* | |
