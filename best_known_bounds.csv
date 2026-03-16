@@ -30,7 +30,7 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 3,4,1,8.296429,optimal,,,
 0,6,2,5.178571,conjectured,,,
 1,5,2,7.833333,conjectured,,,
-2,4,2,9.109524,upper_bound,seed lost,,
+2,4,2,9.109524,upper_bound,,0.15.5,./hardest -f 2 -t 4 -r 2 -b 6 -B 0:7 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 9.03 -i 2000 -s 14103940161794951466 -i 0
 3,3,2,9.535714,upper_bound,,0.15.4,./hardest -f 3 -t 3 -r 2 -b 9 -B 0:10 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 9.42 -i 2000 -s 6422440067747821884 -i 0
 0,5,3,6.571429,upper_bound,,0.15.4,./hardest -f 0 -t 5 -r 3 -b 6 -B 0:7 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 6.48 -i 4000 -s 2026205479363403605 -i 0
 1,4,3,9.058482,upper_bound,,0.15.4,./hardest -f 1 -t 4 -r 3 -b 6 -B 0:7 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 8.99 -i 20 -s 16670210726696513633 -i 0
