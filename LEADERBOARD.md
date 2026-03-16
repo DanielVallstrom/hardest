@@ -20,6 +20,8 @@ To reproduce a solution you need:
 
 These values are printed together with a solution, so they should be easy to find and post.
 
+Per-entry reproduction commands are listed in the [Reproduction Commands](#reproduction-commands) section below, and also in the `reproduce_command` column of [`best_known_bounds.csv`](best_known_bounds.csv).
+
 **Example:**
 ```sh
 ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
@@ -177,3 +179,13 @@ These values are printed together with a solution, so they should be easy to fin
 | 0 | 18 | 2 | *7.768421* | *Conjectured* | |
 | 0 | 19 | 2 | *7.890476* | *Conjectured* | |
 | 0 | 20 | 2 | *7.995671* | *Conjectured* | |
+
+## Reproduction Commands
+
+Commands to quickly reproduce specific upper bounds. Each command runs a single deterministic replay (via `-s SEED -i 0`) and should complete in seconds.
+
+The `-u` value does not need updating when `-H 1` is used (it is biased low).
+
+| \|F\| | \|T\| | \|R\| | E[Qs] | Version | Reproduce Command |
+|------:|------:|------:|------:|---------|-------------------|
+| 2 | 5 | 2 | 9.957672 | 0.15.5 | `./hardest -f 2 -t 5 -r 2 -b 8 -B 0:9 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 9.91 -i 1000 -s 2318762516960874543 -i 0` |
