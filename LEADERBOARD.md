@@ -4,6 +4,7 @@ This file tracks upper bounds on the expected number of questions needed to solv
 
 - Values marked **Optimal** are proven optimal.
 - Values marked *Conjectured* are conjectured optimal.
+- Values marked *Likely* could very well be optimal, too.
 - Values marked as Upper bound may be improvable — you are welcome to try!
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds.
@@ -77,10 +78,10 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 | 3 | 5 | 1 | **9.095238** | **Optimal** | |
 | 4 | 4 | 1 | **9.485714** | **Optimal** | |
 | 0 | 7 | 2 | *5.527778* | *Conjectured* | |
-| 1 | 6 | 2 | *8.273810* | *Conjectured* | |
+| 1 | 6 | 2 | 8.*273810* | *Likely* | |
 | 2 | 5 | 2 | 9.957672 | Upper bound | |
 | 3 | 4 | 2 | 10.692857 | Upper bound | |
-| 0 | 6 | 3 | *7.059524* | *Conjectured* | |
+| 0 | 6 | 3 | 7.*059524* | *Likely* | |
 | 1 | 5 | 3 | 9.721230 | Upper bound | |
 | 2 | 4 | 3 | 11.076984 | Upper bound | |
 | 3 | 3 | 3 | 11.446726 | Upper bound | |
@@ -93,11 +94,11 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 | 3 | 6 | 1 | **9.880952** | **Optimal** | |
 | 4 | 5 | 1 | **10.474603** | **Optimal** | |
 | 0 | 8 | 2 | *5.844444* | *Conjectured* | |
-| 1 | 7 | 2 | *8.844444* | *Conjectured* | |
+| 1 | 7 | 2 | 8.*844444* | *Likely* | |
 | 2 | 6 | 2 | 10.650000 | Upper bound | |
 | 3 | 5 | 2 | 11.654365 | Upper bound | |
 | 4 | 4 | 2 | 11.978095 | Upper bound | |
-| 0 | 7 | 3 | *7.425000* | *Conjectured* | |
+| 0 | 7 | 3 | 7.*425000* | *Likely* | |
 | 1 | 6 | 3 | 10.298810 | Upper bound | |
 | 2 | 5 | 3 | 12.000992 | Upper bound | |
 | 3 | 4 | 3 | 12.698929 | Upper bound | |
