@@ -187,9 +187,9 @@ Commands to quickly reproduce specific upper bounds. Each command runs a single 
 
 The `-u` value does not need updating when `-H 1` is used (it is biased low).
 
-| &nbsp;\|F\|&nbsp; | &nbsp;\|T\|&nbsp; | &nbsp;\|R\|&nbsp; | E[Qs] | Version | Reproduce Command |
+| \|F\| | \|T\| | \|R\| | E[Qs] | Version | Reproduce Command |
 |------:|------:|------:|------:|---------|-------------------|
-| 2 | 3 | 2 | 8.161905 | 0.15.3 | `./hardest -f 2 -t 3 -r 2 -b 4 20 -H 1 -g 3 -i 3000 -S 6 -U 4 -s 4604948742119086823 -i 0` |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3 | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 | 8.161905 | 0.15.3 | `./hardest -f 2 -t 3 -r 2 -b 4 20 -H 1 -g 3 -i 3000 -S 6 -U 4 -s 4604948742119086823 -i 0` |
 | 0 | 4 | 3 | 6.232143 | 0.15.4 | `./hardest -f 0 -t 4 -r 3 -b 5 -B 0:6 -k 20 -H 1 -g 3 -i 70000 -S 7 -U 2 -a 1.02 -e 1.01 -u 6.148 -W 0.0 -s 8347231925438940503 -i 0` |
 | 1 | 3 | 3 | 8.393973 | 0.15.4 | `./hardest -f 1 -t 3 -r 3 -b 5 -B 0:6 -H 1 -i 7000 -S 7 -U 2 -a 1.02 -e 1.01 -s 2557919246952201673 -i 0` |
 | 2 | 2 | 3 | 9.049702 | 0.15.4 | `./hardest -f 2 -t 2 -r 3 -b 5 -B 0:6 -H 1 -i 8 -S 7 -U 2 -a 1.02 -e 1.01 -u 12 -s 9505483977630049913 -i 0` |
