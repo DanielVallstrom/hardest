@@ -35,10 +35,10 @@ The following information is critical for reproducibility. These values are prin
 ### Example Submission
 
 ```
-Problem: 1-6-2 (1 false, 6 true, 2 random gods)
-E[Qs]: 8.273810
-Solver version: 0.12.4
-Reproduction: ./hardest -f 1 -t 6 -r 2 -i 5000 -B 0:4 -B 1:3 -B 3:2 -B 4:1 -B 5:1 -i 0 -s 13030756753776470731 -u 8.299603174603174 -N 2
+Problem: 3-4-2 (3 false, 4 true, 2 random gods)
+E[Qs]: 10.692857
+Solver version: 0.15.5
+Reproduction: ./hardest -f 3 -t 4 -r 2 -b 8 -B 0:9 -H 1 -i 7 -S 7 -a 1.02 -e 1.01 -u 10.57 -i 5000 -s 16955508027985230318 -i 0
 ```
 
 ## Status Markers
