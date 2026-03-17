@@ -183,7 +183,7 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 
 ## Reproduction Commands
 
-Commands to quickly reproduce specific upper bounds. Each command runs a single deterministic replay (via `-s SEED -i 0`) and should complete in seconds.
+Commands to quickly reproduce specific upper bounds. Each command runs a single deterministic replay (via `-s SEED -i 0`) and should, typically, complete in seconds. However, harder problems could take longer.
 
 The `-u` value does not need updating when `-H 1` is used (it is biased low).
 
