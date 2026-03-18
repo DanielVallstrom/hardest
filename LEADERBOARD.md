@@ -148,7 +148,7 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 | 3	| 6	| 3	| 14.705303	| Upper bound | |
 | 4	| 5	| 3	| 15.239854	| Upper bound | |
 | 0	| 8	| 4	| 9.840404	| Upper bound | |
-| 1	| 7	| 4	12.950126	| Upper bound | |
+| 1	| 7	| 4	| 12.950126	| Upper bound | |
 | 2	| 6	| 4	| 14.733135	| Upper bound | |
 | 3	| 5	| 4	| 15.746904	| Upper bound | |
 | 4	| 4	| 4	| 16.068750	| Upper bound | |
