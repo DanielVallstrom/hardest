@@ -75,7 +75,7 @@ Reproduce another current upper bound (1 false, 5 true, 4 random gods):
 ./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0 -s 13683506237796025932
 ```
 
-Show why the optimal solution is optimal (1 false, 3 true, 1 random):
+Show why the solution is optimal (1 false, 3 true, 1 random):
 ```sh
 ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v
 ```
