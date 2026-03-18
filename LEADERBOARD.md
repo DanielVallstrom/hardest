@@ -142,6 +142,16 @@ Per-entry reproduction commands are listed in the [Reproduction Commands](#repro
 | 3 | 7 | 2 | 13.203157 | Upper bound | |
 | 4 | 6 | 2 | 14.030213 | Upper bound | |
 | 5 | 5 | 2 | 14.279161 | Upper bound | |
+| 0 | 9 | 3 | 8.195455 | Upper bound | |
+| 1	| 8	| 3	| 11.404040	| Upper bound	| |
+| 2	| 7	| 3	| 13.427841	| Upper bound	| |
+| 3	| 6	| 3	| 14.705303	| Upper bound | |
+| 4	| 5	| 3	| 15.239854	| Upper bound | |
+| 0	| 8	| 4	| 9.840404	| Upper bound | |
+| 1	| 7	| 4	12.950126	| Upper bound | |
+| 2	| 6	| 4	| 14.733135	| Upper bound | |
+| 3	| 5	| 4	| 15.746904	| Upper bound | |
+| 4	| 4	| 4	| 16.068750	| Upper bound | |
 | 0 | 7 | 5 | 11.249620 | Upper bound | |
 | 1 | 6 | 5 | 14.249496 | Upper bound | |
 | 2 | 5 | 5 | 15.933610 | Upper bound | |
