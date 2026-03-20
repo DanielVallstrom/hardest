@@ -46,6 +46,7 @@
 
 
 
+#if 0
 // Returns a hash value of c. The FNV-1 hash algorithm is used here.
 //   2^logSize should be the size of the hash-table.
 //   Reference: http://www.isthe.com/chongo/tech/comp/fnv/
@@ -79,6 +80,7 @@ static inline uint64_t vvvhashFNV( uint8_t * c, unsigned int logSize,
 
     return ( ( n >> logSize ) ^ n ) & mask(logSize);
 }
+#endif
 
 
 
@@ -292,6 +294,7 @@ PathList * conjHash_lookup( uint64_t c, Hard * h )
 #endif
 
 
+#if 0
 // We'll assume that c is in the table.
 static HashList * conjHash_lookupFast( uint64_t c, Hard * h )
 {
@@ -310,7 +313,7 @@ static HashList * conjHash_lookupFast( uint64_t c, Hard * h )
 
     return NULL;
 }
-
+#endif
 
 
 
@@ -376,9 +379,10 @@ static inline void addConjNode( HashList * * asPtr, HashList * bs )
 }
 
 
+
+#if 0    
 bool conjHash_doubleSize( ConjHash * h )
 {
-#if 0    
     HashList * * oldHT = h->tab;
 
     // Is the new size too big?
@@ -417,10 +421,10 @@ bool conjHash_doubleSize( ConjHash * h )
 
     free(oldHT);
 
-#endif
 
     return false;
 }
+#endif
 
 
 
@@ -491,6 +495,7 @@ bool conjHash_initHash( Hard * h, uint64_t poss0R0 )
 
 
 
+#if 0
 void conjHash_print( Hard * h, FILE * f )
 {
     ConjHash * ht = h->ht;
@@ -506,6 +511,7 @@ void conjHash_print( Hard * h, FILE * f )
         }
     }
 }
+#endif
 
 
 
@@ -913,6 +919,7 @@ uint8_t conjHash_addIf( uint64_t c, uint8_t qs, HardInstance * hi,
 
 
 
+#if 0
 // Old function using countPaths. Don't use. Use addIf above instead.
 // Adds path. c is the conjunction. qs is the number of questions used
 // to reach. qs0 is the length of qPath.
@@ -965,6 +972,7 @@ static uint8_t conjHash_addIfPath( uint64_t c, uint8_t qs, Hard * h,
 
     return 1;
 }
+#endif
 
 
 

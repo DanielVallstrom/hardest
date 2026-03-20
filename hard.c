@@ -26,6 +26,8 @@
 #include "hard.h"
 #include "common.h"
 #include "compilerMacros.h"
+#include "readBounds.h"
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -87,13 +89,13 @@ HardInstance * hard_newInstance(void)
     hi->settings->findGoodGods = 5;  // ??
     hi->settings->optimizeNonR = 50;  // ??
     hi->settings->shuffleConjunctions = 7;  // ??
-    hi->settings->iterate = 20;  // ??
+    hi->settings->iterate = 19;  // ??
     hi->settings->abortLeewayStart = 1.02;  // ??
     // End should maybe be smaller on easier problems. And larger on harder.
     hi->settings->abortLeewayEnd = 1.01;  // ??
     hi->settings->dontAbortUntil = 10;  // ??
-    hi->settings->resumeAbortedLeeway = 1.0001;  // ?? Good if >0, atm.
-    hi->settings->catchAbortsN = 8000;  // ??
+    hi->settings->resumeAbortedLeeway = 1.01;  // ?? Good if >1.0, atm.
+    hi->settings->catchAbortsN = 8;  // ??
     hi->settings->maxCatchDepth = 1;  // ??
     hi->settings->oddBias = 0;  // ??
     hi->settings->indent = 2;  // ??
@@ -104,6 +106,13 @@ HardInstance * hard_newInstance(void)
     hi->settings->goodGodsCandN = 250;  // ??
     hi->settings->maxUnbal = 2;  // ???  // UINT64_MAX;  // ??
     hi->settings->estWeight = 0.0;
+
+    hi->settings->boundsFileName = "best_known_bounds.csv";
+    hi->settings->boundsFile = NULL;
+    hi->settings->updateBoundsFile = true;  // ??
+    hi->settings->useBoundsFileOptions = false;  // ??
+    hi->settings->upperBoundInFile = 0;  // Undefined.
+    hi->settings->boundStatus = HardBoundStatus_undefined;
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -117,6 +126,14 @@ HardInstance * hard_newInstance(void)
     for ( uint16_t n = 0; n != ZeroRepsFromLvl; n++ )
     {
         hi->settings->lvlReps[n] = DefaultReps;
+    }
+
+    // Open the bounds file. We'll re-open file if it's to be written to.
+    hi->settings->boundsFile = fopen( hi->settings->boundsFileName, "r" );
+
+    if ( hi->settings->boundsFile == NULL )
+    {
+        fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
     }
 
 
@@ -309,6 +326,7 @@ static uint64_t godsSize( Hard * h, uint64_t poss0R0 )
 //   Returns true iff there wasn't enough memory, or if god sanity 
 // check failed.
 //   Also prints info.
+//   Also handles the bounds file, closes it.
 bool hard_allocArrays( HardInstance * hi )
 {
     Hard * h = hi->hard;
@@ -404,6 +422,15 @@ bool hard_allocArrays( HardInstance * hi )
         fprintf( s->outFile,
                  "possibilities: %llu\n",
                  (unsigned long long)h->possN );
+    }
+
+
+    // Read and close the bounds file.
+    if ( s->boundsFile != NULL )
+    {
+        readBounds_readFile(hi);
+
+        fclose(s->boundsFile);
     }
 
 
@@ -4370,6 +4397,53 @@ uint8_t hard_solve( HardInstance * hi )
 /*
   gprof:
   newer nearer top:
+
+0.15.6  
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 22.83     22.77    22.77 581699143     0.00     0.00  swapConjs
+ 16.51     39.23    16.46 1235604572     0.00     0.00  countRs
+ 14.02     53.22    13.98 285089868     0.00     0.00  swapConjunctions0111
+  8.28     61.48     8.26 285089865     0.00     0.00  swapConjunctionsG
+  7.17     68.62     7.15 285089865     0.00     0.00  swapConjunctionsG3a
+  6.91     75.52     6.89 285089865     0.00     0.00  swapConjunctionsG3b
+  5.64     81.14     5.62 285089868     0.00     0.00  swapConjunctions1101
+  4.43     85.56     4.42 322556271     0.00     0.00  hashFNV
+  3.52     89.07     3.51  1966137     0.00     0.00  count2RsQuad
+  2.66     91.72     2.65 264114713     0.00     0.00  equalConj
+  1.87     93.59     1.86 106344843     0.00     0.00  randomsAsked
+  1.39     94.98     1.39  1835947     0.00     0.00  conjHash_removeLastLocalMark
+  1.21     96.19     1.21  2124315     0.00     0.00  conjHash_markStateLocally
+  0.93     97.12     0.93   288368     0.00     0.00  conjHash_undo2Locally
+  0.56     97.68     0.56 91428686     0.00     0.00  conjHash_addIf
+  0.48     98.16     0.48   694665     0.00     0.00  conjHash_undoLocally
+  0.45     98.61     0.45 106344843     0.00     0.00  conjHash_lookupHL
+
+0.15.6  
+  Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 22.36     30.39    30.39 815392874     0.00     0.00  swapConjs
+ 16.80     53.22    22.83 1768299868     0.00     0.00  countRs
+ 14.25     72.58    19.37 408003178     0.00     0.00  swapConjunctions0111
+  8.64     84.33    11.74 408003175     0.00     0.00  swapConjunctionsG
+  7.20     94.12     9.79 408003175     0.00     0.00  swapConjunctionsG3b
+  6.84    103.42     9.29 408003175     0.00     0.00  swapConjunctionsG3a
+  5.76    111.24     7.83 408003178     0.00     0.00  swapConjunctions1101
+  4.18    116.92     5.68 457735409     0.00     0.00  hashFNV
+  4.00    122.36     5.44  2813815     0.00     0.00  count2RsQuad
+  2.58    125.86     3.50 373717884     0.00     0.00  equalConj
+  1.71    128.18     2.32 150922618     0.00     0.00  randomsAsked
+  1.47    130.18     2.00  2627653     0.00     0.00  conjHash_removeLastLocalMark
+  0.97    131.50     1.32  3037806     0.00     0.00  conjHash_markStateLocally
+  0.60    132.32     0.82   410153     0.00     0.00  conjHash_undo2Locally
+  0.47    132.97     0.65 130045243     0.00     0.00  conjHash_addIf
+  0.47    133.60     0.64   996685     0.00     0.00  conjHash_undoLocally
+  0.46    134.22     0.62 150922618     0.00     0.00  conjHash_lookupHL
+  0.41    134.78     0.56       12     0.05    11.30  fnd1
+  0.28    135.17     0.39 20877375     0.00     0.00  conjHash_add
+
 
 This is with -b 1 (and defaults are somewhat fixed, now):
 

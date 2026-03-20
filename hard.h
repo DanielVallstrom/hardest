@@ -237,6 +237,15 @@ typedef uint32_t HardVerbosityVector;
 
 
 
+// The status of the upper bound for the instance, from the bounds file.
+#define HardBoundStatus_optimal      (0)
+#define HardBoundStatus_conjectured  (1)
+#define HardBoundStatus_likely       (2)
+#define HardBoundStatus_upperBound   (3)
+#define HardBoundStatus_undefined    (4)
+
+
+
 // Structure containing settings.
 typedef struct Settings_
 {
@@ -365,6 +374,24 @@ typedef struct Settings_
     // and factor for old average will be lowered by this, when taking their
     // average, when calculating a new estimate.
     double estWeight;
+
+    // The name of the csv file with upper bounds.
+    char * boundsFileName;
+
+    // csv file with upper bounds;
+    FILE * boundsFile;
+
+    // We'll update the bounds file if an improvement is found, iff this is true.
+    bool updateBoundsFile;
+
+    // We'll use the options from the bounds file for the instance, iff this is true.
+    bool useBoundsFileOptions;
+
+    // The upper bound listed in the bounds file, for the current instance.
+    double upperBoundInFile;
+
+    // The status of the bound from the bounds file.
+    uint8_t boundStatus;
 
 } Settings;
 

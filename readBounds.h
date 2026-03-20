@@ -1,0 +1,41 @@
+// Module extracting data from csv bound file.
+
+
+/*
+    Copyright (C) 2026 Daniel Vallstrom. All rights reserved.
+
+    Unless explicitly acquired and licensed from Licensor under a license
+    other than the Reciprocal Public License ("RPL"), the contents of this
+    file are subject to the RPL Version 1.1, or subsequent versions as
+    allowed by the RPL, and You may not copy or use this file in either
+    source code or executable form, except in compliance with the terms
+    and conditions of the RPL.
+
+    You should be able to find a copy of the RPL (the "License") in a file
+    named LICENSE that should come along with this file; if not, write to
+    daniel.vallstrom@gmail.com.
+
+    All software distributed under the License is provided in the hope
+    that it will be useful, but WITHOUT ANY WARRANTY; without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+    PURPOSE. See the License for more details.
+*/
+
+
+#ifndef readBounds_H
+#define readBounds_H
+
+
+#include <stdbool.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+
+#include "hard.h"
+
+
+// Parses the bounds file. Returns true iff an error occurred.
+bool readBounds_readFile( HardInstance * hi );
+
+
+#endif  // readBounds_H

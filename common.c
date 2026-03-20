@@ -230,9 +230,9 @@ bool readReal( char * s, double * x )
     if ( *s == '.' )
     {
         s++;
-        for ( double z = 0.1; isdigit(*s); s++, z *= 0.1 )
+        for ( double z = 10; isdigit(*s); s++, z *= 10 )
         {
-            y += z * ( *s - '0' );
+            y += ( *s - '0' ) / z;
         }
     }
 

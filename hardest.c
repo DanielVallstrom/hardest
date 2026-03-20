@@ -35,6 +35,7 @@
 
 
 
+#if 0
 // Prints various info.
 static void printMoreInfo( HardInstance * hi )
 {
@@ -47,6 +48,7 @@ static void printMoreInfo( HardInstance * hi )
 
     putc( '\n', stdout );
 }
+#endif
 
 
 
@@ -96,7 +98,7 @@ int main( int argc, char * * argv )
     // Print various info.
     if ( hi->settings->verbosityVector & HardVerbosity_printMore )
     {
-        printMoreInfo(hi);
+        //printMoreInfo(hi);
     }
 
 

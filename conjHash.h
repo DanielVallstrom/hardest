@@ -116,7 +116,8 @@ void conjHash_delete( ConjHash * h );
 // satisfied.
 //   If the size is already at max, maxLoad will be increased and false
 // returned.
-bool conjHash_doubleSize( ConjHash * h );
+//   Not used.
+//bool conjHash_doubleSize( ConjHash * h );
 
 // Returns the value of conjunction c. c should be an index pointing 
 // into h->gods.
@@ -153,7 +154,7 @@ ConjHash * conjHash_new( Hard * h );
 bool conjHash_initHash( Hard * h, uint64_t poss0R0 );
 
 // Prints the hash table to file in order.
-void conjHash_print( Hard * h, FILE * f );
+//void conjHash_print( Hard * h, FILE * f );
 
 // Collects and prints some statistics about the hash table to f.
 void conjHash_stats( Hard * h, FILE * f );

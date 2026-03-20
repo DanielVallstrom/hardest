@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.15.5
+version = 0.16.4
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -252,16 +252,29 @@ CFLAGS += -D AssertionLevel=$(assertLevel)
 objDir = objects
 
 # API (or non-main) library objects.
-objNames = hard.o options.o common.o conjHash.o
+objNames = hard.o options.o common.o conjHash.o readBounds.o
 objs = $(foreach f, $(objNames), $(objDir)/$(f))
 
 # hardest objects.
 objects = $(objDir)/hardest.o $(objs)
 
 
-# Fix the default rule.
+# Fix the default rule. The objects directory is created for github.
+#$(objDir)/%.o: %.c
+#	$(CC) -c $(CFLAGS) $< -o $@
 $(objDir)/%.o: %.c
+	@mkdir -p $(objDir)
 	$(CC) -c $(CFLAGS) $< -o $@
+
+
+# I'd like to create the objects directory, for github repo. 
+# But this doesn't work:
+# 1. Add the pipe and directory name to your pattern rule
+#$(objDir)/%.o: %.c | $(objDir)
+#	$(CC) -c $(CFLAGS) $< -o $@
+# 2. Add this target to create the directory if it's missing
+#$(objDir):
+#	mkdir -p $(objDir)
 
 
 # Files included in a distribution.
@@ -278,7 +291,8 @@ distFiles =     *.[ch]                                     \
 	            makefile_icc_profile_static                \
 	            makefile_icc_release_static                \
 	            README INSTALL LICENSE                     \
-	            configure
+	            configure								   \
+				best_known_bounds.csv
 
 
 .PHONY: clean
@@ -419,12 +433,16 @@ deps:
 	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/options.o'  options.c
 	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/common.o'   common.c
 	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/conjHash.o' conjHash.c
+	$(CC) $(CFLAGS) -MM -MT '$$(objDir)/readBounds.o' readBounds.c
 
 # Dependencies. Dependencies can be generated with "make -s deps" or something
 # like that. See deps above.
 $(objDir)/hardest.o: hardest.c hard.h conjHash.h options.h common.h
-$(objDir)/hard.o: hard.c hard.h conjHash.h common.h compilerMacros.h
+$(objDir)/hard.o: hard.c hard.h conjHash.h common.h compilerMacros.h \
+ readBounds.h
 $(objDir)/options.o: options.c options.h hard.h conjHash.h common.h
 $(objDir)/common.o: common.c common.h compilerMacros.h
-$(objDir)/conjHash.o: conjHash.c conjHash.h hard.h common.h
+$(objDir)/conjHash.o: conjHash.c conjHash.h hard.h common.h \
+ compilerMacros.h
+$(objDir)/readBounds.o: readBounds.c readBounds.h hard.h conjHash.h
 
