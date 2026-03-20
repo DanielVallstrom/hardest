@@ -24,7 +24,7 @@ Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`
 
 Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`
 
-Current version: **0.15.5** — Default compiler: `gcc`
+Current version: **0.16.4** — Default compiler: `gcc`
 
 ## Usage
 
