@@ -270,6 +270,9 @@ stdout,
 "                          The integer can be bin (0b), hex (0x),\n"
 "                          octal (0), or plain decimal.\n"
 "  --version               Print the version number.\n"
+"  -w --update-bounds[=no|yes]\n"
+"                          If true, then improved upper bounds are written to\n"
+"                          the csv bounds file.\n"
 "  -W --estimate-weight <float>\n"
 "                          In estimate heuristic 1, factor for new results will\n"
 "                          get upped by this, and factor for old average will be\n"
@@ -417,6 +420,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "true-gods",              required_argument, NULL, 't' },
             { "upper-bound",            required_argument, NULL, 'u' },
             { "verbose",                optional_argument, NULL, 'v' },
+            { "update-bounds",          optional_argument, NULL, 'w' },
             { "version",                no_argument,       NULL, CHAR_MAX+2 },
             { "print-more",             optional_argument, NULL, CHAR_MAX+3 },
             { "print-options",          no_argument,       NULL, CHAR_MAX+4 },
@@ -427,7 +431,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:qr:s:t:u:v::",
+                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -1121,6 +1125,34 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     //hi->settings->verbosityVector = 0xffffffffffffffff;
                     setVerbosityLevel( hi, 8 );
+                }
+
+                break;
+
+            case 'w':
+                if ( optarg )
+                {
+                    if ( strcmp( optarg, "no" ) == 0 )
+                    {
+                        hi->settings->updateBoundsFile = false;
+                    }
+                    else if ( strcmp( optarg, "yes" ) == 0 )
+                    {
+                        hi->settings->updateBoundsFile = true;
+                    }
+                    else
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -w and --update-bounds must be\n"
+                                 "no or yes. You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+                }
+                else
+                {
+                    hi->settings->updateBoundsFile = true;
                 }
 
                 break;

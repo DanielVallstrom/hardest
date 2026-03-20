@@ -447,7 +447,7 @@ static bool parseBody( HardInstance * hi )
                s->boundStatus == HardBoundStatus_likely )  &&
              s->verbosityVector & HardVerbosity_printInfo )
         {
-            printf ( "version: ", outFile );
+            fprintf ( outFile, "version: " );
 
             if ( printUntilChar( file, ',', outFile ) )
             {
