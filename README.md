@@ -17,7 +17,6 @@ The generalization considers _n_ gods with arbitrary numbers of each type (false
 **hardest** is a standard C program. Build with:
 
 ```sh
-mkdir objects
 make
 ```
 
