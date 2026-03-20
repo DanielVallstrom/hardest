@@ -20,9 +20,9 @@ The generalization considers _n_ gods with arbitrary numbers of each type (false
 make
 ```
 
-Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`
+Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`, `readBounds.c`
 
-Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`
+Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`, `readBounds.h`
 
 Current version: **0.16.4** — Default compiler: `gcc`
 
