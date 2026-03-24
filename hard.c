@@ -108,10 +108,11 @@ HardInstance * hard_newInstance(void)
     hi->settings->estWeight = 0.0;
 
     hi->settings->boundsFileName = "best_known_bounds.csv";
+    hi->settings->backupBoundsFileName = "best_known_bounds.csv~";
     hi->settings->boundsFile = NULL;
     hi->settings->updateBoundsFile = true;  // ??
     hi->settings->useBoundsFileOptions = false;  // ??
-    hi->settings->upperBoundInFile = 0;  // Undefined.
+    hi->settings->upperBoundInFile = DBL_MAX;  // Undefined.
     hi->settings->boundStatus = HardBoundStatus_undefined;
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
@@ -129,13 +130,15 @@ HardInstance * hard_newInstance(void)
     }
 
     // Open the bounds file. We'll re-open file if it's to be written to.
+    // Or, let's wait with opening the file until it's needed.
+    #if 0
     hi->settings->boundsFile = fopen( hi->settings->boundsFileName, "r" );
 
     if ( hi->settings->boundsFile == NULL )
     {
         fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
     }
-
+    #endif
 
     // Set up the hard part. ------------------------------
 
@@ -426,7 +429,14 @@ bool hard_allocArrays( HardInstance * hi )
 
 
     // Read and close the bounds file.
-    if ( s->boundsFile != NULL )
+    
+    s->boundsFile = fopen( s->boundsFileName, "r" );
+
+    if ( s->boundsFile == NULL )
+    {
+        fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
+    }
+    else
     {
         readBounds_readFile(hi);
 
@@ -4193,6 +4203,13 @@ uint8_t hard_solve( HardInstance * hi )
 
             fputc( '\n', s->outFile );
         }
+
+        // See if the bound is an absolute improvement.
+        if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
+             s->updateBoundsFile )
+        {
+            readBounds_write( hi, bestResult, seedForBestResult );
+        }
     }
     else
     {
@@ -4306,6 +4323,13 @@ uint8_t hard_solve( HardInstance * hi )
                              s->catchAbortsN - h->catchAbortsN );
 
                      fputc( '\n', s->outFile );
+                }
+
+                // See if the bound is an absolute improvement.
+                if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
+                     s->updateBoundsFile )
+                {
+                    readBounds_write( hi, bestResult, seedForBestResult );
                 }
             }
         }

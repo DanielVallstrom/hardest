@@ -38,6 +38,8 @@
 // options. argC and argV work like C's 'main' function arguments.
 //   2 is returned if a help, version or print-options flag is encountered.
 // 1 is returned iff something went wrong. 0 is returned otherwise.
+//   Also saves the command line in case we want to write it to the 
+// bounds file.
 int options_parseCommandLineOptions( HardInstance * hi,
                                      int argC, char * * argV );
 

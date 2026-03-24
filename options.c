@@ -200,6 +200,13 @@ s->optimizeNonR
 
     fprintf(
 stdout,
+"  -p --print-placeholders <unsigned integer>-<unsigned integer>\n"
+"                          Generate placeholders for the upper bounds file,\n"
+"                          from where number of gods sums up to first value,\n"
+"                          to, and including, where gods sum up to second value.\n"
+"                          Prints to stdout since it's dangerous to append the bounds file:\n"
+"                          Make sure that a placeholder don't come after a real\n"
+"                          upper bound of the same problem instance in the bounds file!\n"
 "  -P --print-info[=no|yes]\n"
 "                          Print info if possible. [%s]\n"
 "  -F --precision <unsigned integer>\n"
@@ -366,6 +373,49 @@ static void printSettings( HardInstance * hi )
 
 
 
+// Generates placeholders for upper bounds file, from where number of
+// gods sums up to lowSum, to, and including, where gods sum up to highSum.
+//   Appends the bounds file. Not, since it's dangerous. Goes to stdout instead.
+static bool printPlaceholders( /*HardInstance * hi,*/ GodsN lowSum, GodsN highSum )
+{
+    if ( lowSum > highSum  ||  highSum < 3 )
+    {
+        return false;
+    }
+
+    lowSum = max( lowSum, 3 );
+
+    // Open the bounds file.
+    //FILE * file = fopen( hi->settings->boundsFileName, "a" );
+
+    /*
+    if ( file == NULL )
+    {
+        fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
+
+        return true;
+    }
+    */
+
+    for ( GodsN n = lowSum; n != highSum + 1; n++ )
+    {
+        for ( GodsN r = 1; r != (n-1) / 2 + 1; r++ )
+        {
+            for ( GodsN t = n-r, f = 0; f <= t; t--, f++ )
+            {
+                fprintf( stdout /*file*/, "%u,%u,%u,999.9,upper_bound,placeholder,,\r\n",
+                                f, t, r );
+            }
+        }
+    }
+
+    //fclose(file);
+
+    return false;
+}
+
+
+
 // Parse the command line options.
 //   Returns 0 iff everything went fine and you should continue on.
 // Returns 1 iff there was an error. Returns > 1 for e.g. --help and you
@@ -413,6 +463,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "gods",                   required_argument, NULL, 'n' },
             { "outfile",                required_argument, NULL, 'o' },
+            { "print-placeholders",     required_argument, NULL, 'p' },
             { "quiet",                  no_argument,       NULL, 'q' },
             { "silent",                 no_argument,       NULL, 'q' },
             { "random-gods",            required_argument, NULL, 'r' },
@@ -431,7 +482,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:qr:s:t:u:v::w::",
+                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -1017,6 +1068,27 @@ static int parseCommandLineOptions( HardInstance * hi,
 
                 break;
 
+            case 'p':
+                {
+                    unsigned int n;
+                    unsigned int k;
+
+                    if ( readUintCharUint( optarg, &k, '-', &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -p and --print-placeholders must be\n"
+                                 "<unsigned integer>-<unsigned integer>. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    printPlaceholders( /*hi,*/ k, n );
+                }
+
+                return 2;
+
             case 'q':
                 hi->settings->verbosityVector = 0;
 
@@ -1299,17 +1371,22 @@ static int parseCommandLineOptions( HardInstance * hi,
 // Returns 0 iff everything went fine and you should continue on.
 // Returns 1 iff there was an error. Returns > 1 for e.g. --help and you
 // should stop.
+//   Also saves the command line in case we want to write it to the 
+// bounds file.
 int options_parseCommandLineOptions( HardInstance * hi,
                                      int argC, char * * argV )
 {
     int result = parseCommandLineOptions( hi, argC, argV );
+
+    hi->settings->argC = argC;
+    hi->settings->argV = argV;
 
     #ifndef NoGetopt
 
     // Reset getopt so that more calls to options_parseCommandLineOptions
     // can be made. An alternative would be to set optind to 1 at the start
     // of parseCommandLineOptions. Best would be though to dump getopt
-    // altogether and write something good instead!!
+    // altogether and write something else instead.
     optind = 1;  // Is this enough???
 
     #endif // #ifndef NoGetopt

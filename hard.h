@@ -90,6 +90,11 @@ typedef uint8_t GodsN;  // The number of gods. Should maybe be larger.
 #define GodsN_Undef (UINT8_MAX)
 
 
+// For knowing when a found bound really is an improvement over the bound in
+// the bounds file. The current precision in the bounds file is six decimals.
+#define BoundsFilePrecision (0.000001)
+
+
 // The main structure containing the investigation settings and data.
 typedef struct Hard_
 {
@@ -392,6 +397,14 @@ typedef struct Settings_
 
     // The status of the bound from the bounds file.
     uint8_t boundStatus;
+
+    // The name of backup of the csv file with upper bounds.
+    char * backupBoundsFileName;
+
+    // For saving the command line in case we want to write it to the 
+    // bounds file.
+    int argC; 
+    char * * argV;
 
 } Settings;
 

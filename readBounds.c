@@ -234,6 +234,7 @@ static bool parseBody( HardInstance * hi )
     FILE * outFile = s->outFile;
 
     uint32_t rows = 1;  // Number of lines in csv file, including header.
+    uint32_t entries = 0;  // Number of entries for the instance.
 
     int chr;
 
@@ -253,7 +254,7 @@ static bool parseBody( HardInstance * hi )
 
         if ( chr == EOF )
         {
-            return false;
+            break;
         }
 
         rows++;
@@ -341,7 +342,10 @@ static bool parseBody( HardInstance * hi )
 
         // This is the row for the instance.
 
+        entries++;
+
         // Read upper bound.
+
         double bound;
         if ( getReal( file, &bound ) )
         {
@@ -357,7 +361,7 @@ static bool parseBody( HardInstance * hi )
         if ( s->verbosityVector & HardVerbosity_printInfo )
         {
             fprintf( outFile, "\nFrom the upper bounds file:\n"
-                     "upper bound: %g\n", bound );
+                     "upper bound: %f\n", bound );
         }
 
 
@@ -425,6 +429,8 @@ static bool parseBody( HardInstance * hi )
         {
             if ( s->verbosityVector & HardVerbosity_printInfo )
             {
+                putc( chr, outFile );
+
                 if ( printUntilChar( file, ',', outFile ) )
                 {
                     fprintf( stderr, "Parse error reading notes on line %u in csv file.\n\n",
@@ -443,25 +449,30 @@ static bool parseBody( HardInstance * hi )
 
 
         // Here is the column for the version.
-        if ( ( s->boundStatus == HardBoundStatus_upperBound  ||
-               s->boundStatus == HardBoundStatus_likely )  &&
-             s->verbosityVector & HardVerbosity_printInfo )
-        {
-            fprintf ( outFile, "version: " );
 
-            if ( printUntilChar( file, ',', outFile ) )
+        chr = getc(file);
+
+        if ( chr != ',' )
+        {
+            if ( s->verbosityVector & HardVerbosity_printInfo )
             {
-                fprintf( stderr, "Parse error reading version on line %u in csv file.\n\n",
-                                 rows );
+                fprintf ( outFile, "version: " );
+                putc( chr, outFile );
 
-                return true;
-           }
+                if ( printUntilChar( file, ',', outFile ) )
+                {
+                    fprintf( stderr, "Parse error reading version on line %u in csv file.\n\n",
+                                     rows );
 
-           putc( '\n', outFile );
-        }
-        else
-        {
-            eatUntilChar( file, ',' );
+                    return true;
+                }
+
+                putc( '\n', outFile );
+            }
+            else
+            {
+                eatUntilChar( file, ',' );
+            }
         }
 
 
@@ -504,8 +515,23 @@ static bool parseBody( HardInstance * hi )
     while ( chr != EOF );  // EOF is handled at the start, mostly.
 
 
+    if ( entries == 0 )
+    {
+        if ( s->verbosityVector & HardVerbosity_printInfo )
+        {
+            fprintf( s->outFile, "\nno entry found for the problem in the bounds file\n\n" );
+        }
+    }
+    else if ( entries > 1 )
+    {
+        fprintf( stderr, "Error: bounds file contains %u entries for the "
+                         "problem; the last one is used.\n\n", entries );
+    }
+
+
     return false;
 }
+
 
 
 // Parses the bounds file. Returns true iff an error occurred.
@@ -520,6 +546,380 @@ bool readBounds_readFile( HardInstance * hi )
     {
         return true;
     }
+
+    return false;
+}
+
+
+
+// Append new csv row.
+static bool append( HardInstance * hi, double bound, uint64_t seed )
+{
+    Hard * h = hi->hard;
+    Settings * s = hi->settings;
+
+    FILE * file = s->boundsFile;
+
+    int argc = s->argC;
+    char * * argv = s->argV;
+
+    fprintf( file, "%u,", h->fGodsN );
+    fprintf( file, "%u,", h->tGodsN );
+    fprintf( file, "%u,", h->rGodsN );
+    fprintf( file, "%.*f,", s->precision, bound );
+
+    // What do we want to do here?
+    if ( h->rGodsN == 1 )
+    {
+        fprintf( file, "optimal," );
+    }
+    else
+    {
+        fprintf( file, "upper_bound," );
+    }
+
+    // Notes. Now it's empty. Do we want it to include anything? You could 
+    // place an identifier for the one who found the upper bound here, perhaps?
+    fprintf( file, "," );
+
+    fprintf( file, "%s,", hardestVersion );
+
+    // Here comes the replication command. We'll add seed and -i 0 last.
+
+    for ( int c = 0; c != argc; c++ )
+    {
+        fprintf( file, "%s ", argv[c] );
+    }
+
+    fprintf( file, "-s %lu -i 0", seed );    
+
+    // End with CRLF.
+    fprintf( file, "\r\n" );
+
+    return false;
+}
+
+
+
+// Updates bound in the upper bounds file. Returns true iff an error occurred.
+//   seed should be the seed for the search that found the bound.
+//   Rows will end with CRLF, following some csv definition or convention,
+// apparently. 
+//   Will also remove duplicates of the instance.
+static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
+{
+    Hard * h = hi->hard;
+    Settings * s = hi->settings;
+
+    int argc = s->argC;
+    char * * argv = s->argV;
+
+    // Name of the temporary bounds file. 
+    // The file is to be renamed as the new bounds file.
+    char tmpFileName[L_tmpnam];
+
+    if ( tmpnam(tmpFileName) == NULL )
+    {
+        fprintf( stderr, "\nCould not get a temporary file name.\n\n" );
+
+        return true;
+    }
+
+    // Open files.
+
+    FILE * newFile = fopen( tmpFileName, "w");
+
+    if ( newFile == NULL )
+    {
+        fprintf( stderr, "\nCould not open a new bounds file.\n\n" );
+
+        return true;
+    }
+
+    s->boundsFile = fopen( s->boundsFileName, "r");
+
+    if ( s->boundsFile == NULL )
+    {
+        fprintf( stderr, "\nCould not open bounds file.\n\n" );
+
+        fclose(newFile);
+
+        return true;
+    }
+
+
+    GodsN f = h->fGodsN;
+    GodsN t = h->tGodsN;
+    GodsN r = h->rGodsN;
+
+    FILE * file = s->boundsFile;
+
+    uint32_t rows = 1;  // Number of lines in csv file, including header.
+    uint32_t entries = 0;  // Number of entries for the instance.
+
+    int chr;
+
+
+    // Print header.
+    printUntilChar( file, '\n', newFile );
+    putc( '\n', newFile );
+
+
+    do
+    {   // Parse one row.
+
+        //uint8_t col = 1;  // The current column.
+
+        uint32_t n;  // Used for reading numbers.
+
+        // Read false column.
+        //   If EOF comes early, the line will be treated as
+        // white space, ending the file, and not treated as an error.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            break;
+        }
+
+        rows++;
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of false gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != f )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,", n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+    
+
+        // Read true column.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            fprintf( stderr, "Parse error on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of true gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != t )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,%u,", f, n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+
+
+        // Read random column.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            fprintf( stderr, "Parse error on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of random gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != r )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,%u,%u,", f, t, n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+
+
+        // This is the row for the instance.
+
+        // Skip the rest of the line in the old file.
+        eatLine(file);
+
+        entries++;
+
+        // If this isn't the first entry, just skip the row, without
+        // printing anything.
+        if ( entries > 1 )
+        {
+            continue;
+        }
+
+        // Print gods.
+        fprintf( newFile, "%u,%u,%u,", f, t, r );
+
+        // Print new upper bound.
+        fprintf( newFile, "%.*f,", s->precision, bound );
+
+        // This is the status column.
+        if ( h->rGodsN == 1 )
+        {
+            fprintf( newFile, "optimal," );
+        }
+        else
+        {
+            fprintf( newFile, "upper_bound," );
+        }
+
+        // Here are notes. We could add "by XY" here.
+        putc( ',', newFile );
+
+        fprintf( newFile, "%s,", hardestVersion );
+
+        // Here comes the replication command. We'll add seed and -i 0 last.
+
+        for ( int c = 0; c != argc; c++ )
+        {
+            fprintf( newFile, "%s ", argv[c] );
+        }
+
+        fprintf( newFile, "-s %lu -i 0", seed );    
+
+        // End with CRLF.
+        fprintf( newFile, "\r\n" );
+
+    }
+    while ( chr != EOF );  // EOF is handled at the start, mostly.
+
+
+    fclose(file);
+    fclose(newFile);
+
+    // Update backup file.
+
+    remove( s->backupBoundsFileName );
+
+    if ( rename( s->boundsFileName, s->backupBoundsFileName ) )
+    {
+        fprintf( stderr, "error: couldn't rename backup bounds file\n\n" );
+    }
+
+    remove( s->boundsFileName );  // In case above failed, and we are on Windows.
+
+    if ( rename( tmpFileName, s->boundsFileName ) )
+    {
+        fprintf( stderr, "error: couldn't rename temporary bounds file\n\n" );
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+
+// Writes bound to the upper bounds file. Returns true iff an error occurred.
+//   seed should be the seed for the search that found the bound.
+//   Also updates hi.
+//   Rows will end with CRLF, following some csv definition or convention,
+// apparently. 
+//   Uses tmpnam, which is deprecated. However, there is no standard C
+// alternative.
+bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
+{
+    Hard * h = hi->hard;
+    Settings * s = hi->settings;
+
+    // If bound isn't in the bounds file, we'll append it last. Otherwise
+    // we'll replace the current row.
+
+    if ( s->boundStatus == HardBoundStatus_undefined )
+    {
+        // Open the bounds file.
+        s->boundsFile = fopen( hi->settings->boundsFileName, "a" );
+
+        if ( hi->settings->boundsFile == NULL )
+        {
+            fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
+
+            return true;
+        }
+
+        // Append new csv row.
+        if ( append( hi, bound, seed ) )
+        {
+            fprintf( stderr, "\nCould not append best_known_bounds.csv\n\n" );
+
+            fclose(s->boundsFile);
+
+            return true;
+        }
+
+        fclose(s->boundsFile);
+    }
+    else
+    {
+        if ( updateBound( hi, bound, seed ) )
+        {
+            fprintf( stderr, "\nCould not update best_known_bounds.csv\n\n" );
+
+            return true;
+        }
+    }
+
+
+    // Update s with new values.
+
+    if ( h->rGodsN == 1 )
+    {
+        s->boundStatus = HardBoundStatus_optimal;
+    }
+    else
+    {
+        s->boundStatus = HardBoundStatus_upperBound;
+    }
+
+    s->upperBoundInFile = bound;
+
+
+    // Print info.
+    if ( s->verbosityVector & HardVerbosity_printInfo )
+    {
+        fprintf( s->outFile, "Updated bounds file with new bound: %f\n\n", bound );
+    }
+
 
     return false;
 }
