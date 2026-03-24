@@ -7,7 +7,7 @@ This file tracks upper bounds on the expected number of questions needed to solv
 - Values marked *Likely* could very well be optimal, too.
 - Values marked as Upper bound may be improvable — you are welcome to try!
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds. Easiest is to just run the program and upload best_known_bounds.csv if you find any improvement; best_known_bounds.csv is updated automatically with default options. However, then bounds in this file might be outdated --- and might stay outdated until it's updated by an AI agent.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds. Easiest is to just run the program and upload [best_known_bounds.csv](best_known_bounds.csv) if you find any improvement; best_known_bounds.csv is updated automatically with default options. However, then bounds in this file might be outdated --- and might stay outdated until it's updated by an AI agent.
 
 ## How to Reproduce
 
