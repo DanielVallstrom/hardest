@@ -8,7 +8,7 @@ There are three ways to submit an improved bound:
 
 ### 1. Pull Request (preferred)
 
-Update [`best_known_bounds.csv`](best_known_bounds.csv) and [`LEADERBOARD.md`](LEADERBOARD.md) with your improved bound, including full reproduction information (see below). Open a pull request with these changes.
+Update [`best_known_bounds.csv`](best_known_bounds.csv) and [`LEADERBOARD.md`](LEADERBOARD.md) with your improved bound, including full reproduction information (see below). Open a pull request with these changes. Easiest is to just run the program and upload [`best_known_bounds.csv`](best_known_bounds.csv) if you find any improvement; [`best_known_bounds.csv`](best_known_bounds.csv) is updated automatically with default options.
 
 ### 2. GitHub Issue
 
