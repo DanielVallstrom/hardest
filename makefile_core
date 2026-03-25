@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.16.14
+version = 0.16.15
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -292,7 +292,9 @@ distFiles =     *.[ch]                                     \
 	            makefile_icc_release_static                \
 	            README INSTALL LICENSE                     \
 	            configure								   \
-				best_known_bounds.csv
+				best_known_bounds.csv                      \
+				shardest.sh shardestr.sh                   \
+				shardestr2.sh shardestrf.sh
 
 
 .PHONY: clean
