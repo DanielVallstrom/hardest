@@ -355,7 +355,11 @@ static bool parseBody( HardInstance * hi )
             return true;
         }
 
-        s->upperBoundInFile = bound;
+        // In case there are multiple bounds in the file.
+        if ( bound < s->upperBoundInFile )
+        {
+            s->upperBoundInFile = bound;
+        }
 
         // Print info.
         if ( s->verbosityVector & HardVerbosity_printInfo )
@@ -525,7 +529,7 @@ static bool parseBody( HardInstance * hi )
     else if ( entries > 1 )
     {
         fprintf( stderr, "Error: bounds file contains %u entries for the "
-                         "problem; the last one is used.\n\n", entries );
+                         "problem; the smallest bound is used.\n\n", entries );
     }
 
 
@@ -545,6 +549,22 @@ bool readBounds_readFile( HardInstance * hi )
     if ( parseBody(hi) )
     {
         return true;
+    }
+
+    // Update rest of hi.
+    if ( hi->settings->useBoundFromFile == 1 )
+    {
+        if ( hi->hard->upperBound == DBL_MAX )
+        {
+            hi->hard->upperBound = hi->settings->upperBoundInFile;
+        }
+    }
+    else if ( hi->settings->useBoundFromFile == 2 )
+    {
+        if ( hi->settings->upperBoundInFile < hi->hard->upperBound )
+        {
+            hi->hard->upperBound = hi->settings->upperBoundInFile;
+        }
     }
 
     return false;

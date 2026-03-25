@@ -185,9 +185,9 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 4,5,5,19.311446,upper_bound,,0.16.12,./hardest -f 4 -t 5 -r 5 -b 1 -i 0 -s 1774361632 -i 0
 0,8,6,13.827684,upper_bound,,0.16.12,./hardest -f 0 -t 8 -r 6 -b 1 -i 0 -s 1774363807 -i 0
 1,7,6,16.986330,upper_bound,,0.16.12,./hardest -f 1 -t 7 -r 6 -b 1 -i 0 -s 1774363885 -i 0
-2,6,6,999.9,upper_bound,placeholder,,
-3,5,6,999.9,upper_bound,placeholder,,
-4,4,6,999.9,upper_bound,placeholder,,
+2,6,6,18.843441,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 2 -t 6 -r 6 -s 1774405434 -i 0
+3,5,6,19.877307,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 3 -t 5 -r 6 -s 1774405510 -i 0
+4,4,6,20.201837,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 4 -t 4 -r 6 -s 1774405819 -i 0
 0,14,1,4.0,optimal,,,
 1,13,1,7.847619,optimal,,0.16.6,./hardest -f 1 -t 13 -r 1 -b 1 -u 12 -i 1000 -b 9 -s 1774094435 -i 0
 2,12,1,10.566300,optimal,,0.16.8,./hardest -f 2 -t 12 -r 1 -i 99 -b 6 -s 1774187197 -i 0
@@ -221,17 +221,17 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 2,8,5,18.210801,upper_bound,,0.16.12,./hardest -f 2 -t 8 -r 5 -b 1 -i 0 -s 1774361010 -i 0
 3,7,5,19.657054,upper_bound,,0.16.12,./hardest -f 3 -t 7 -r 5 -b 1 -i 0 -s 1774361822 -i 0
 4,6,5,20.445487,upper_bound,,0.16.12,./hardest -f 4 -t 6 -r 5 -b 1 -i 0 -s 1774364307 -i 0
-5,5,5,999.9,upper_bound,placeholder,,
-0,9,6,999.9,upper_bound,placeholder,,
-1,8,6,999.9,upper_bound,placeholder,,
-2,7,6,999.9,upper_bound,placeholder,,
-3,6,6,999.9,upper_bound,placeholder,,
-4,5,6,999.9,upper_bound,placeholder,,
-0,8,7,999.9,upper_bound,placeholder,,
-1,7,7,999.9,upper_bound,placeholder,,
-2,6,7,999.9,upper_bound,placeholder,,
-3,5,7,999.9,upper_bound,placeholder,,
-4,4,7,999.9,upper_bound,placeholder,,
+5,5,5,20.787394,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 5 -t 5 -r 5 -s 1774405623 -i 0
+0,9,6,14.141394,upper_bound,,0.16.13,./hardest -b 1 -i 1 -f 0 -t 9 -r 6 -s 1774406758 -i 0
+1,8,6,17.452887,upper_bound,,0.16.13,./hardest -b 0 -i 1 -f 1 -t 8 -r 6 -s 18248355884403292224 -i 0
+2,7,6,19.497263,upper_bound,,0.16.13,./hardest -b 0 -i 1 -f 2 -t 7 -r 6 -s 1774406982 -i 0
+3,6,6,20.807643,upper_bound,,0.16.13,./hardest -b 0 -i 1 -f 3 -t 6 -r 6 -s 1774407098 -i 0
+4,5,6,21.368066,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 4 -t 5 -r 6 -s 1774407320 -i 0
+0,8,7,16.012912,upper_bound,,0.16.13,./hardest -b 0 -i 3 -f 0 -t 8 -r 7 -s 1774407211 -i 0
+1,7,7,19.268177,upper_bound,,0.16.13,./hardest -b 0 -i 1 -f 1 -t 7 -r 7 -s 5678233198318744987 -i 0
+2,6,7,21.235702,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 2 -t 6 -r 7 -s 1774407920 -i 0
+3,5,7,22.223071,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 3 -t 5 -r 7 -s 1774407909 -i 0
+4,4,7,22.607851,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 4 -t 4 -r 7 -s 1774407549 -i 0
 0,15,1,4.093750,optimal,,,
 1,14,1,7.995833,optimal,,0.16.6,./hardest -f 1 -t 14 -r 1 -b 1 -u 12 -i 1000 -b 9 -s 1774094445 -i 0
 2,13,1,10.843452,optimal,,0.16.8,./hardest -f 2 -t 13 -r 1 -i 99 -b 4 -s 1774187259 -i 0
@@ -241,44 +241,44 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 6,9,1,16.425737,optimal,,0.16.8,./hardest -f 6 -t 9 -r 1 -i 99 -b 4 -s 1774187297 -i 0
 7,8,1,16.789462,optimal,,0.16.8,./hardest -f 7 -t 8 -r 1 -i 49 -b 3 -s 1774187332 -i 0
 0,14,2,7.075000,conjectured,,,
-1,13,2,999.9,upper_bound,placeholder,,
-2,12,2,999.9,upper_bound,placeholder,,
-3,11,2,999.9,upper_bound,placeholder,,
-4,10,2,999.9,upper_bound,placeholder,,
-5,9,2,999.9,upper_bound,placeholder,,
-6,8,2,999.9,upper_bound,placeholder,,
-7,7,2,999.9,upper_bound,placeholder,,
-0,13,3,999.9,upper_bound,placeholder,,
-1,12,3,999.9,upper_bound,placeholder,,
-2,11,3,999.9,upper_bound,placeholder,,
-3,10,3,999.9,upper_bound,placeholder,,
-4,9,3,999.9,upper_bound,placeholder,,
-5,8,3,999.9,upper_bound,placeholder,,
-6,7,3,999.9,upper_bound,placeholder,,
-0,12,4,999.9,upper_bound,placeholder,,
-1,11,4,999.9,upper_bound,placeholder,,
-2,10,4,999.9,upper_bound,placeholder,,
-3,9,4,999.9,upper_bound,placeholder,,
-4,8,4,999.9,upper_bound,placeholder,,
-5,7,4,999.9,upper_bound,placeholder,,
-6,6,4,999.9,upper_bound,placeholder,,
-0,11,5,999.9,upper_bound,placeholder,,
-1,10,5,999.9,upper_bound,placeholder,,
-2,9,5,999.9,upper_bound,placeholder,,
-3,8,5,999.9,upper_bound,placeholder,,
-4,7,5,999.9,upper_bound,placeholder,,
-5,6,5,999.9,upper_bound,placeholder,,
-0,10,6,999.9,upper_bound,placeholder,,
-1,9,6,999.9,upper_bound,placeholder,,
-2,8,6,999.9,upper_bound,placeholder,,
-3,7,6,999.9,upper_bound,placeholder,,
-4,6,6,999.9,upper_bound,placeholder,,
-5,5,6,999.9,upper_bound,placeholder,,
-0,9,7,999.9,upper_bound,placeholder,,
-1,8,7,999.9,upper_bound,placeholder,,
-2,7,7,999.9,upper_bound,placeholder,,
-3,6,7,999.9,upper_bound,placeholder,,
-4,5,7,999.9,upper_bound,placeholder,,
+1,13,2,10.933333,upper_bound,,0.16.13,./hardest -f 1 -t 13 -r 2 -b 0 -i 0 -s 1774408142 -i 0
+2,12,2,13.655769,upper_bound,,0.16.13,./hardest -f 2 -t 12 -r 2 -b 0 -i 0 -s 1774408142 -i 0
+3,11,2,15.656960,upper_bound,,0.16.13,./hardest -f 3 -t 11 -r 2 -b 0 -i 0 -s 1774408142 -i 0
+4,10,2,17.079924,upper_bound,,0.16.13,./hardest -f 4 -t 10 -r 2 -b 0 -i 0 -s 1774408143 -i 0
+5,9,2,18.074856,upper_bound,,0.16.13,./hardest -f 5 -t 9 -r 2 -b 0 -i 0 -s 1774408143 -i 0
+6,8,2,18.702800,upper_bound,,0.16.13,./hardest -f 6 -t 8 -r 2 -b 0 -i 0 -s 1774408144 -i 0
+7,7,2,18.884390,upper_bound,,0.16.13,./hardest -f 7 -t 7 -r 2 -b 0 -i 0 -s 1774408146 -i 0
+0,13,3,9.457143,upper_bound,,0.16.13,./hardest -f 0 -t 13 -r 3 -b 0 -i 0 -s 1774408149 -i 0
+1,12,3,13.166106,upper_bound,,0.16.13,./hardest -f 1 -t 12 -r 3 -b 0 -i 0 -s 1774408149 -i 0
+2,11,3,15.814973,upper_bound,,0.16.13,./hardest -f 2 -t 11 -r 3 -b 0 -i 0 -s 1774408149 -i 0
+3,10,3,17.684753,upper_bound,,0.16.13,./hardest -f 3 -t 10 -r 3 -b 0 -i 0 -s 1774408149 -i 0
+4,9,3,19.002139,upper_bound,,0.16.13,./hardest -f 4 -t 9 -r 3 -b 0 -i 0 -s 1774408151 -i 0
+5,8,3,19.857876,upper_bound,,0.16.13,./hardest -f 5 -t 8 -r 3 -b 0 -i 0 -s 1774408156 -i 0
+6,7,3,20.221115,upper_bound,,0.16.13,./hardest -f 6 -t 7 -r 3 -b 0 -i 0 -s 1774408164 -i 0
+0,12,4,11.357143,upper_bound,,0.16.13,./hardest -f 0 -t 12 -r 4 -b 0 -i 0 -s 1774408177 -i 0
+1,11,4,15.031599,upper_bound,,0.16.13,./hardest -f 1 -t 11 -r 4 -b 0 -i 0 -s 1774408177 -i 0
+2,10,4,17.476802,upper_bound,,0.16.13,./hardest -f 2 -t 10 -r 4 -b 0 -i 0 -s 1774408177 -i 0
+3,9,4,19.197033,upper_bound,,0.16.13,./hardest -f 3 -t 9 -r 4 -b 0 -i 0 -s 1774408180 -i 0
+4,8,4,20.375996,upper_bound,,0.16.13,./hardest -f 4 -t 8 -r 4 -b 0 -i 0 -s 1774408189 -i 0
+5,7,4,21.093232,upper_bound,,0.16.13,./hardest -f 5 -t 7 -r 4 -b 0 -i 0 -s 1774408217 -i 0
+6,6,4,21.292365,upper_bound,,0.16.13,./hardest -f 6 -t 6 -r 4 -b 0 -i 0 -s 1774408253 -i 0
+0,11,5,13.072137,upper_bound,,0.16.13,./hardest -f 0 -t 11 -r 5 -b 0 -i 0 -s 1774408308 -i 0
+1,10,5,16.550770,upper_bound,,0.16.13,./hardest -f 1 -t 10 -r 5 -b 0 -i 0 -s 1774408309 -i 0
+2,9,5,18.985363,upper_bound,,0.16.13,./hardest -f 2 -t 9 -r 5 -b 0 -i 0 -s 1774408312 -i 0
+3,8,5,20.512070,upper_bound,,0.16.13,./hardest -f 3 -t 8 -r 5 -b 0 -i 0 -s 1774408327 -i 0
+4,7,5,21.515182,upper_bound,,0.16.13,./hardest -f 4 -t 7 -r 5 -b 0 -i 0 -s 1774408367 -i 0
+5,6,5,22.058711,upper_bound,,0.16.13,./hardest -f 5 -t 6 -r 5 -b 0 -i 0 -s 1774408447 -i 0
+0,10,6,14.543678,upper_bound,,0.16.13,./hardest -b 0 -i 0 -f 0 -t 10 -r 6 -b1 -i9 -s 3017074973487137738 -i 0
+1,9,6,18.090797,upper_bound,,0.16.13,./hardest -f 1 -t 9 -r 6 -b 0 -i 0 -s 1774408576 -i 0
+2,8,6,20.190312,upper_bound,,0.16.13,./hardest -f 2 -t 8 -r 6 -b 0 -i 0 -s 1774408586 -i 0
+3,7,6,21.690833,upper_bound,,0.16.13,./hardest -f 3 -t 7 -r 6 -b 0 -i 0 -s 1774408629 -i 0
+4,6,6,22.470107,upper_bound,,0.16.13,./hardest -f 4 -t 6 -r 6 -b 0 -i 0 -s 1774408730 -i 0
+5,5,6,22.815823,upper_bound,,0.16.13,./hardest -f 5 -t 5 -r 6 -b 0 -i 0 -s 1774408932 -i 0
+0,9,7,16.321492,upper_bound,,0.16.13,./hardest -f 0 -t 9 -r 7 -b 0 -i 0 -s 1774409151 -i 0
+1,8,7,19.681046,upper_bound,,0.16.13,./hardest -f 1 -t 8 -r 7 -b 0 -i 0 -s 1774409154 -i 0
+2,7,7,21.736260,upper_bound,,0.16.13,./hardest -f 2 -t 7 -r 7 -b 0 -i 0 -s 1774409187 -i 0
+3,6,7,22.968507,upper_bound,,0.16.13,./hardest -f 3 -t 6 -r 7 -b 0 -i 0 -s 1774409303 -i 0
+4,5,7,23.566978,upper_bound,,0.16.13,./hardest -f 4 -t 5 -r 7 -b 0 -i 0 -s 1774409574 -i 0
 0,16,1,4.176471,optimal,,,
 1,15,1,8.176471,optimal,,0.16.6,./hardest -f 1 -t 15 -r 1 -b 1 -u 12 -i 1000 -b 9 -s 1774094461 -i 0
 2,14,1,11.054902,optimal,,0.16.8,./hardest -f 2 -t 14 -r 1 -i 29 -b 2 -s 1774187360 -i 0
@@ -288,106 +288,105 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 6,10,1,17.133220,optimal,,0.16.8,./hardest -f 6 -t 10 -r 1 -i 19 -b 2 -s 1774187400 -i 0
 7,9,1,17.710901,optimal,,0.16.8,./hardest -f 7 -t 9 -r 1 -i 19 -b 2 -s 1774187412 -i 0
 8,8,1,17.860670,optimal,,0.16.6,./hardest -f 8 -t 8 -r 1 -i 10 -b 1 -s 1774099742 -i 0
-0,15,2,7.257353,conjectured,,,
-0,15,2,999.9,upper_bound,placeholder,,
-1,14,2,999.9,upper_bound,placeholder,,
-2,13,2,999.9,upper_bound,placeholder,,
-3,12,2,999.9,upper_bound,placeholder,,
-4,11,2,999.9,upper_bound,placeholder,,
-5,10,2,999.9,upper_bound,placeholder,,
-6,9,2,999.9,upper_bound,placeholder,,
-7,8,2,999.9,upper_bound,placeholder,,
-0,14,3,999.9,upper_bound,placeholder,,
-1,13,3,999.9,upper_bound,placeholder,,
-2,12,3,999.9,upper_bound,placeholder,,
-3,11,3,999.9,upper_bound,placeholder,,
-4,10,3,999.9,upper_bound,placeholder,,
-5,9,3,999.9,upper_bound,placeholder,,
-6,8,3,999.9,upper_bound,placeholder,,
-7,7,3,999.9,upper_bound,placeholder,,
-0,13,4,999.9,upper_bound,placeholder,,
-1,12,4,999.9,upper_bound,placeholder,,
-2,11,4,999.9,upper_bound,placeholder,,
-3,10,4,999.9,upper_bound,placeholder,,
-4,9,4,999.9,upper_bound,placeholder,,
-5,8,4,999.9,upper_bound,placeholder,,
-6,7,4,999.9,upper_bound,placeholder,,
-0,12,5,999.9,upper_bound,placeholder,,
-1,11,5,999.9,upper_bound,placeholder,,
-2,10,5,999.9,upper_bound,placeholder,,
-3,9,5,999.9,upper_bound,placeholder,,
-4,8,5,999.9,upper_bound,placeholder,,
-5,7,5,999.9,upper_bound,placeholder,,
-6,6,5,999.9,upper_bound,placeholder,,
-0,11,6,999.9,upper_bound,placeholder,,
-1,10,6,999.9,upper_bound,placeholder,,
-2,9,6,999.9,upper_bound,placeholder,,
-3,8,6,999.9,upper_bound,placeholder,,
-4,7,6,999.9,upper_bound,placeholder,,
-5,6,6,999.9,upper_bound,placeholder,,
-0,10,7,999.9,upper_bound,placeholder,,
-1,9,7,999.9,upper_bound,placeholder,,
-2,8,7,999.9,upper_bound,placeholder,,
-3,7,7,999.9,upper_bound,placeholder,,
-4,6,7,999.9,upper_bound,placeholder,,
-5,5,7,999.9,upper_bound,placeholder,,
-0,9,8,999.9,upper_bound,placeholder,,
-1,8,8,999.9,upper_bound,placeholder,,
-2,7,8,999.9,upper_bound,placeholder,,
-3,6,8,999.9,upper_bound,placeholder,,
-4,5,8,999.9,upper_bound,placeholder,,
+0,15,2,7.257353,conjectured,,0.16.13,./hardest -f 0 -t 15 -r 2 -b 0 -i 0 -s 1774408161 -i 0
+1,14,2,11.192157,upper_bound,,0.16.13,./hardest -f 1 -t 14 -r 2 -b 0 -i 0 -s 1774408161 -i 0
+2,13,2,13.997969,upper_bound,,0.16.13,./hardest -f 2 -t 13 -r 2 -b 0 -i 0 -s 1774408161 -i 0
+3,12,2,16.106521,upper_bound,,0.16.13,./hardest -f 3 -t 12 -r 2 -b 0 -i 0 -s 1774408161 -i 0
+4,11,2,17.734459,upper_bound,,0.16.13,./hardest -f 4 -t 11 -r 2 -b 0 -i 0 -s 1774408162 -i 0
+5,10,2,18.862970,upper_bound,,0.16.13,./hardest -f 5 -t 10 -r 2 -b 0 -i 0 -s 1774408163 -i 0
+6,9,2,19.608731,upper_bound,,0.16.13,./hardest -f 6 -t 9 -r 2 -b 0 -i 0 -s 1774408166 -i 0
+7,8,2,19.948625,upper_bound,,0.16.13,./hardest -f 7 -t 8 -r 2 -b 0 -i 0 -s 1774408170 -i 0
+0,14,3,9.758824,upper_bound,,0.16.13,./hardest -f 0 -t 14 -r 3 -b 0 -i 0 -s 1774408175 -i 0
+1,13,3,13.576366,upper_bound,,0.16.13,./hardest -f 1 -t 13 -r 3 -b 0 -i 0 -s 1774408175 -i 0
+2,12,3,16.230333,upper_bound,,0.16.13,./hardest -f 2 -t 12 -r 3 -b 0 -i 0 -s 1774408175 -i 0
+3,11,3,18.244417,upper_bound,,0.16.13,./hardest -f 3 -t 11 -r 3 -b 0 -i 0 -s 1774408176 -i 0
+4,10,3,19.751363,upper_bound,,0.16.13,./hardest -f 4 -t 10 -r 3 -b 0 -i 0 -s 1774408179 -i 0
+5,9,3,20.752597,upper_bound,,0.16.13,./hardest -f 5 -t 9 -r 3 -b 0 -i 0 -s 1774408189 -i 0
+6,8,3,21.290109,upper_bound,,0.16.13,./hardest -f 6 -t 8 -r 3 -b 0 -i 0 -s 1774408215 -i 0
+7,7,3,21.509125,upper_bound,,0.16.13,./hardest -f 7 -t 7 -r 3 -b 0 -i 0 -s 1774408262 -i 0
+0,13,4,11.777311,upper_bound,,0.16.13,./hardest -f 0 -t 13 -r 4 -b 0 -i 0 -s 1774408313 -i 0
+1,12,4,15.465377,upper_bound,,0.16.13,./hardest -f 1 -t 12 -r 4 -b 0 -i 0 -s 1774408313 -i 0
+2,11,4,18.059143,upper_bound,,0.16.13,./hardest -f 2 -t 11 -r 4 -b 0 -i 0 -s 1774408314 -i 0
+3,10,4,19.983227,upper_bound,,0.16.13,./hardest -f 3 -t 10 -r 4 -b 0 -i 0 -s 1774408319 -i 0
+4,9,4,21.235338,upper_bound,,0.16.13,./hardest -f 4 -t 9 -r 4 -b 0 -i 0 -s 1774408340 -i 0
+5,8,4,22.116203,upper_bound,,0.16.13,./hardest -f 5 -t 8 -r 4 -b 0 -i 0 -s 1774408404 -i 0
+6,7,4,22.539547,upper_bound,,0.16.13,./hardest -f 6 -t 7 -r 4 -b 0 -i 0 -s 1774408522 -i 0
+0,12,5,13.433500,upper_bound,,0.16.13,./hardest -f 0 -t 12 -r 5 -b 0 -i 0 -s 1774408676 -i 0
+1,11,5,17.097868,upper_bound,,0.16.13,./hardest -f 1 -t 11 -r 5 -b 0 -i 0 -s 1774408676 -i 0
+2,10,5,19.541392,upper_bound,,0.16.13,./hardest -f 2 -t 10 -r 5 -b 0 -i 0 -s 1774408681 -i 0
+3,9,5,21.313637,upper_bound,,0.16.13,./hardest -f 3 -t 9 -r 5 -b 0 -i 0 -s 1774408707 -i 0
+4,8,5,22.477918,upper_bound,,0.16.13,./hardest -f 4 -t 8 -r 5 -b 0 -i 0 -s 1774408796 -i 0
+5,7,5,23.178574,upper_bound,,0.16.13,./hardest -f 5 -t 7 -r 5 -b 0 -i 0 -s 1774409000 -i 0
+6,6,5,23.398445,upper_bound,,0.16.13,./hardest -f 6 -t 6 -r 5 -b 0 -i 0 -s 1774409350 -i 0
+0,11,6,15.093575,upper_bound,,0.16.13,./hardest -f 0 -t 11 -r 6 -b 0 -i 0 -s 1774409688 -i 0
+1,10,6,18.550426,upper_bound,,0.16.13,./hardest -f 1 -t 10 -r 6 -b 0 -i 0 -s 1774409689 -i 0
+2,9,6,20.998717,upper_bound,,0.16.13,./hardest -f 2 -t 9 -r 6 -b 0 -i 0 -s 1774409703 -i 0
+3,8,6,22.489286,upper_bound,,0.16.13,./hardest -f 3 -t 8 -r 6 -b 0 -i 0 -s 1774409781 -i 0
+4,7,6,23.527069,upper_bound,,0.16.13,./hardest -f 4 -t 7 -r 6 -b 0 -i 0 -s 1774410020 -i 0
+5,6,6,24.086161,upper_bound,,0.16.13,./hardest -f 5 -t 6 -r 6 -b 0 -i 0 -s 1774410366 -i 0
+0,10,7,16.673058,upper_bound,,0.16.13,./hardest -f 0 -t 10 -r 7 -b 0 -i 0 -s 1774411043 -i 0
+1,9,7,20.117337,upper_bound,,0.16.13,./hardest -f 1 -t 9 -r 7 -b 0 -i 0 -s 1774411047 -i 0
+2,8,7,22.317170,upper_bound,,0.16.13,./hardest -f 2 -t 8 -r 7 -b 0 -i 0 -s 1774411090 -i 0
+3,7,7,23.770775,upper_bound,,0.16.13,./hardest -f 3 -t 7 -r 7 -b 0 -i 0 -s 1774411290 -i 0
+4,6,7,24.559938,upper_bound,,0.16.13,./hardest -f 4 -t 6 -r 7 -b 0 -i 0 -s 1774411932 -i 0
+5,5,7,24.853889,upper_bound,,0.16.13,./hardest -f 5 -t 5 -r 7 -b 0 -i 0 -s 1774413026 -i 0
+0,9,8,18.578518,upper_bound,,0.16.13,./hardest -f 0 -t 9 -r 8 -b 0 -i 0 -s 1774414316 -i 0
+1,8,8,22.079430,upper_bound,,0.16.13,./hardest -f 1 -t 8 -r 8 -b 0 -i 0 -s 1774414330 -i 0
+2,7,8,24.162392,upper_bound,,0.16.13,./hardest -f 2 -t 7 -r 8 -b 0 -i 0 -s 1774414482 -i 0
+3,6,8,25.314281,upper_bound,,0.16.13,./hardest -f 3 -t 6 -r 8 -b 0 -i 0 -s 1774415223 -i 0
+4,5,8,25.979344,upper_bound,,0.16.13,./hardest -f 4 -t 5 -r 8 -b 0 -i 0 -s 1774416880 -i 0
 0,17,1,4.277778,optimal,,,
 1,16,1,8.382353,optimal,,0.16.6,./hardest -f 1 -t 16 -r 1 -b 1 -u 12 -i 1000 -b 9 -s 1774094474 -i 0
-2,15,1,999.9,upper_bound,placeholder,,
-3,14,1,999.9,upper_bound,placeholder,,
-4,13,1,999.9,upper_bound,placeholder,,
-5,12,1,999.9,upper_bound,placeholder,,
-6,11,1,999.9,upper_bound,placeholder,,
-7,10,1,999.9,upper_bound,placeholder,,
-8,9,1,999.9,upper_bound,placeholder,,
+2,15,1,11.382353,optimal,,0.16.13,./hardest -f 2 -t 15 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+3,14,1,13.716993,optimal,,0.16.13,./hardest -f 3 -t 14 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+4,13,1,15.525770,optimal,,0.16.13,./hardest -f 4 -t 13 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+5,12,1,16.878798,optimal,,0.16.13,./hardest -f 5 -t 12 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+6,11,1,17.878798,optimal,,0.16.13,./hardest -f 6 -t 11 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+7,10,1,18.557864,optimal,,0.16.13,./hardest -f 7 -t 10 -r 1 -b 0 -i 0 -s 1774408190 -i 0
+8,9,1,18.857402,optimal,,0.16.13,./hardest -f 8 -t 9 -r 1 -b 0 -i 0 -s 1774408191 -i 0
 0,16,2,7.457516,conjectured,,,
-1,15,2,999.9,upper_bound,placeholder,,
-2,14,2,999.9,upper_bound,placeholder,,
-3,13,2,999.9,upper_bound,placeholder,,
-4,12,2,999.9,upper_bound,placeholder,,
-5,11,2,999.9,upper_bound,placeholder,,
-6,10,2,999.9,upper_bound,placeholder,,
-7,9,2,999.9,upper_bound,placeholder,,
-8,8,2,999.9,upper_bound,placeholder,,
-0,15,3,999.9,upper_bound,placeholder,,
-1,14,3,999.9,upper_bound,placeholder,,
-2,13,3,999.9,upper_bound,placeholder,,
-3,12,3,999.9,upper_bound,placeholder,,
-4,11,3,999.9,upper_bound,placeholder,,
-5,10,3,999.9,upper_bound,placeholder,,
-6,9,3,999.9,upper_bound,placeholder,,
-7,8,3,999.9,upper_bound,placeholder,,
-0,14,4,999.9,upper_bound,placeholder,,
-1,13,4,999.9,upper_bound,placeholder,,
-2,12,4,999.9,upper_bound,placeholder,,
-3,11,4,999.9,upper_bound,placeholder,,
-4,10,4,999.9,upper_bound,placeholder,,
-5,9,4,999.9,upper_bound,placeholder,,
-6,8,4,999.9,upper_bound,placeholder,,
-7,7,4,999.9,upper_bound,placeholder,,
-0,13,5,999.9,upper_bound,placeholder,,
-1,12,5,999.9,upper_bound,placeholder,,
-2,11,5,999.9,upper_bound,placeholder,,
-3,10,5,999.9,upper_bound,placeholder,,
-4,9,5,999.9,upper_bound,placeholder,,
-5,8,5,999.9,upper_bound,placeholder,,
-6,7,5,999.9,upper_bound,placeholder,,
-0,12,6,999.9,upper_bound,placeholder,,
-1,11,6,999.9,upper_bound,placeholder,,
-2,10,6,999.9,upper_bound,placeholder,,
-3,9,6,999.9,upper_bound,placeholder,,
-4,8,6,999.9,upper_bound,placeholder,,
-5,7,6,999.9,upper_bound,placeholder,,
-6,6,6,999.9,upper_bound,placeholder,,
-0,11,7,999.9,upper_bound,placeholder,,
-1,10,7,999.9,upper_bound,placeholder,,
-2,9,7,999.9,upper_bound,placeholder,,
-3,8,7,999.9,upper_bound,placeholder,,
+1,15,2,11.472835,upper_bound,,0.16.13,./hardest -f 1 -t 15 -r 2 -b 0 -i 0 -s 1774408191 -i 0
+2,14,2,14.378840,upper_bound,,0.16.13,./hardest -f 2 -t 14 -r 2 -b 0 -i 0 -s 1774408191 -i 0
+3,13,2,16.606723,upper_bound,,0.16.13,./hardest -f 3 -t 13 -r 2 -b 0 -i 0 -s 1774408191 -i 0
+4,12,2,18.292995,upper_bound,,0.16.13,./hardest -f 4 -t 12 -r 2 -b 0 -i 0 -s 1774408192 -i 0
+5,11,2,19.567953,upper_bound,,0.16.13,./hardest -f 5 -t 11 -r 2 -b 0 -i 0 -s 1774408196 -i 0
+6,10,2,20.443776,upper_bound,,0.16.13,./hardest -f 6 -t 10 -r 2 -b 0 -i 0 -s 1774408202 -i 0
+7,9,2,20.938780,upper_bound,,0.16.13,./hardest -f 7 -t 9 -r 2 -b 0 -i 0 -s 1774408215 -i 0
+8,8,2,21.078361,upper_bound,,0.16.13,./hardest -f 8 -t 8 -r 2 -b 0 -i 0 -s 1774408234 -i 0
+0,15,3,9.992647,upper_bound,,0.16.13,./hardest -f 0 -t 15 -r 3 -b 0 -i 0 -s 1774408257 -i 0
+1,14,3,13.919036,upper_bound,,0.16.13,./hardest -f 1 -t 14 -r 3 -b 0 -i 0 -s 1774408257 -i 0
+2,13,3,16.735656,upper_bound,,0.16.13,./hardest -f 2 -t 13 -r 3 -b 0 -i 0 -s 1774408257 -i 0
+3,12,3,18.851473,upper_bound,,0.16.13,./hardest -f 3 -t 12 -r 3 -b 0 -i 0 -s 1774408259 -i 0
+4,11,3,20.408400,upper_bound,,0.16.13,./hardest -f 4 -t 11 -r 3 -b 0 -i 0 -s 1774408267 -i 0
+5,10,3,21.565687,upper_bound,,0.16.13,./hardest -f 5 -t 10 -r 3 -b 0 -i 0 -s 1774408289 -i 0
+6,9,3,22.265842,upper_bound,,0.16.13,./hardest -f 6 -t 9 -r 3 -b 0 -i 0 -s 1774408343 -i 0
+7,8,3,22.671652,upper_bound,,0.16.13,./hardest -f 7 -t 8 -r 3 -b 0 -i 0 -s 1774408443 -i 0
+0,14,4,12.056699,upper_bound,,0.16.13,./hardest -f 0 -t 14 -r 4 -b 0 -i 0 -s 1774408555 -i 0
+1,13,4,15.941083,upper_bound,,0.16.13,./hardest -f 1 -t 13 -r 4 -b 0 -i 0 -s 1774408555 -i 0
+2,12,4,18.615405,upper_bound,,0.16.13,./hardest -f 2 -t 12 -r 4 -b 0 -i 0 -s 1774408557 -i 0
+3,11,4,20.613457,upper_bound,,0.16.13,./hardest -f 3 -t 11 -r 4 -b 0 -i 0 -s 1774408569 -i 0
+4,10,4,22.060478,upper_bound,,0.16.13,./hardest -f 4 -t 10 -r 4 -b 0 -i 0 -s 1774408610 -i 0
+5,9,4,23.064760,upper_bound,,0.16.13,./hardest -f 5 -t 9 -r 4 -b 0 -i 0 -s 1774408735 -i 0
+6,8,4,23.684350,upper_bound,,0.16.13,./hardest -f 6 -t 8 -r 4 -b 0 -i 0 -s 1774408985 -i 0
+7,7,4,23.902521,upper_bound,,0.16.13,./hardest -f 7 -t 7 -r 4 -b 0 -i 0 -s 1774409340 -i 0
+0,13,5,13.926182,upper_bound,,0.16.13,./hardest -f 0 -t 13 -r 5 -b 0 -i 0 -s 1774409776 -i 0
+1,12,5,17.622170,upper_bound,,0.16.13,./hardest -f 1 -t 12 -r 5 -b 0 -i 0 -s 1774409776 -i 0
+2,11,5,20.157081,upper_bound,,0.16.13,./hardest -f 2 -t 11 -r 5 -b 0 -i 0 -s 1774409782 -i 0
+3,10,5,22.064905,upper_bound,,0.16.13,./hardest -f 3 -t 10 -r 5 -b 0 -i 0 -s 1774409812 -i 0
+4,9,5,23.346964,upper_bound,,0.16.13,./hardest -f 4 -t 9 -r 5 -b 0 -i 0 -s 1774409952 -i 0
+5,8,5,24.242708,upper_bound,,0.16.13,./hardest -f 5 -t 8 -r 5 -b 0 -i 0 -s 1774410266 -i 0
+6,7,5,24.698153,upper_bound,,0.16.13,./hardest -f 6 -t 7 -r 5 -b 0 -i 0 -s 1774411031 -i 0
+0,12,6,15.465350,upper_bound,,0.16.13,./hardest -f 0 -t 12 -r 6 -b 0 -i 0 -s 1774412021 -i 0
+1,11,6,19.109335,upper_bound,,0.16.13,./hardest -f 1 -t 11 -r 6 -b 0 -i 0 -s 1774412023 -i 0
+2,10,6,21.622480,upper_bound,,0.16.13,./hardest -f 2 -t 10 -r 6 -b 0 -i 0 -s 1774412041 -i 0
+3,9,6,23.274365,upper_bound,,0.16.13,./hardest -f 3 -t 9 -r 6 -b 0 -i 0 -s 1774412147 -i 0
+4,8,6,24.490783,upper_bound,,0.16.13,./hardest -f 4 -t 8 -r 6 -b 0 -i 0 -s 1774412577 -i 0
+5,7,6,25.199675,upper_bound,,0.16.13,./hardest -f 5 -t 7 -r 6 -b 0 -i 0 -s 1774413650 -i 0
+6,6,6,25.431462,upper_bound,,0.16.13,./hardest -f 6 -t 6 -r 6 -b 0 -i 0 -s 1774415558 -i 0
+0,11,7,17.058675,upper_bound,,0.16.13,./hardest -f 0 -t 11 -r 7 -b 0 -i 0 -s 1774417867 -i 0
+1,10,7,20.645905,upper_bound,,0.16.13,./hardest -f 1 -t 10 -r 7 -b 0 -i 0 -s 1774417874 -i 0
+2,9,7,23.025602,upper_bound,,0.16.13,./hardest -f 2 -t 9 -r 7 -b 0 -i 0 -s 1774417962 -i 0
+3,8,7,24.570618,upper_bound,,0.16.13,./hardest -f 3 -t 8 -r 7 -b 0 -i 0 -s 1774418344 -i 0
 4,7,7,999.9,upper_bound,placeholder,,
 5,6,7,999.9,upper_bound,placeholder,,
 0,10,8,999.9,upper_bound,placeholder,,
@@ -398,53 +397,53 @@ false_gods,true_gods,random_gods,expected_questions,status,notes,version,reprodu
 5,5,8,999.9,upper_bound,placeholder,,
 0,18,1,4.368421,optimal,,,
 1,17,1,8.555556,optimal,,0.16.6,./hardest -f 1 -t 17 -r 1 -b 1 -u 12 -i 1000 -b 9 -s 1774094772 -i 0
-2,16,1,999.9,upper_bound,placeholder,,
-3,15,1,999.9,upper_bound,placeholder,,
-4,14,1,999.9,upper_bound,placeholder,,
-5,13,1,999.9,upper_bound,placeholder,,
-6,12,1,999.9,upper_bound,placeholder,,
-7,11,1,999.9,upper_bound,placeholder,,
-8,10,1,999.9,upper_bound,placeholder,,
+2,16,1,11.643619,optimal,,0.16.13,./hardest -f 2 -t 16 -r 1 -b 0 -i 0 -s 1774410390 -i 0
+3,15,1,13.995872,optimal,,0.16.13,./hardest -f 3 -t 15 -r 1 -b 0 -i 0 -s 1774410390 -i 0
+4,14,1,15.925421,optimal,,0.16.13,./hardest -f 4 -t 14 -r 1 -b 0 -i 0 -s 1774410390 -i 0
+5,13,1,17.442331,optimal,,0.16.13,./hardest -f 5 -t 13 -r 1 -b 0 -i 0 -s 1774410390 -i 0
+6,12,1,18.566201,optimal,,0.16.13,./hardest -f 6 -t 12 -r 1 -b 0 -i 0 -s 1774410391 -i 0
+7,11,1,19.318462,optimal,,0.16.13,./hardest -f 7 -t 11 -r 1 -b 0 -i 0 -s 1774410391 -i 0
+8,10,1,19.791417,optimal,,0.16.13,./hardest -f 8 -t 10 -r 1 -b 0 -i 0 -s 1774410392 -i 0
 9,9,1,19.917539,optimal,,0.16.6,./hardest -f 9 -t 9 -r 1 -i 0 -b 1 -s 1774097091 -i 0
 0,17,2,7.625731,conjectured,,,
-1,16,2,999.9,upper_bound,placeholder,,
-2,15,2,999.9,upper_bound,placeholder,,
-3,14,2,999.9,upper_bound,placeholder,,
-4,13,2,999.9,upper_bound,placeholder,,
-5,12,2,999.9,upper_bound,placeholder,,
-6,11,2,999.9,upper_bound,placeholder,,
-7,10,2,999.9,upper_bound,placeholder,,
-8,9,2,999.9,upper_bound,placeholder,,
-0,16,3,999.9,upper_bound,placeholder,,
-1,15,3,999.9,upper_bound,placeholder,,
-2,14,3,999.9,upper_bound,placeholder,,
-3,13,3,999.9,upper_bound,placeholder,,
-4,12,3,999.9,upper_bound,placeholder,,
-5,11,3,999.9,upper_bound,placeholder,,
-6,10,3,999.9,upper_bound,placeholder,,
-7,9,3,999.9,upper_bound,placeholder,,
-8,8,3,999.9,upper_bound,placeholder,,
-0,15,4,999.9,upper_bound,placeholder,,
-1,14,4,999.9,upper_bound,placeholder,,
-2,13,4,999.9,upper_bound,placeholder,,
-3,12,4,999.9,upper_bound,placeholder,,
-4,11,4,999.9,upper_bound,placeholder,,
-5,10,4,999.9,upper_bound,placeholder,,
-6,9,4,999.9,upper_bound,placeholder,,
+1,16,2,11.715858,upper_bound,,0.16.13,./hardest -f 1 -t 16 -r 2 -b 0 -i 0 -s 1774410394 -i 0
+2,15,2,14.718223,upper_bound,,0.16.13,./hardest -f 2 -t 15 -r 2 -b 0 -i 0 -s 1774410394 -i 0
+3,14,2,17.000525,upper_bound,,0.16.13,./hardest -f 3 -t 14 -r 2 -b 0 -i 0 -s 1774410394 -i 0
+4,13,2,18.840024,upper_bound,,0.16.13,./hardest -f 4 -t 13 -r 2 -b 0 -i 0 -s 1774410395 -i 0
+5,12,2,20.182726,upper_bound,,0.16.13,./hardest -f 5 -t 12 -r 2 -b 0 -i 0 -s 1774410398 -i 0
+6,11,2,21.196975,upper_bound,,0.16.13,./hardest -f 6 -t 11 -r 2 -b 0 -i 0 -s 1774410409 -i 0
+7,10,2,21.867287,upper_bound,,0.16.13,./hardest -f 7 -t 10 -r 2 -b 0 -i 0 -s 1774410428 -i 0
+8,9,2,22.167241,upper_bound,,0.16.13,./hardest -f 8 -t 9 -r 2 -b 0 -i 0 -s 1774410463 -i 0
+0,16,3,10.164087,upper_bound,,0.16.13,./hardest -f 0 -t 16 -r 3 -b 0 -i 0 -s 1774410511 -i 0
+1,15,3,14.195691,upper_bound,,0.16.13,./hardest -f 1 -t 15 -r 3 -b 0 -i 0 -s 1774410511 -i 0
+2,14,3,17.108695,upper_bound,,0.16.13,./hardest -f 2 -t 14 -r 3 -b 0 -i 0 -s 1774410511 -i 0
+3,13,3,19.354452,upper_bound,,0.16.13,./hardest -f 3 -t 13 -r 3 -b 0 -i 0 -s 1774410513 -i 0
+4,12,3,21.043997,upper_bound,,0.16.13,./hardest -f 4 -t 12 -r 3 -b 0 -i 0 -s 1774410524 -i 0
+5,11,3,22.305350,upper_bound,,0.16.13,./hardest -f 5 -t 11 -r 3 -b 0 -i 0 -s 1774410566 -i 0
+6,10,3,23.177105,upper_bound,,0.16.13,./hardest -f 6 -t 10 -r 3 -b 0 -i 0 -s 1774410659 -i 0
+7,9,3,23.731876,upper_bound,,0.16.13,./hardest -f 7 -t 9 -r 3 -b 0 -i 0 -s 1774410864 -i 0
+8,8,3,23.902315,upper_bound,,0.16.13,./hardest -f 8 -t 8 -r 3 -b 0 -i 0 -s 1774411143 -i 0
+0,15,4,12.351006,upper_bound,,0.16.13,./hardest -f 0 -t 15 -r 4 -b 0 -i 0 -s 1774411495 -i 0
+1,14,4,16.271207,upper_bound,,0.16.13,./hardest -f 1 -t 14 -r 4 -b 0 -i 0 -s 1774411495 -i 0
+2,13,4,19.095949,upper_bound,,0.16.13,./hardest -f 2 -t 13 -r 4 -b 0 -i 0 -s 1774411498 -i 0
+3,12,4,21.213637,upper_bound,,0.16.13,./hardest -f 3 -t 12 -r 4 -b 0 -i 0 -s 1774411519 -i 0
+4,11,4,22.851843,upper_bound,,0.16.13,./hardest -f 4 -t 11 -r 4 -b 0 -i 0 -s 1774411592 -i 0
+5,10,4,23.994799,upper_bound,,0.16.13,./hardest -f 5 -t 10 -r 4 -b 0 -i 0 -s 1774411827 -i 0
+6,9,4,24.724015,upper_bound,,0.16.13,./hardest -f 6 -t 9 -r 4 -b 0 -i 0 -s 1774412361 -i 0
 7,8,4,999.9,upper_bound,placeholder,,
-0,14,5,999.9,upper_bound,placeholder,,
-1,13,5,999.9,upper_bound,placeholder,,
-2,12,5,999.9,upper_bound,placeholder,,
-3,11,5,999.9,upper_bound,placeholder,,
-4,10,5,999.9,upper_bound,placeholder,,
+0,14,5,14.196089,upper_bound,,0.16.13,./hardest -f 0 -t 14 -r 5 -b 0 -i 0 -s 1774414239 -i 0
+1,13,5,18.079927,upper_bound,,0.16.13,./hardest -f 1 -t 13 -r 5 -b 0 -i 0 -s 1774414241 -i 0
+2,12,5,20.837889,upper_bound,,0.16.13,./hardest -f 2 -t 12 -r 5 -b 0 -i 0 -s 1774414254 -i 0
+3,11,5,22.809747,upper_bound,,0.16.13,./hardest -f 3 -t 11 -r 5 -b 0 -i 0 -s 1774414326 -i 0
+4,10,5,24.190508,upper_bound,,0.16.13,./hardest -f 4 -t 10 -r 5 -b 0 -i 0 -s 1774414643 -i 0
 5,9,5,999.9,upper_bound,placeholder,,
 6,8,5,999.9,upper_bound,placeholder,,
 7,7,5,999.9,upper_bound,placeholder,,
-0,13,6,999.9,upper_bound,placeholder,,
-1,12,6,999.9,upper_bound,placeholder,,
-2,11,6,999.9,upper_bound,placeholder,,
-3,10,6,999.9,upper_bound,placeholder,,
-4,9,6,999.9,upper_bound,placeholder,,
+0,13,6,15.950170,upper_bound,,0.16.13,./hardest -f 0 -t 13 -r 6 -b 0 -i 0 -s 1774416415 -i 0
+1,12,6,19.667607,upper_bound,,0.16.13,./hardest -f 1 -t 12 -r 6 -b 0 -i 0 -s 1774416419 -i 0
+2,11,6,22.229345,upper_bound,,0.16.13,./hardest -f 2 -t 11 -r 6 -b 0 -i 0 -s 1774416461 -i 0
+3,10,6,24.104804,upper_bound,,0.16.13,./hardest -f 3 -t 10 -r 6 -b 0 -i 0 -s 1774416704 -i 0
+4,9,6,25.416112,upper_bound,,0.16.13,./hardest -f 4 -t 9 -r 6 -b 0 -i 0 -s 1774417668 -i 0
 5,8,6,999.9,upper_bound,placeholder,,
 6,7,6,999.9,upper_bound,placeholder,,
 0,12,7,999.9,upper_bound,placeholder,,

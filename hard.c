@@ -114,6 +114,7 @@ HardInstance * hard_newInstance(void)
     hi->settings->useBoundsFileOptions = false;  // ??
     hi->settings->upperBoundInFile = DBL_MAX;  // Undefined.
     hi->settings->boundStatus = HardBoundStatus_undefined;
+    hi->settings->useBoundFromFile = 1;  // ??
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 

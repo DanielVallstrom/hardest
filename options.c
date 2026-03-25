@@ -163,6 +163,11 @@ stdout,
 "  -L --top-local-reset-level <unsigned integer>\n"
 "                          The top level where we'll switch from a global hash\n"
 "                          reset to a local reset. [%u]\n"
+"  -M --use-file-bound <unsigned integer>\n"
+"                          Set how the upper bound from the bounds file is used. [%u]\n"
+"                          0 means do nothing.\n"
+"                          1 means use bound from file if upper bound is undefined.\n"
+"                          2 means use bound from file if it's smaller than current upper bound.\n"
 "  -n --gods <unsigned integer>\n"
 "                          Set number of total gods.\n"
 "                          Only 3 of the 4 god numbers need to be set;\n"
@@ -177,6 +182,7 @@ stdout,
 s->goodGodsCandN,
 s->resumeAbortedLeeway,
 s->topLocalResetLevel,
+s->useBoundFromFile,
 s->oddBias
            );
 
@@ -442,6 +448,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "precision",              required_argument, NULL, 'F' },
             { "global-bound",           required_argument, NULL, 'G' },
             { "estimate-heuristic",     required_argument, NULL, 'H' },
+            { "use-file-bound",         required_argument, NULL, 'M' },
             { "odd-bias",               required_argument, NULL, 'N' },
             { "optimize-non-r",         required_argument, NULL, 'O' },
             { "print-info",             optional_argument, NULL, 'P' },
@@ -482,7 +489,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:p:qr:s:t:u:v::w::",
+                             "A:B:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -649,6 +656,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->topLocalResetLevel = n;
+                }
+
+                break;
+
+            case 'M':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -M and --use-file-bound must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->useBoundFromFile = n;
                 }
 
                 break;

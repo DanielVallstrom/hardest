@@ -406,6 +406,12 @@ typedef struct Settings_
     int argC; 
     char * * argV;
 
+    // We'll use the upper bound from the bounds file, depending on this value.
+    // 0 means do nothing.
+    // 1 means use bound from file if upper bound is undefined.
+    // 2 means use bound from file if it's smaller than upper bound.
+    uint8_t useBoundFromFile;
+
 } Settings;
 
 
