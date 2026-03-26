@@ -163,6 +163,8 @@ stdout,
 "  -L --top-local-reset-level <unsigned integer>\n"
 "                          The top level where we'll switch from a global hash\n"
 "                          reset to a local reset. [%u]\n"
+"  -m --print-used-bound[=no|yes]\n"
+"                          Add the bound used to the replication command. [%s]\n"
 "  -M --use-file-bound <unsigned integer>\n"
 "                          Set how the upper bound from the bounds file is used. [%u]\n"
 "                          0 means do nothing.\n"
@@ -182,6 +184,7 @@ stdout,
 s->goodGodsCandN,
 s->resumeAbortedLeeway,
 s->topLocalResetLevel,
+s->printBoundUsed ? "yes" : "no",
 s->useBoundFromFile,
 s->oddBias
            );
@@ -287,7 +290,7 @@ stdout,
 "  --version               Print the version number.\n"
 "  -w --update-bounds[=no|yes]\n"
 "                          If true, then improved upper bounds are written to\n"
-"                          the csv bounds file.\n"
+"                          the csv bounds file. [%s]\n"
 "  -W --estimate-weight <float>\n"
 "                          In estimate heuristic 1, factor for new results will\n"
 "                          get upped by this, and factor for old average will be\n"
@@ -296,6 +299,7 @@ stdout,
 hi->hard->upperBound,
 s->maxUnbal,
 (unsigned long long int)s->verbosityVector,
+s->updateBoundsFile ? "yes" : "no",
 s->estWeight
            );
 
@@ -450,6 +454,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "precision",              required_argument, NULL, 'F' },
             { "global-bound",           required_argument, NULL, 'G' },
             { "estimate-heuristic",     required_argument, NULL, 'H' },
+            { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "use-file-bound",         required_argument, NULL, 'M' },
             { "odd-bias",               required_argument, NULL, 'N' },
             { "optimize-non-r",         required_argument, NULL, 'O' },
@@ -469,7 +474,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "iterate",                required_argument, NULL, 'i' },
             { "good-gods-candidates",   required_argument, NULL, 'k' },
             { "resume-aborted-leeway",  required_argument, NULL, 'l' },
-            { "top-local-reset-level",  required_argument, NULL, 'L' },
+            { "print-used-bound",       optional_argument, NULL, 'm' },
             { "gods",                   required_argument, NULL, 'n' },
             { "outfile",                required_argument, NULL, 'o' },
             { "print-placeholders",     required_argument, NULL, 'p' },
@@ -491,7 +496,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:n:o:p:qr:s:t:u:v::w::",
+                             "A:B:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -1038,6 +1043,34 @@ static int parseCommandLineOptions( HardInstance * hi,
  
                     hi->settings->resumeAbortedLeeway = r;
                                                       //min( r, 1.01 );  // ??
+                }
+
+                break;
+
+            case 'm':
+                if ( optarg )
+                {
+                    if ( strcmp( optarg, "no" ) == 0 )
+                    {
+                        hi->settings->printBoundUsed = false;
+                    }
+                    else if ( strcmp( optarg, "yes" ) == 0 )
+                    {
+                        hi->settings->printBoundUsed = true;
+                    }
+                    else
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -m and --print-used-bound must be\n"
+                                 "no or yes. You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+                }
+                else
+                {
+                    hi->settings->printBoundUsed = true;
                 }
 
                 break;

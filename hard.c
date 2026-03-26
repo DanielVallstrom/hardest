@@ -115,6 +115,7 @@ HardInstance * hard_newInstance(void)
     hi->settings->upperBoundInFile = DBL_MAX;  // Undefined.
     hi->settings->boundStatus = HardBoundStatus_undefined;
     hi->settings->useBoundFromFile = 1;  // ??
+    hi->settings->printBoundUsed = true;  // ??
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -4209,7 +4210,8 @@ uint8_t hard_solve( HardInstance * hi )
         if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
              s->updateBoundsFile )
         {
-            readBounds_write( hi, bestResult, seedForBestResult );
+            readBounds_write( hi, bestResult, seedForBestResult, 
+                              upperBoundForBest );
         }
     }
     else
@@ -4330,7 +4332,8 @@ uint8_t hard_solve( HardInstance * hi )
                 if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
                      s->updateBoundsFile )
                 {
-                    readBounds_write( hi, bestResult, seedForBestResult );
+                    readBounds_write( hi, bestResult, seedForBestResult,
+                                      upperBoundForBest );
                 }
             }
         }

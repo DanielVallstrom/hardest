@@ -412,6 +412,9 @@ typedef struct Settings_
     // 2 means use bound from file if it's smaller than upper bound.
     uint8_t useBoundFromFile;
 
+    // The bound used will be added to the replication command iff this is true.
+    bool printBoundUsed;
+
 } Settings;
 
 

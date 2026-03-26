@@ -38,13 +38,15 @@
 bool readBounds_readFile( HardInstance * hi );
 
 // Writes bound to the upper bounds file. Returns true iff an error occurred.
-//   seed should be the seed for the search that found the bound.
+//   seed and boundUsed should be the seed and bound used for the search that 
+// found the new bound.
 //   Also updates hi.
 //   Rows will end with CRLF, following some csv definition or convention,
 // apparently. 
 //   Uses tmpnam, which is deprecated. However, there is no standard C
 // alternative.
-bool readBounds_write( HardInstance * hi, double bound, uint64_t seed );
+bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
+                       double boundUsed );
 
 
 #endif  // readBounds_H

@@ -573,7 +573,8 @@ bool readBounds_readFile( HardInstance * hi )
 
 
 // Append new csv row.
-static bool append( HardInstance * hi, double bound, uint64_t seed )
+static bool append( HardInstance * hi, double bound, uint64_t seed,
+                    double boundUsed )
 {
     Hard * h = hi->hard;
     Settings * s = hi->settings;
@@ -604,7 +605,8 @@ static bool append( HardInstance * hi, double bound, uint64_t seed )
 
     fprintf( file, "%s,", hardestVersion );
 
-    // Here comes the replication command. We'll add seed and -i 0 last.
+    // Here comes the replication command. We'll add seed and -i 0 last,
+    // and maybe the bound used.
 
     for ( int c = 0; c != argc; c++ )
     {
@@ -612,6 +614,19 @@ static bool append( HardInstance * hi, double bound, uint64_t seed )
     }
 
     fprintf( file, "-s %lu -i 0", seed );    
+
+    // Handle bound used.
+    if ( s->printBoundUsed )
+    {
+        if ( boundUsed > 888.8 )
+        {
+            fprintf( file, " -u 888.8 -M 1" );        
+        }
+        else
+        {
+            fprintf( file, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
+        }
+    }
 
     // End with CRLF.
     fprintf( file, "\r\n" );
@@ -622,11 +637,13 @@ static bool append( HardInstance * hi, double bound, uint64_t seed )
 
 
 // Updates bound in the upper bounds file. Returns true iff an error occurred.
-//   seed should be the seed for the search that found the bound.
+//   seed and boundUsed should be the seed and bound used for the search that 
+// found the new bound.
 //   Rows will end with CRLF, following some csv definition or convention,
 // apparently. 
 //   Will also remove duplicates of the instance.
-static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
+static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
+                         double boundUsed )
 {
     Hard * h = hi->hard;
     Settings * s = hi->settings;
@@ -827,7 +844,8 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
 
         fprintf( newFile, "%s,", hardestVersion );
 
-        // Here comes the replication command. We'll add seed and -i 0 last.
+        // Here comes the replication command. We'll add seed and -i 0 last,
+        // and maybe the bound used.
 
         for ( int c = 0; c != argc; c++ )
         {
@@ -835,6 +853,19 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
         }
 
         fprintf( newFile, "-s %lu -i 0", seed );    
+
+        // Handle bound used.
+        if ( s->printBoundUsed )
+        {
+            if ( boundUsed > 888.8 )
+            {
+                fprintf( file, " -u 888.8 -M 1" );        
+            }
+            else
+            {
+                fprintf( file, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
+            }
+        }
 
         // End with CRLF.
         fprintf( newFile, "\r\n" );
@@ -871,13 +902,15 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
 
 
 // Writes bound to the upper bounds file. Returns true iff an error occurred.
-//   seed should be the seed for the search that found the bound.
+//   seed and boundUsed should be the seed and bound used for the search that 
+// found the new bound.
 //   Also updates hi.
 //   Rows will end with CRLF, following some csv definition or convention,
 // apparently. 
 //   Uses tmpnam, which is deprecated. However, there is no standard C
 // alternative.
-bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
+bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
+                       double boundUsed )
 {
     Hard * h = hi->hard;
     Settings * s = hi->settings;
@@ -898,7 +931,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
         }
 
         // Append new csv row.
-        if ( append( hi, bound, seed ) )
+        if ( append( hi, bound, seed, boundUsed ) )
         {
             fprintf( stderr, "\nError: Could not append best_known_bounds.csv\n\n" );
 
@@ -911,7 +944,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
     }
     else
     {
-        if ( updateBound( hi, bound, seed ) )
+        if ( updateBound( hi, bound, seed, boundUsed ) )
         {
             fprintf( stderr, "\nError: Could not update best_known_bounds.csv\n\n" );
 
