@@ -640,7 +640,7 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
 
     if ( tmpnam(tmpFileName) == NULL )
     {
-        fprintf( stderr, "\nCould not get a temporary file name.\n\n" );
+        fprintf( stderr, "\nError: Could not get a temporary file name.\n\n" );
 
         return true;
     }
@@ -651,7 +651,7 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
 
     if ( newFile == NULL )
     {
-        fprintf( stderr, "\nCould not open a new bounds file.\n\n" );
+        fprintf( stderr, "\nError: Could not open a new bounds file.\n\n" );
 
         return true;
     }
@@ -660,7 +660,7 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed )
 
     if ( s->boundsFile == NULL )
     {
-        fprintf( stderr, "\nCould not open bounds file.\n\n" );
+        fprintf( stderr, "\nError: Could not open bounds file.\n\n" );
 
         fclose(newFile);
 
@@ -892,7 +892,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
 
         if ( hi->settings->boundsFile == NULL )
         {
-            fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
+            fprintf( stderr, "\nError: Could not open best_known_bounds.csv\n\n" );
 
             return true;
         }
@@ -900,7 +900,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
         // Append new csv row.
         if ( append( hi, bound, seed ) )
         {
-            fprintf( stderr, "\nCould not append best_known_bounds.csv\n\n" );
+            fprintf( stderr, "\nError: Could not append best_known_bounds.csv\n\n" );
 
             fclose(s->boundsFile);
 
@@ -913,7 +913,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed )
     {
         if ( updateBound( hi, bound, seed ) )
         {
-            fprintf( stderr, "\nCould not update best_known_bounds.csv\n\n" );
+            fprintf( stderr, "\nError: Could not update best_known_bounds.csv\n\n" );
 
             return true;
         }

@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.16.15
+version = 0.16.17
 
 
 # If CC or MODE are not defined the following defaults will be used:
