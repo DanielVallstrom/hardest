@@ -48,5 +48,15 @@ bool readBounds_readFile( HardInstance * hi );
 bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
                        double boundUsed );
 
+// Increments the replication counter in the upper bounds file. Returns true 
+// iff an error occurred.
+//   seed and boundUsed should be the seed and bound used for the search that 
+// found the new bound.
+//   Also replaces the replication command, if s->noteRep > 1.
+//   Rows will end with CRLF, following some csv definition or convention,
+// apparently. 
+//   Uses tmpnam, which is deprecated. However, there is no standard C
+// alternative.
+bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed );
 
 #endif  // readBounds_H

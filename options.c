@@ -101,6 +101,12 @@ stdout,
 "  -c --catch-aborts <unsigned integer>\n"
 "                          Catch this many aborts in one search. [%lu]\n"
 "                          -c 0 will turn off abort catching.\n"
+"  -C --inc-ind-rep-count <unsigned integer>\n"
+"                          Set how an independant replication is handled. [%u]\n"
+"                          0 means no update.\n"
+"                          1 means ind. rep. count will be incremented.\n"
+"                          2 means 1 and old replication command will be\n"
+"                          replaced with the most recent one.\n"
 "  -D --mem-inc-factor <float>\n"
 "                          Set factor >= 1.1 that memory is to be enlarged\n"
 "                          by when it needs to be reallocated. [%f]\n"
@@ -119,6 +125,7 @@ s->dontAbortUntil,
 s->lvlReps[0], s->lvlReps[1], s->lvlReps[2], s->lvlReps[3], s->lvlReps[4], 
 s->lvlReps[5], s->lvlReps[6], s->lvlReps[7], s->lvlReps[8], s->lvlReps[9],
 s->catchAbortsN,
+s->noteReplications,
 s->memIncFactor,
 s->abortLeewayEnd,
 s->bestLvl0PosEst
@@ -449,6 +456,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         {
             { "dont-abort-until",       required_argument, NULL, 'A' },
             { "iterate-sub-search-lvl", required_argument, NULL, 'B' },
+            { "inc-ind-rep-count",      required_argument, NULL, 'C' },
             { "mem-inc-factor",         required_argument, NULL, 'D' },
             { "best-lvl-0-pos-est",     required_argument, NULL, 'E' },
             { "precision",              required_argument, NULL, 'F' },
@@ -496,7 +504,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
+                             "A:B:C:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -543,6 +551,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->lvlReps[k] = n;
+                }
+
+                break;
+
+            case 'C':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -C and --inc-ind-rep-count must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->noteReplications = n;
                 }
 
                 break;

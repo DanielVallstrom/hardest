@@ -267,7 +267,7 @@ typedef struct Settings_
                           // when it needs to be reallocated. Not used.
 
     // The current seed. The default is time(NULL).
-    unsigned long int seed;
+    uint64_t seed;
 
     // The greater the value, the more swaps will be tried.
     uint8_t doSwaps;  // 0 means no conjunction swaps to try to get gi 
@@ -414,6 +414,19 @@ typedef struct Settings_
 
     // The bound used will be added to the replication command iff this is true.
     bool printBoundUsed;
+
+    // Conjectured and likely bounds will be updated in file if replicated
+    // with different seed, if this value is true. Or maybe all but optimal ones?
+    // Or maybe just update all bounds, regardless of status? That's what we'll
+    // do: an independant replication count will be updated regardless of status.
+    // 0 means no update.
+    // 1 means ind. rep. count will be incremented.
+    // 2 means 1 and old replication command will be replaced with the most 
+    //   recent one.
+    uint8_t noteReplications;
+
+    // The seed in the replication command in the bounds file.
+    uint64_t boundsFileSeed;
 
 } Settings;
 
