@@ -116,6 +116,8 @@ HardInstance * hard_newInstance(void)
     hi->settings->boundStatus = HardBoundStatus_undefined;
     hi->settings->useBoundFromFile = 1;  // ??
     hi->settings->printBoundUsed = true;  // ??
+    hi->settings->noteReplications = 2;
+    hi->settings->boundsFileSeed = UINT64_MAX;  // ?? undef. value?? (it's okayish)
 
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -4206,12 +4208,18 @@ uint8_t hard_solve( HardInstance * hi )
             fputc( '\n', s->outFile );
         }
 
-        // See if the bound is an absolute improvement.
+        // See if the bound is an absolute improvement, or a replication.
         if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
              s->updateBoundsFile )
         {
             readBounds_write( hi, bestResult, seedForBestResult, 
                               upperBoundForBest );
+        }
+        else if ( bestResult - BoundsFilePrecision < s->upperBoundInFile  &&
+                  s->noteReplications >= 1  &&  
+                  seedForBestResult != s->boundsFileSeed )
+        {
+            readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
         }
     }
     else
@@ -4328,13 +4336,25 @@ uint8_t hard_solve( HardInstance * hi )
                      fputc( '\n', s->outFile );
                 }
 
-                // See if the bound is an absolute improvement.
+                // See if the bound is an absolute improvement, or a replication.
                 if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
                      s->updateBoundsFile )
                 {
                     readBounds_write( hi, bestResult, seedForBestResult,
                                       upperBoundForBest );
                 }
+                else if ( bestResult - BoundsFilePrecision < s->upperBoundInFile  &&
+                          s->noteReplications >= 1  &&  
+                          seedForBestResult != s->boundsFileSeed )
+                {
+                    readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+                }
+            }
+            else if ( result - BoundsFilePrecision < s->upperBoundInFile  &&
+                      s->noteReplications >= 1  &&  
+                      seedForBestResult != s->boundsFileSeed )
+            {   // Note replication.
+                readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
             }
         }
         else

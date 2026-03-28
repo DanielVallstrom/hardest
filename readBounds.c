@@ -124,21 +124,19 @@ static bool printUntilChar( FILE * file, int d, FILE * outfile )
 }
 
 
-#if 0
 // Like eatUntilCharLF but also prints the parsed file content.
-static int printUntilCharLF( FILE * file, int d )
+static int printUntilCharLF( FILE * file, int d, FILE * outFile )
 {
     int c = getc(file);
 
     while ( c != d  &&  c != '\n'  &&  c != EOF )
     {
-        putchar(c);
+        putc( c, outFile );
         c = getc(file);
     }
 
     return c;
 }
-#endif
 
 
 // Parses the first line of a csv file.
@@ -425,6 +423,34 @@ static bool parseBody( HardInstance * hi )
         eatUntilChar( file, ',' );
 
 
+        // This is the ind. rep. count column.
+
+        chr = getc(file);
+
+        if ( !isdigit(chr) )
+        {
+            fprintf( stderr, "Parse error in ind. rep. count, line %u: "
+                             "%c should be a digit.\n\n",
+                             rows, chr );
+            return true;
+        }
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow ind. rep. count. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( s->verbosityVector & HardVerbosity_printInfo )
+        {
+            fprintf( outFile, "independently replicated count: %u\n", n );
+        }
+
+
         // Here are notes.
 
         chr = getc(file);
@@ -480,7 +506,8 @@ static bool parseBody( HardInstance * hi )
         }
 
 
-        // Now comes the reproduction command. We'll just print it.
+        // Now comes the reproduction command. We'll extract any seed used.
+        // Otherwise we'll just print the command.
 
         chr = getc(file);
 
@@ -495,16 +522,144 @@ static bool parseBody( HardInstance * hi )
         // Print info.
         if ( chr != '\n'  &&  chr != EOF )
         {
+            uint64_t nSeed;  // Seed can be 64 bits.
+
             if ( s->verbosityVector & HardVerbosity_printInfo )
             {
                 fprintf( s->outFile, "reproduction command:\n" );
                 putc ( chr, outFile );
-                printUntilChar( file, '\n', outFile );
+
+                chr = printUntilCharLF( file, '-', outFile );
+                while ( chr != '\n'  &&  chr != EOF )
+                {
+                    assert( chr == '-' );
+                    chr = getc(file);
+
+                    // Check if seed.
+                    if ( chr == 's' )
+                    {
+                        chr = getc(file);
+
+                        if ( chr == ' ' )
+                        {
+                            chr = getc(file);
+                        }
+
+                        getNumber( file, chr, nSeed );
+                        s->boundsFileSeed = nSeed;
+                        fprintf( outFile, "-s %lu", nSeed );
+                        putc( chr, outFile );
+                    }
+                    else if ( chr == '-' )  // Check long-option.
+                    {
+                        chr = getc(file);
+                        if ( chr == 's' )
+                        {
+                            chr = getc(file);
+                            if ( chr == 'e' )
+                            {
+                                chr = getc(file);
+                                if ( chr == 'e' )
+                                {
+                                    chr = getc(file);
+                                    if ( chr == 'd' )
+                                    {
+                                        chr = getc(file);
+                                        if ( chr == ' ' ||  chr == '=' )
+                                        {
+                                            chr = getc(file);
+                                            getNumber( file, chr, nSeed );
+                                            s->boundsFileSeed = nSeed;
+                                            fprintf( outFile, "--seed %lu", nSeed );
+                                            putc( chr, outFile );
+                                        }
+                                        else
+                                        {
+                                            fprintf( outFile, "--seed%c", chr );
+                                        }
+                                    }
+                                    else
+                                    {
+                                        fprintf( outFile, "--see%c", chr );
+                                    }
+                                }
+                                else
+                                {
+                                    fprintf( outFile, "--se%c", chr );
+                                }
+                            }
+                            else
+                            {
+                                fprintf( outFile, "--s%c", chr );
+                            }
+                        }
+                        else
+                        {
+                            fprintf( outFile, "--%c", chr );
+                        }
+                    }
+                    else
+                    {
+                        fprintf( outFile, "-%c", chr );
+                    }
+
+                    chr = printUntilCharLF( file, '-', outFile );
+                }
+
                 putc( '\n', outFile );
             }
             else
             {
-                eatLine(file);
+                // Search for seed.
+
+                chr = eatUntilCharLF( file, '-' );
+                while ( chr != '\n'  &&  chr != EOF )
+                {
+                    assert( chr == '-' );
+                    chr = getc(file);
+
+                    // Check if seed.
+                    if ( chr == 's' )
+                    {
+                        chr = getc(file);
+
+                        if ( chr == ' ' )
+                        {
+                            chr = getc(file);
+                        }
+
+                        getNumber( file, chr, nSeed );
+                        s->boundsFileSeed = nSeed;
+                    }
+                    else if ( chr == '-' )  // Check long-option.
+                    {
+                        chr = getc(file);
+                        if ( chr == 's' )
+                        {
+                            chr = getc(file);
+                            if ( chr == 'e' )
+                            {
+                                chr = getc(file);
+                                if ( chr == 'e' )
+                                {
+                                    chr = getc(file);
+                                    if ( chr == 'd' )
+                                    {
+                                        chr = getc(file);
+                                        if ( chr == ' ' ||  chr == '=' )
+                                        {
+                                            chr = getc(file);
+                                            getNumber( file, chr, nSeed );
+                                            s->boundsFileSeed = nSeed;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    chr = eatUntilCharLF( file, '-' );
+                }
             }
         }
 
@@ -599,6 +754,9 @@ static bool append( HardInstance * hi, double bound, uint64_t seed,
         fprintf( file, "upper_bound," );
     }
 
+    // Ind. rep. count.
+    fprintf( file, "0," );
+    
     // Notes. Now it's empty. Do we want it to include anything? You could 
     // place an identifier for the one who found the upper bound here, perhaps?
     fprintf( file, "," );
@@ -839,6 +997,9 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
             fprintf( newFile, "upper_bound," );
         }
 
+        // This is the ind. rep. count.
+        fprintf( newFile, "0,");
+
         // Here are notes. We could add "by XY" here.
         putc( ',', newFile );
 
@@ -859,11 +1020,11 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
         {
             if ( boundUsed > 888.8 )
             {
-                fprintf( file, " -u 888.8 -M 1" );        
+                fprintf( newFile, " -u 888.8 -M 1" );        
             }
             else
             {
-                fprintf( file, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
+                fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
             }
         }
 
@@ -977,3 +1138,304 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
     return false;
 }
 
+
+
+// Increments the replication counter in the upper bounds file. Returns true 
+// iff an error occurred.
+//   seed and boundUsed should be the seed and bound used for the search that 
+// found the new bound.
+//   Also replaces the replication command, if s->noteRep > 1.
+//   Rows will end with CRLF, following some csv definition or convention,
+// apparently. 
+//   Uses tmpnam, which is deprecated. However, there is no standard C
+// alternative.
+bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
+{
+    Hard * h = hi->hard;
+    Settings * s = hi->settings;
+
+    int argc = s->argC;
+    char * * argv = s->argV;
+
+    // Name of the temporary bounds file. 
+    // The file is to be renamed as the new bounds file.
+    char tmpFileName[L_tmpnam];
+
+    if ( tmpnam(tmpFileName) == NULL )
+    {
+        fprintf( stderr, "\nError: Could not get a temporary file name.\n\n" );
+
+        return true;
+    }
+
+    // Open files.
+
+    FILE * newFile = fopen( tmpFileName, "w");
+
+    if ( newFile == NULL )
+    {
+        fprintf( stderr, "\nError: Could not open a new bounds file.\n\n" );
+
+        return true;
+    }
+
+    s->boundsFile = fopen( s->boundsFileName, "r");
+
+    if ( s->boundsFile == NULL )
+    {
+        fprintf( stderr, "\nError: Could not open bounds file.\n\n" );
+
+        remove(tmpFileName);
+        fclose(newFile);
+
+        return true;
+    }
+
+
+    GodsN f = h->fGodsN;
+    GodsN t = h->tGodsN;
+    GodsN r = h->rGodsN;
+
+    FILE * file = s->boundsFile;
+
+    uint32_t rows = 1;  // Number of lines in csv file, including header.
+    uint32_t entries = 0;  // Number of entries for the instance.
+
+    int chr;
+
+
+    // Print header.
+    printUntilChar( file, '\n', newFile );
+    putc( '\n', newFile );
+
+
+    do
+    {   // Parse one row.
+
+        //uint8_t col = 1;  // The current column.
+
+        uint32_t n;  // Used for reading numbers.
+
+        // Read false column.
+        //   If EOF comes early, the line will be treated as
+        // white space, ending the file, and not treated as an error.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            break;
+        }
+
+        rows++;
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of false gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != f )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,", n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+    
+
+        // Read true column.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            fprintf( stderr, "Parse error on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of true gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != t )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,%u,", f, n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+
+
+        // Read random column.
+
+        chr = eatUntilDigitRet(file);
+
+        if ( chr == EOF )
+        {
+            fprintf( stderr, "Parse error on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        getNumber( file, chr, n );
+
+        if ( chr != ',' )
+        {
+            fprintf( stderr, "Parse error: %c must follow number of random gods. "
+                             "It was %c on line %u in csv file.\n\n",
+                             ',', chr, rows );
+            return true;
+        }
+
+        if ( n != r )
+        {
+            // Print row and continue.
+            fprintf( newFile, "%u,%u,%u,", f, t, n );
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;
+        }
+
+
+        // This is the row for the instance.
+
+        entries++;
+
+        // If this isn't the first entry, print warning, but proceed.
+        if ( entries > 1 )
+        {
+            fprintf( stderr, "Error: duplicated instance at row %u in csv file. Proceeding anyway.\n\n",
+                             rows );
+        }
+
+        // Print gods.
+        fprintf( newFile, "%u,%u,%u,", f, t, r );
+
+        // Print upper bound.
+        printUntilChar( file, ',', newFile );
+        putc( ',', newFile );
+
+        // Print status.
+        printUntilChar( file, ',', newFile );
+        putc( ',', newFile );
+
+        // This is the ind. rep. count; read, increment, print.
+
+        chr = getc(file);
+
+        if ( !isdigit(chr) )
+        {
+            fprintf( stderr, "Error reading ind. rep. counter on row %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        getNumber( file, chr, n );
+        n++;
+        fprintf( newFile, "%u,", n );
+
+        // Print info.
+        if ( s->verbosityVector & HardVerbosity_printInfo )
+        {
+            fprintf( s->outFile, "\nindependent replication counter "
+                                 "incremented, to: %u\n", n );
+        }
+        
+
+        // Print notes.
+        printUntilChar( file, ',', newFile );
+        putc( ',', newFile );
+
+
+        // Print version and replication command.
+        if ( s->noteReplications == 1 )
+        {
+            // Print version.
+            printUntilChar( file, ',', newFile );
+            putc( ',', newFile );
+
+            // Print replication command.
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+        }
+        else  // Replace old replication command with new.
+        {
+            fprintf( newFile, "%s,", hardestVersion );
+            
+            // Here comes the replication command. We'll add seed and -i 0 last,
+            // and maybe the bound used.
+
+            for ( int c = 0; c != argc; c++ )
+            {
+                fprintf( newFile, "%s ", argv[c] );
+            }
+
+            fprintf( newFile, "-s %lu -i 0", seed );    
+
+            // Handle bound used.
+            if ( s->printBoundUsed )
+            {
+                if ( boundUsed > 888.8 )
+                {
+                    fprintf( newFile, " -u 888.8 -M 1" );        
+                }
+                else
+                {
+                    fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
+                }
+            }
+
+            // End with CRLF.
+            fprintf( newFile, "\r\n" );
+
+            // Skip rest of file line.
+            eatLine(file);
+        }
+    }
+    while ( chr != EOF );  // EOF is handled at the start, mostly.
+
+
+    fclose(file);
+    fclose(newFile);
+
+    // Update backup file.
+
+    remove( s->backupBoundsFileName );
+
+    if ( rename( s->boundsFileName, s->backupBoundsFileName ) )
+    {
+        fprintf( stderr, "error: couldn't rename backup bounds file\n\n" );
+    }
+
+    remove( s->boundsFileName );  // In case above failed, and we are on Windows.
+
+    if ( rename( tmpFileName, s->boundsFileName ) )
+    {
+        fprintf( stderr, "error: couldn't rename temporary bounds file\n\n" );
+
+        return true;
+    }
+
+
+    return false;
+}
