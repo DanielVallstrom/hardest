@@ -9,6 +9,8 @@ This file tracks upper bounds on the expected number of questions needed to solv
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds. Easiest is to just run the program and upload [best_known_bounds.csv](best_known_bounds.csv) if you find any improvement; [best_known_bounds.csv](best_known_bounds.csv) is updated automatically with default options. However, then bounds in this file might be outdated --- and might stay outdated until it's updated by an AI agent.
 
+That a bound is reproduced independently means that it was replicated without use of the seed in the reproduction command.
+
 ## How to Reproduce
 
 To reproduce a solution you need:
