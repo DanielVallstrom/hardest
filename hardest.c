@@ -131,7 +131,7 @@ int main( int argc, char * * argv )
     // Print cpu time used.
     if ( hi->settings->verbosityVector & HardVerbosity_printTime )
     {
-        printf( "\ncpu time used, in seconds: %.3f\n",
+        printf( "cpu time used, in seconds: %.3f\n\n",
                 (double)(clock()-clockStart) / CLOCKS_PER_SEC );
     }
 
