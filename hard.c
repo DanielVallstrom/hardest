@@ -119,6 +119,9 @@ HardInstance * hard_newInstance(void)
     hi->settings->noteReplications = 2;
     hi->settings->boundsFileSeed = UINT64_MAX;  // ?? undef. value?? (it's okayish)
 
+    hi->settings->abortPromilleGoal = 960;  // ??
+    hi->settings->abortLeewayChange = 0.001;  // ??
+
     hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
 
     if ( hi->settings->lvlReps == NULL )
@@ -4356,6 +4359,23 @@ uint8_t hard_solve( HardInstance * hi )
             {   // Note replication.
                 readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
             }
+            
+            // Update abort heuristics.
+            if ( s->abortPromilleGoal <= 1000 )
+            {
+                if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  >
+                     s->abortPromilleGoal )
+                {
+                    s->abortLeewayStart += s->abortLeewayChange;
+                    s->abortLeewayEnd   += s->abortLeewayChange;
+                }
+                else if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  <
+                          s->abortPromilleGoal )
+                {
+                    s->abortLeewayStart -= 1.1 * s->abortLeewayChange;
+                    s->abortLeewayEnd   -= 1.1 * s->abortLeewayChange;
+                }
+            }
         }
         else
         {
@@ -4369,6 +4389,23 @@ uint8_t hard_solve( HardInstance * hi )
                 fprintf( s->outFile,
                          "Search number %u aborted.\n\n", reps+2 );
             }
+
+            // Update abort heuristics.
+            if ( s->abortPromilleGoal <= 1000 )
+            {
+                if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  >
+                     s->abortPromilleGoal )
+                {
+                    s->abortLeewayStart += 1.1 * s->abortLeewayChange;
+                    s->abortLeewayEnd   += 1.1 * s->abortLeewayChange;
+                }
+                else if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  <
+                          s->abortPromilleGoal )
+                {
+                    s->abortLeewayStart -= s->abortLeewayChange;
+                    s->abortLeewayEnd   -= s->abortLeewayChange;
+                }
+            }
         }
     }
 
@@ -4376,8 +4413,14 @@ uint8_t hard_solve( HardInstance * hi )
     if ( s->verbosityVector & HardVerbosity_printInfo )
     {
         fprintf( s->outFile,
-                 "Searches aborted: %f %%\n\n", 
+                 "Searches aborted: %f %%\n", 
                  100 * (double)(nrOfAborts) / ( s->iterate + 1 ) );
+
+        fprintf( s->outFile,
+                 "abort-leeway-start: %g\n", s->abortLeewayStart );
+
+        fprintf( s->outFile,
+                 "abort-leeway-end: %g\n\n", s->abortLeewayEnd );
 
         // Print best estimates.
         for ( uint8_t n = 0; n != s->maxCatchDepth; n++ )

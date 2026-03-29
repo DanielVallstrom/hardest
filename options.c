@@ -163,6 +163,9 @@ stdout,
 "  -k --good-gods-candidates <unsigned integer>\n"
 "                          Number of gods that will be (extra) considered in the search\n"
 "                          for good gods to ask. [%u]\n"
+"  -K --abort-promille-goal <unsigned integer>\n"
+"                          We'll aim to get this many promille aborts. [%u]\n"
+"                          Anything above 1000 will turn this off.\n"
 "  -l --resume-aborted-leeway <float>\n"
 "                          When the result estimate at a node is <\n"
 "                          resume-aborted-leeway * upperBound, aborts\n"
@@ -189,6 +192,7 @@ stdout,
 "                          2 means negative side will always have one more disjunct\n"
 "                            when there is an odd number of disjuncts. [%u]\n",
 s->goodGodsCandN,
+s->abortPromilleGoal,
 s->resumeAbortedLeeway,
 s->topLocalResetLevel,
 s->printBoundUsed ? "yes" : "no",
@@ -302,12 +306,16 @@ stdout,
 "                          In estimate heuristic 1, factor for new results will\n"
 "                          get upped by this, and factor for old average will be\n"
 "                          lowered by this, when taking their average, when\n"
-"                          calculating a new estimate. [%g]\n",
+"                          calculating a new estimate. [%g]\n"
+"  -Y --abort-leeway-change <float>\n"
+"                          We'll add or subtract this from abort-leeway-start and -end,\n"
+"                          to achive abort-promille-goal. [%g]\n",
 hi->hard->upperBound,
 s->maxUnbal,
 (unsigned long long int)s->verbosityVector,
 s->updateBoundsFile ? "yes" : "no",
-s->estWeight
+s->estWeight,
+s->abortLeewayChange
            );
 
     fprintf(
@@ -462,6 +470,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "precision",              required_argument, NULL, 'F' },
             { "global-bound",           required_argument, NULL, 'G' },
             { "estimate-heuristic",     required_argument, NULL, 'H' },
+            { "abort-promille-goal",    required_argument, NULL, 'K' },
             { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "use-file-bound",         required_argument, NULL, 'M' },
             { "odd-bias",               required_argument, NULL, 'N' },
@@ -472,6 +481,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "indent",                 required_argument, NULL, 'T' },
             { "max-unbal",              required_argument, NULL, 'U' },
             { "estimate-weight",        required_argument, NULL, 'W' },
+            { "abort-leeway-change",    required_argument, NULL, 'Y' },
             { "abort-leeway-start",     required_argument, NULL, 'a' },
             { "iterate-sub-searches",   required_argument, NULL, 'b' },
             { "catch-aborts",           required_argument, NULL, 'c' },
@@ -504,7 +514,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:C:D:E:F:G:H:L:M:N:O:P::R:S:T:U:W:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
+                             "A:B:C:D:E:F:G:H:K:L:M:N:O:P::R:S:T:U:W:Y:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -671,6 +681,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->estimateHeuristic = n;
+                }
+
+                break;
+
+            case 'K':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -K and --abort-promille-goal must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->abortPromilleGoal = n;
                 }
 
                 break;
@@ -886,6 +916,26 @@ static int parseCommandLineOptions( HardInstance * hi,
 
                 break;
 
+            case 'Y':
+                {
+                    double r;
+
+                    if ( readReal( optarg, &r ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -Y and --abort-leeway-change\n"
+                                 "must be a real on form '1.2', '3.' or '4'. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+ 
+                    hi->settings->abortLeewayChange = r;
+                }
+
+                break;
+
             case 'a':
                 {
                     double r;
@@ -901,7 +951,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->abortLeewayStart = max( r, 0.999 );  // ??
+                    hi->settings->abortLeewayStart = max( r, 0.8 );  // ??
                 }
 
                 break;
@@ -964,7 +1014,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->abortLeewayEnd = max( r, 0.998 );  // ??
+                    hi->settings->abortLeewayEnd = max( r, 0.7 );  // ??
                 }
 
                 break;

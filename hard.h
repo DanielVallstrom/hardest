@@ -428,6 +428,14 @@ typedef struct Settings_
     // The seed in the replication command in the bounds file.
     uint64_t boundsFileSeed;
 
+    // We'll aim to get this many promille aborts.
+    //   Anything above 1000 will turn this off.
+    uint16_t abortPromilleGoal;
+
+    // We'll add or subtract this from abortLeewayStart and -End,
+    // to achive abortPromilleGoal.
+    double abortLeewayChange;
+
 } Settings;
 
 
