@@ -62,6 +62,10 @@ def select_results_entries(entries):
     """Select which entries to include in the Results table."""
     selected = set()
 
+    # How far to look for adjacent conjectured/likely entries when
+    # deciding whether to include gap upper_bound entries.
+    gap_range = 3
+
     for (f, t, r), e in entries.items():
         # Skip placeholder values
         if float(e['expected_questions']) >= 999:
@@ -99,11 +103,11 @@ def select_results_entries(entries):
             has_lower = any(
                 entries.get((f, t2, r), {}).get('status') in
                 ('conjectured', 'likely')
-                for t2 in range(max(r, t - 3), t))
+                for t2 in range(max(r, t - gap_range), t))
             has_higher = any(
                 entries.get((f, t2, r), {}).get('status') in
                 ('conjectured', 'likely')
-                for t2 in range(t + 1, t + 4))
+                for t2 in range(t + 1, t + gap_range + 1))
             if has_lower and has_higher:
                 selected.add((f, t, r))
 
