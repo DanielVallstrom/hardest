@@ -764,7 +764,7 @@ static bool append( HardInstance * hi, double bound, uint64_t seed,
     fprintf( file, "%s,", hardestVersion );
 
     // Here comes the replication command. We'll add seed and -i 0 last,
-    // and maybe the bound used.
+    // and maybe the bound used. And leeways.
 
     for ( int c = 0; c != argc; c++ )
     {
@@ -785,6 +785,10 @@ static bool append( HardInstance * hi, double bound, uint64_t seed,
             fprintf( file, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
         }
     }
+
+    // Print leeways.
+    fprintf( file, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
+             s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
 
     // End with CRLF.
     fprintf( file, "\r\n" );
@@ -1006,7 +1010,7 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
         fprintf( newFile, "%s,", hardestVersion );
 
         // Here comes the replication command. We'll add seed and -i 0 last,
-        // and maybe the bound used.
+        // and maybe the bound used. And leeways.
 
         for ( int c = 0; c != argc; c++ )
         {
@@ -1027,6 +1031,10 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
                 fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
             }
         }
+
+        // Print leeways.
+        fprintf( newFile, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
+                 s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
 
         // End with CRLF.
         fprintf( newFile, "\r\n" );
@@ -1383,7 +1391,7 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
             fprintf( newFile, "%s,", hardestVersion );
             
             // Here comes the replication command. We'll add seed and -i 0 last,
-            // and maybe the bound used.
+            // and maybe the bound used. And leeways.
 
             for ( int c = 0; c != argc; c++ )
             {
@@ -1404,6 +1412,10 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
                     fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
                 }
             }
+
+            // Print leeways.
+            fprintf( newFile, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
+                     s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
 
             // End with CRLF.
             fprintf( newFile, "\r\n" );

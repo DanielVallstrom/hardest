@@ -42,7 +42,7 @@
 #define FNV_prime64  ((uint64_t)1099511628211)
 #define FNV_prime    FNV_prime64
 #define FNV_offset_basis32 ((uint64_t)2166136261)
-#define FNV_offset_basis64 ((uint64_t)14695981039346656037)
+#define FNV_offset_basis64 ((uint64_t)14695981039346656037U)
 
 
 

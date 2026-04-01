@@ -307,15 +307,25 @@ stdout,
 "                          get upped by this, and factor for old average will be\n"
 "                          lowered by this, when taking their average, when\n"
 "                          calculating a new estimate. [%g]\n"
+"  -X --change-factor <float>\n"
+"                          Determines how much abort values will change. [%g]\n"
 "  -Y --abort-leeway-change <float>\n"
 "                          We'll add or subtract this from abort-leeway-start and -end,\n"
-"                          to achive abort-promille-goal. [%g]\n",
+"                          adjusted, to achive abort-promille-goal. [%g]\n"
+"  -z --CIz <float>        Set z-value for CIs. Default is 95%% CIs. [%f]\n"
+"  -Z --min-sample-size <unsigned integer>\n"
+"                          The minimal sample size in order to update abort heuristics.\n"
+"                          If 0, then we'll try to set it to something reasonable,\n"
+"                          conservatively. [%u]\n",
 hi->hard->upperBound,
 s->maxUnbal,
 (unsigned long long int)s->verbosityVector,
 s->updateBoundsFile ? "yes" : "no",
 s->estWeight,
-s->abortLeewayChange
+s->changeFactor,
+s->abortLeewayChange,
+s->ciz,
+s->minSampleSize
            );
 
     fprintf(
@@ -481,7 +491,9 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "indent",                 required_argument, NULL, 'T' },
             { "max-unbal",              required_argument, NULL, 'U' },
             { "estimate-weight",        required_argument, NULL, 'W' },
+            { "change-factor",          required_argument, NULL, 'X' },
             { "abort-leeway-change",    required_argument, NULL, 'Y' },
+            { "min-sample-size",        required_argument, NULL, 'Z' },
             { "abort-leeway-start",     required_argument, NULL, 'a' },
             { "iterate-sub-searches",   required_argument, NULL, 'b' },
             { "catch-aborts",           required_argument, NULL, 'c' },
@@ -504,6 +516,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "upper-bound",            required_argument, NULL, 'u' },
             { "verbose",                optional_argument, NULL, 'v' },
             { "update-bounds",          optional_argument, NULL, 'w' },
+            { "CIz",                    required_argument, NULL, 'z' },
             { "version",                no_argument,       NULL, CHAR_MAX+2 },
             { "print-more",             optional_argument, NULL, CHAR_MAX+3 },
             { "print-options",          no_argument,       NULL, CHAR_MAX+4 },
@@ -514,7 +527,8 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:C:D:E:F:G:H:K:L:M:N:O:P::R:S:T:U:W:Y:a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
+                             "A:B:C:D:E:F:G:H:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
+                             "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -916,6 +930,26 @@ static int parseCommandLineOptions( HardInstance * hi,
 
                 break;
 
+            case 'X':
+                {
+                    double r;
+
+                    if ( readReal( optarg, &r ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -X and --change-factor\n"
+                                 "must be a real on form '1.2', '3.' or '4'. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+ 
+                    hi->settings->changeFactor = r;
+                }
+
+                break;
+
             case 'Y':
                 {
                     double r;
@@ -932,6 +966,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
  
                     hi->settings->abortLeewayChange = r;
+                }
+
+                break;
+
+            case 'Z':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -Z and --min-sample-size must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->minSampleSize = n;
                 }
 
                 break;
@@ -1365,6 +1419,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                 else
                 {
                     hi->settings->updateBoundsFile = true;
+                }
+
+                break;
+
+            case 'z':
+                {
+                    double ciz;
+
+                    if ( readReal( optarg, &ciz ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -z and --CIz\n"
+                                 "must be a real on form '1.2', '3.' or '4'. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+ 
+                    hi->settings->ciz = ciz;
                 }
 
                 break;

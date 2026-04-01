@@ -46,6 +46,9 @@ typedef struct HardInstance_ HardInstance;
 // The default size of qPath. See below.
 #define DefaultqPathSize (300)
 
+// The default z-value for CIs.
+#define DefaultCIz (1.96)
+
 
 // Types. -------------------------------------------------------------
 
@@ -428,13 +431,58 @@ typedef struct Settings_
     // The seed in the replication command in the bounds file.
     uint64_t boundsFileSeed;
 
+
     // We'll aim to get this many promille aborts.
     //   Anything above 1000 will turn this off.
     uint16_t abortPromilleGoal;
 
-    // We'll add or subtract this from abortLeewayStart and -End,
+    // We'll add or subtract this from abortLeewayStart and -End, adjusted,
     // to achive abortPromilleGoal.
+    //   But only when there is a high probability that abort values are 
+    // not achiving the abort-promille-goal; we'll trust user supplied
+    // values, otherwise.
     double abortLeewayChange;
+
+    // Since we trust user supplied values, we'll have a whole batch of
+    // searches, namely this value, without changing abort values. The batch 
+    // size, this value, should be big enough so that there is a high probability
+    // that changes to abort values are correct for achiving the abort goal.
+    //   This value should depend on the abort goal. g^n < p, where p is some
+    // probability to ensure good conclusions with high probability, g is
+    // the abort-goal probability, and n is the batch size.
+    //   Actually, we'll just do searches until a non-aborted search happen,
+    // and maybe an aborted one too. Then we calculate abort probabilities, 
+    // and adjust values depending on how far away we are, and perhaps certainty
+    // intervals.
+    //uint16_t abortBatch;
+
+    // Determines how much abort values will change, depending on how off they are.
+    double changeFactor;
+    
+
+    // An exponential factor to change abort leeways. 
+    // Its "local and live representative" increases 
+    // exponentially, by this factor, when situation is bad. And resets when
+    // situation is fixed.
+    //   This type of problem --- how to home in on good abort values ---
+    // ought to be known. Something like "inverse" of "exponential decay".
+    // Maybe ask ai, or someone, when this implementation is done.
+    //   This approach is abandoned; see above, for reasons; it's too reactive,
+    // and too untrusting of user values.
+
+
+    // The minimal sample size in order to update abort heuristics.
+    //   If 0, then we'll try to set it to something reasonable, conservatively.
+    uint32_t minSampleSize;
+
+    // If > 0, the -b option will be set to 0 initially, until good abort
+    // heuristic values have been found.
+    //   If > 1, the abort values, -a and -e, will be lower a little, 
+    // depending on the -b jump, since the -b increase is expected to lower
+    // the expected number of questions.
+    uint8_t bInit;
+
+    double ciz;  // The z-value used for CIs.
 
 } Settings;
 

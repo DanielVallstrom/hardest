@@ -72,59 +72,64 @@ HardInstance * hard_newInstance(void)
         return NULL;
     }
 
-    hi->settings->verbosityVector = 127;
-    hi->settings->verbosityVector |= HardVerbosity_printSeed;
+    Settings * s = hi->settings;
+
+    s->verbosityVector = 127;
+    s->verbosityVector |= HardVerbosity_printSeed;
 
 
-    hi->settings->precision = DefaultPrecision;
-    hi->settings->memIncFactor = 2.0;  // ??
+    s->precision = DefaultPrecision;
+    s->memIncFactor = 2.0;  // ??
 
-    hi->settings->outFile = stdout;
-    hi->settings->outFileName = NULL;
+    s->outFile = stdout;
+    s->outFileName = NULL;
 
-    hi->settings->seed = time(NULL);
-    common_srand(hi->settings->seed);
+    s->seed = time(NULL);
+    common_srand(s->seed);
 
-    hi->settings->doSwaps = 7;  // ??
-    hi->settings->findGoodGods = 5;  // ??
-    hi->settings->optimizeNonR = 50;  // ??
-    hi->settings->shuffleConjunctions = 7;  // ??
-    hi->settings->iterate = 19;  // ??
-    hi->settings->abortLeewayStart = 1.02;  // ??
+    s->doSwaps = 7;  // ??
+    s->findGoodGods = 5;  // ??
+    s->optimizeNonR = 50;  // ??
+    s->shuffleConjunctions = 7;  // ??
+    s->iterate = 19;  // ??
+    s->abortLeewayStart = 1.02;  // ??
     // End should maybe be smaller on easier problems. And larger on harder.
-    hi->settings->abortLeewayEnd = 1.01;  // ??
-    hi->settings->dontAbortUntil = 10;  // ??
-    hi->settings->resumeAbortedLeeway = 1.01;  // ?? Good if >1.0, atm.
-    hi->settings->catchAbortsN = 8;  // ??
-    hi->settings->maxCatchDepth = 1;  // ??
-    hi->settings->oddBias = 0;  // ??
-    hi->settings->indent = 2;  // ??
-    hi->settings->bestLvl0PosEst = DBL_MAX;
-    hi->settings->estimateHeuristic = 0;  // ??
-    hi->settings->globalBound = true;
-    hi->settings->topLocalResetLevel = 2;  // ??
-    hi->settings->goodGodsCandN = 250;  // ??
-    hi->settings->maxUnbal = 2;  // ???  // UINT64_MAX;  // ??
-    hi->settings->estWeight = 0.0;
+    s->abortLeewayEnd = 1.01;  // ??
+    s->dontAbortUntil = 10;  // ??
+    s->resumeAbortedLeeway = 1.01;  // ?? Good if >1.0, atm.
+    s->catchAbortsN = 8;  // ??
+    s->maxCatchDepth = 1;  // ??
+    s->oddBias = 0;  // ??
+    s->indent = 2;  // ??
+    s->bestLvl0PosEst = DBL_MAX;
+    s->estimateHeuristic = 0;  // ??
+    s->globalBound = true;
+    s->topLocalResetLevel = 2;  // ??
+    s->goodGodsCandN = 250;  // ??
+    s->maxUnbal = 2;  // ???  // UINT64_MAX;  // ??
+    s->estWeight = 0.0;
 
-    hi->settings->boundsFileName = "best_known_bounds.csv";
-    hi->settings->backupBoundsFileName = "best_known_bounds.csv~";
-    hi->settings->boundsFile = NULL;
-    hi->settings->updateBoundsFile = true;  // ??
-    hi->settings->useBoundsFileOptions = false;  // ??
-    hi->settings->upperBoundInFile = DBL_MAX;  // Undefined.
-    hi->settings->boundStatus = HardBoundStatus_undefined;
-    hi->settings->useBoundFromFile = 1;  // ??
-    hi->settings->printBoundUsed = true;  // ??
-    hi->settings->noteReplications = 2;
-    hi->settings->boundsFileSeed = UINT64_MAX;  // ?? undef. value?? (it's okayish)
+    s->boundsFileName = "best_known_bounds.csv";
+    s->backupBoundsFileName = "best_known_bounds.csv~";
+    s->boundsFile = NULL;
+    s->updateBoundsFile = true;  // ??
+    s->useBoundsFileOptions = false;  // ??
+    s->upperBoundInFile = DBL_MAX;  // Undefined.
+    s->boundStatus = HardBoundStatus_undefined;
+    s->useBoundFromFile = 1;  // ??
+    s->printBoundUsed = true;  // ??
+    s->noteReplications = 2;
+    s->boundsFileSeed = UINT64_MAX;  // ?? undef. value?? (it's okayish)
 
-    hi->settings->abortPromilleGoal = 960;  // ??
-    hi->settings->abortLeewayChange = 0.001;  // ??
+    s->abortPromilleGoal = 960;  // ??
+    s->abortLeewayChange = 0.001;  // ??
+    s->changeFactor = 1.01;  // ??
+    s->minSampleSize = 0;  // ??
+    s->ciz = DefaultCIz;
 
-    hi->settings->lvlReps = calloc( 256, sizeof(uint16_t) );
+    s->lvlReps = calloc( 256, sizeof(uint16_t) );
 
-    if ( hi->settings->lvlReps == NULL )
+    if ( s->lvlReps == NULL )
     {
         fprintf( stderr, "\nError: not enough memory.\n\n" );
 
@@ -133,15 +138,15 @@ HardInstance * hard_newInstance(void)
 
     for ( uint16_t n = 0; n != ZeroRepsFromLvl; n++ )
     {
-        hi->settings->lvlReps[n] = DefaultReps;
+        s->lvlReps[n] = DefaultReps;
     }
 
     // Open the bounds file. We'll re-open file if it's to be written to.
     // Or, let's wait with opening the file until it's needed.
     #if 0
-    hi->settings->boundsFile = fopen( hi->settings->boundsFileName, "r" );
+    s->boundsFile = fopen( s->boundsFileName, "r" );
 
-    if ( hi->settings->boundsFile == NULL )
+    if ( s->boundsFile == NULL )
     {
         fprintf( stderr, "\nCould not open best_known_bounds.csv\n\n" );
     }
@@ -171,8 +176,8 @@ HardInstance * hard_newInstance(void)
     hi->hard->upperBound = DBL_MAX;
     hi->hard->subresultsFound = 0;
     hi->hard->subresSum = 0;
-    hi->hard->abortLeeway = hi->settings->abortLeewayStart;
-    hi->hard->catchAbortsN = hi->settings->catchAbortsN;
+    hi->hard->abortLeeway = s->abortLeewayStart;
+    hi->hard->catchAbortsN = s->catchAbortsN;
 
     hi->hard->gods = NULL;
     hi->hard->prefix = NULL;
@@ -337,6 +342,7 @@ static uint64_t godsSize( Hard * h, uint64_t poss0R0 )
 // check failed.
 //   Also prints info.
 //   Also handles the bounds file, closes it.
+//   Also handles minSampleSize, if 0.
 bool hard_allocArrays( HardInstance * hi )
 {
     Hard * h = hi->hard;
@@ -499,6 +505,30 @@ bool hard_allocArrays( HardInstance * hi )
     h->abortLeeway = s->abortLeewayStart;
     h->catchAbortsN = s->catchAbortsN;
       
+
+    // If the minimal sample size for updating abort heuristics is 0,
+    // then we'll try to set it to something reasonable, conservatively.
+    //   Depending on iterations, abort-goal.
+    if ( s->minSampleSize == 0 )
+    {
+        // This sample size might be roughly suitable.
+        double size = s->abortPromilleGoal >= 500 ? 
+                      5 / ( 1 - ( s->abortPromilleGoal / 1000.0 ) ) : 
+                      5 / ( s->abortPromilleGoal / 1000.0 );                    
+
+        size /= 2;
+
+        if ( s->iterate > 20000 )
+        {
+            size *= 2;
+        }
+        else
+        {
+            size += size * ( (double)s->iterate / 20000 ); 
+        }
+
+        s->minSampleSize = size;
+    }
 
     return false;
 }
@@ -2363,7 +2393,7 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         // Calculate how many of the conjunctions can get the floor log,
         // and how many get the ceiling log.
         uint64_t conjs = (end-start) / n;  // Number of conjunctions.
-        uint64_t logconjs = (uint64_t)log2(conjs);
+        uint64_t logconjs = log2(conjs);
         uint64_t conjsCeiling = ((uint64_t)1) << (logconjs+1);
 
         // How many that get the floor log discovery.
@@ -4145,7 +4175,8 @@ uint8_t hard_solve( HardInstance * hi )
     double lvl0PosEstForBest;
     double currentBestLvl0PosEst = h->bestPositiveEstimates[0];
     double upperBoundForBest = h->upperBound;
-
+    double abortLeewayStartForBest = s->abortLeewayStart;
+    double abortLeewayEndForBest = s->abortLeewayEnd;
 
     // We'll search at least one --- besides, 'iterate 0 times' means
     // one search, I guess.
@@ -4239,6 +4270,29 @@ uint8_t hard_solve( HardInstance * hi )
 
     
     // Repeat search.
+
+    // An exponential factor to change abort leeways. It increases 
+    // exponentially when situation is bad. And resets when
+    // situation is fixed.
+    //   This type of problem --- how to home in on good abort values ---
+    // ought to be known. Something like "inverse" of "exponential decay".
+    // Maybe ask ai, or someone, when this implementation is done.
+    //   This approach istn't used any more.
+    //double changeFactor = 1; 
+
+    // Abort heuristic variables.
+    //   We'll do searches until a non-aborted search happen,
+    // and maybe an aborted one too. Then we calculate abort probabilities, 
+    // and adjust values depending on how far away we are, and perhaps certainty
+    // intervals.
+
+    // The abort rate, with exponential decay. For the abort heuristics.
+    //double expDecayAbortRate = 0.5;  // ??  // Not used any more.
+
+    uint32_t aborts = 0;  // Number of aborts since abort heuristic batch start.
+    uint32_t solutions = 0;  // Number of non-aborts since abort heuristic batch start.
+
+
     for ( uint32_t reps = 0; reps != s->iterate; reps++ )
     {
         // Reset h to prepare for a repeated call to find1.
@@ -4285,6 +4339,8 @@ uint8_t hard_solve( HardInstance * hi )
                 bestResult = result;
                 seedForBestResult = currentSeed;
                 lvl0PosEstForBest = currentBestLvl0PosEst;
+                abortLeewayStartForBest = s->abortLeewayStart;
+                abortLeewayEndForBest = s->abortLeewayEnd;
 
                 if ( bestResult < h->upperBound )
                 {
@@ -4318,6 +4374,12 @@ uint8_t hard_solve( HardInstance * hi )
                                     seedForBestResult, DBL_DECIMAL_DIG, lvl0PosEstForBest,
                                     DBL_DECIMAL_DIG, upperBoundForBest );
                         }
+
+                        fprintf( s->outFile,
+                                "abort-leeway-start: %g\n", s->abortLeewayStart );
+
+                        fprintf( s->outFile,
+                                "abort-leeway-end: %g\n\n", s->abortLeewayEnd );
                     }
 
                     // Print best estimates.
@@ -4360,26 +4422,12 @@ uint8_t hard_solve( HardInstance * hi )
                 readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
             }
             
-            // Update abort heuristics.
-            if ( s->abortPromilleGoal <= 1000 )
-            {
-                if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  >
-                     s->abortPromilleGoal )
-                {
-                    s->abortLeewayStart += s->abortLeewayChange;
-                    s->abortLeewayEnd   += s->abortLeewayChange;
-                }
-                else if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  <
-                          s->abortPromilleGoal )
-                {
-                    s->abortLeewayStart -= 1.1 * s->abortLeewayChange;
-                    s->abortLeewayEnd   -= 1.1 * s->abortLeewayChange;
-                }
-            }
+            solutions++;
         }
         else
         {
             nrOfAborts++;
+            aborts++;
 
             // Print result, occasionally.
             if ( ( s->iterate >= 8  &&  reps % ( s->iterate / 8 ) == 0  ||
@@ -4389,22 +4437,49 @@ uint8_t hard_solve( HardInstance * hi )
                 fprintf( s->outFile,
                          "Search number %u aborted.\n\n", reps+2 );
             }
+        }
 
-            // Update abort heuristics.
-            if ( s->abortPromilleGoal <= 1000 )
+        // Update abort heuristics.
+        if ( s->abortPromilleGoal <= 1000 )
+        {
+            uint32_t sampleSize = aborts + solutions;
+
+            if ( sampleSize >= 2 * s->minSampleSize  ||
+                 sampleSize >= s->minSampleSize  &&  
+                 aborts > 0  &&  solutions > 0 )  // ??
             {
-                if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  >
-                     s->abortPromilleGoal )
+                // Calculate confidence intervals, CIs.
+                // CI = `p` ± 1.96 * √(`p` * (1 - `p`) / `n`)
+                //   Ideally, the sample size shoulbe be >= 
+                // 5 / (1 - abort_goal), assuming abort_goal >= 50%.
+                double p = (double)(aborts) / sampleSize;
+                double se = sqrt( ( p * ( 1 - p ) ) / sampleSize );
+                double moe = s->ciz * se;
+
+                if ( 1000 * p  >  s->abortPromilleGoal )
                 {
-                    s->abortLeewayStart += 1.1 * s->abortLeewayChange;
-                    s->abortLeewayEnd   += 1.1 * s->abortLeewayChange;
+                    double change = 
+                        s->changeFactor  * 
+                        ( 1 + p - (double)s->abortPromilleGoal/1000 )  *
+                        ( 1 + 1 - moe )  *  // ??
+                        s->abortLeewayChange;
+                    s->abortLeewayStart += change;
+                    s->abortLeewayEnd   += change;
                 }
-                else if ( 1000 * (double)(nrOfAborts) / ( reps + 2 )  <
-                          s->abortPromilleGoal )
+                else if ( 1000 * p  <  s->abortPromilleGoal )
                 {
-                    s->abortLeewayStart -= s->abortLeewayChange;
-                    s->abortLeewayEnd   -= s->abortLeewayChange;
+                    double change = 
+                        s->changeFactor  *
+                        ( 1 + (double)s->abortPromilleGoal/1000 - p )  *
+                        ( 1 + 1 - moe )  *  // ??
+                        s->abortLeewayChange;
+                    s->abortLeewayStart -= change;
+                    s->abortLeewayEnd   -= change;
                 }
+
+                // Reset.
+                aborts = 0;
+                solutions = 0;
             }
         }
     }
@@ -4443,6 +4518,12 @@ uint8_t hard_solve( HardInstance * hi )
                      "the best result:\n");
 
             fprintf( s->outFile, "  seed: %lu\n", seedForBestResult );
+
+            fprintf( s->outFile,
+                     "  abort-leeway-start: %g\n", abortLeewayStartForBest );
+
+            fprintf( s->outFile,
+                     "  abort-leeway-end: %g\n", abortLeewayEndForBest );
         }
 
         if ( s->verbosityVector & HardVerbosity_printSeed  &&
