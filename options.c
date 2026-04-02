@@ -151,11 +151,15 @@ stdout,
 "                          2 means counting weights with low probability fully, and\n"
 "                            repeatedly. This will be biased high. [%u]\n"
 "  -i --iterate <unsigned integer>\n"
-"                          The search will be repeated this many times. [%u]\n",
+"                          The search will be repeated this many times. [%u]\n"
+"  -I --inc-sample <unsigned integer>\n"
+"                          Increase sample size by this each time a new sample\n"
+"                          run ends. [%u]\n",
 s->findGoodGods,
 s->globalBound,
 s->estimateHeuristic,
-s->iterate
+s->iterate,
+s->minSampleInc
            );
 
     fprintf(
@@ -480,6 +484,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "precision",              required_argument, NULL, 'F' },
             { "global-bound",           required_argument, NULL, 'G' },
             { "estimate-heuristic",     required_argument, NULL, 'H' },
+            { "inc-sample",             required_argument, NULL, 'I' },
             { "abort-promille-goal",    required_argument, NULL, 'K' },
             { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "use-file-bound",         required_argument, NULL, 'M' },
@@ -527,8 +532,8 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:C:D:E:F:G:H:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
-                             "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::",
+                             "A:B:C:D:E:F:G:H:I:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
+                             "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
 
             if ( c == -1 )
@@ -695,6 +700,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     hi->settings->estimateHeuristic = n;
+                }
+
+                break;
+
+            case 'I':
+                {
+                    unsigned int n;
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -I and --inc-sample must be\n"
+                                 "an unsigned integer. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    hi->settings->minSampleInc = n;
                 }
 
                 break;

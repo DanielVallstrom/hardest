@@ -125,6 +125,7 @@ HardInstance * hard_newInstance(void)
     s->abortLeewayChange = 0.001;  // ??
     s->changeFactor = 1.01;  // ??
     s->minSampleSize = 0;  // ??
+    s->minSampleInc = 1;  // ??
     s->ciz = DefaultCIz;
 
     s->lvlReps = calloc( 256, sizeof(uint16_t) );
@@ -4178,6 +4179,11 @@ uint8_t hard_solve( HardInstance * hi )
     double abortLeewayStartForBest = s->abortLeewayStart;
     double abortLeewayEndForBest = s->abortLeewayEnd;
 
+    // For the abort heuristics.
+    uint32_t aborts = 0;  // Number of aborts since abort heuristic batch start.
+    uint32_t solutions = 0;  // Number of non-aborts since abort heuristic batch start.
+
+
     // We'll search at least one --- besides, 'iterate 0 times' means
     // one search, I guess.
     /*
@@ -4206,6 +4212,8 @@ uint8_t hard_solve( HardInstance * hi )
 
     if ( retVal == Hard_resultFound )
     {
+        solutions++;
+
         bestResult = conjHash_questionAvg(hi->hard);
         seedForBestResult = currentSeed;
         lvl0PosEstForBest = currentBestLvl0PosEst;
@@ -4259,6 +4267,7 @@ uint8_t hard_solve( HardInstance * hi )
     else
     {
         nrOfAborts++;
+        aborts++;
 
         // Print result.
         if ( s->verbosityVector & HardVerbosity_printInfo )
@@ -4288,10 +4297,6 @@ uint8_t hard_solve( HardInstance * hi )
 
     // The abort rate, with exponential decay. For the abort heuristics.
     //double expDecayAbortRate = 0.5;  // ??  // Not used any more.
-
-    uint32_t aborts = 0;  // Number of aborts since abort heuristic batch start.
-    uint32_t solutions = 0;  // Number of non-aborts since abort heuristic batch start.
-
 
     for ( uint32_t reps = 0; reps != s->iterate; reps++ )
     {
@@ -4456,6 +4461,15 @@ uint8_t hard_solve( HardInstance * hi )
                 double se = sqrt( ( p * ( 1 - p ) ) / sampleSize );
                 double moe = s->ciz * se;
 
+                // Print abort probability, sometimes.
+                if ( s->verbosityVector & HardVerbosity_printInfo  &&
+                     reps > s->iterate / 2 )
+                {
+                    fprintf( s->outFile, 
+                             "abort probability: %g +- %g, with -a %g  -e %g\n",
+                             p, moe, s->abortLeewayStart, s->abortLeewayEnd );
+                }
+
                 if ( 1000 * p  >  s->abortPromilleGoal )
                 {
                     double change = 
@@ -4539,6 +4553,25 @@ uint8_t hard_solve( HardInstance * hi )
             fprintf( s->outFile,
                      "  upper bound (-u): %.*g\n\n",
                      DBL_DECIMAL_DIG, upperBoundForBest );
+        }
+
+        // Print abort probability.
+        if ( s->abortPromilleGoal > 1000  &&  
+             s->verbosityVector & HardVerbosity_printInfo  &&
+             solutions != 0 )
+        {
+            // Calculate confidence intervals, CIs.
+            // CI = `p` ± 1.96 * √(`p` * (1 - `p`) / `n`)
+            //   Ideally, the sample size shoulbe be >= 
+            // 5 / (1 - abort_goal), assuming abort_goal >= 50%.
+            uint32_t sampleSize = aborts + solutions;
+            double p = (double)(aborts) / sampleSize;
+            double se = sqrt( ( p * ( 1 - p ) ) / sampleSize );
+            double moe = s->ciz * se;
+
+            fprintf( s->outFile, 
+                        "abort probability: %g +- %g, with -a %g  -e %g\n\n",
+                        p, moe, s->abortLeewayStart, s->abortLeewayEnd );
         }
 
         if ( s->verbosityVector & HardVerbosity_printResult )

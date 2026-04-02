@@ -46,7 +46,7 @@ typedef struct HardInstance_ HardInstance;
 // The default size of qPath. See below.
 #define DefaultqPathSize (300)
 
-// The default z-value for CIs.
+// The default z-value for CIs. For 95 %. 99 % is 2.576.
 #define DefaultCIz (1.96)
 
 
@@ -474,6 +474,9 @@ typedef struct Settings_
     // The minimal sample size in order to update abort heuristics.
     //   If 0, then we'll try to set it to something reasonable, conservatively.
     uint32_t minSampleSize;
+
+    // Increase minSampleSize by this each time a new sample run ends.
+    uint8_t minSampleInc;
 
     // If > 0, the -b option will be set to 0 initially, until good abort
     // heuristic values have been found.
