@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.17.9
+version = 0.17.11
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -294,7 +294,8 @@ distFiles =     *.[ch]                                     \
 	            configure								   \
 				best_known_bounds.csv                      \
 				shardest.sh shardestr.sh                   \
-				shardestr2.sh shardestrf.sh
+				shardestr2.sh shardestrf.sh                \
+				LEADERBOARD.md generate_leaderboard.py
 
 
 .PHONY: clean
@@ -381,6 +382,11 @@ onefile:
 # How to do this??? Is is possible to use a variable argument $?
 #diff:
 #	tar -xzf hardest.tar.gz $ -O | diff --minimal $ -
+
+
+# Generate the leaderboard.
+leaderboard:
+	python3 generate_leaderboard.py
 
 
 # Create references.

@@ -317,6 +317,8 @@ stdout,
 "                          We'll add or subtract this from abort-leeway-start and -end,\n"
 "                          adjusted, to achive abort-promille-goal. [%g]\n"
 "  -z --CIz <float>        Set z-value for CIs. Default is 95%% CIs. [%f]\n"
+"                          -99 is interpreted as the z-value for 99%% CIs. -80, -90,\n"
+"                          -95, -99, -999 are also supported.\n"
 "  -Z --min-sample-size <unsigned integer>\n"
 "                          The minimal sample size in order to update abort heuristics.\n"
 "                          If 0, then we'll try to set it to something reasonable,\n"
@@ -466,6 +468,8 @@ static int parseCommandLineOptions( HardInstance * hi,
 {
     #ifndef NoGetopt
 
+    Settings * s = hi->settings;
+
     // Tells whether or not an out-file has been specified.
     bool outFileIsSet = false;
 
@@ -558,7 +562,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->dontAbortUntil = n;
+                    s->dontAbortUntil = n;
                 }
 
                 break;
@@ -579,7 +583,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->lvlReps[k] = n;
+                    s->lvlReps[k] = n;
                 }
 
                 break;
@@ -599,7 +603,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->noteReplications = n;
+                    s->noteReplications = n;
                 }
 
                 break;
@@ -619,7 +623,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->memIncFactor = max( memIncFactor, 1.1 );
+                    s->memIncFactor = max( memIncFactor, 1.1 );
                 }
 
                 break;
@@ -639,7 +643,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->bestLvl0PosEst = x;
+                    s->bestLvl0PosEst = x;
                 }
 
                 break;
@@ -659,7 +663,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->precision = n;
+                    s->precision = n;
                 }
 
                 break;
@@ -679,7 +683,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->globalBound = n;
+                    s->globalBound = n;
                 }
 
                 break;
@@ -699,7 +703,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->estimateHeuristic = n;
+                    s->estimateHeuristic = n;
                 }
 
                 break;
@@ -719,7 +723,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->minSampleInc = n;
+                    s->minSampleInc = n;
                 }
 
                 break;
@@ -739,7 +743,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->abortPromilleGoal = n;
+                    s->abortPromilleGoal = n;
                 }
 
                 break;
@@ -759,7 +763,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->topLocalResetLevel = n;
+                    s->topLocalResetLevel = n;
                 }
 
                 break;
@@ -779,7 +783,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->useBoundFromFile = n;
+                    s->useBoundFromFile = n;
                 }
 
                 break;
@@ -799,7 +803,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->oddBias = n;
+                    s->oddBias = n;
                 }
 
                 break;
@@ -819,7 +823,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->optimizeNonR = n;
+                    s->optimizeNonR = n;
                 }
 
                 break;
@@ -829,12 +833,12 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
                     {
-                        hi->settings->verbosityVector &=
+                        s->verbosityVector &=
                             ~HardVerbosity_printInfo;
                     }
                     else if ( strcmp( optarg, "yes" ) == 0 )
                     {
-                        hi->settings->verbosityVector |=
+                        s->verbosityVector |=
                             HardVerbosity_printInfo;
                     }
                     else
@@ -849,7 +853,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    hi->settings->verbosityVector |=
+                    s->verbosityVector |=
                         HardVerbosity_printInfo;
                 }
 
@@ -870,7 +874,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->shuffleConjunctions = n;
+                    s->shuffleConjunctions = n;
                 }
 
                 break;
@@ -890,7 +894,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->doSwaps = n;
+                    s->doSwaps = n;
                 }
 
                 break;
@@ -910,7 +914,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->indent = n;
+                    s->indent = n;
                 }
 
                 break;
@@ -930,7 +934,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->maxUnbal = n;
+                    s->maxUnbal = n;
                 }
 
                 break;
@@ -950,7 +954,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->estWeight = r;
+                    s->estWeight = r;
                 }
 
                 break;
@@ -970,7 +974,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->changeFactor = r;
+                    s->changeFactor = r;
                 }
 
                 break;
@@ -990,7 +994,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->abortLeewayChange = r;
+                    s->abortLeewayChange = r;
                 }
 
                 break;
@@ -1010,7 +1014,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->minSampleSize = n;
+                    s->minSampleSize = n;
                 }
 
                 break;
@@ -1030,7 +1034,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->abortLeewayStart = max( r, 0.8 );  // ??
+                    s->abortLeewayStart = max( r, 0.8 );  // ??
                 }
 
                 break;
@@ -1052,7 +1056,7 @@ static int parseCommandLineOptions( HardInstance * hi,
 
                     for ( uint16_t k = 0; k != MaxDepth; k++ )
                     {
-                        hi->settings->lvlReps[k] = n;
+                        s->lvlReps[k] = n;
                     }
                 }
 
@@ -1073,7 +1077,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->catchAbortsN = n;
+                    s->catchAbortsN = n;
                 }
 
                 break;
@@ -1093,7 +1097,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->abortLeewayEnd = max( r, 0.7 );  // ??
+                    s->abortLeewayEnd = max( r, 0.7 );  // ??
                 }
 
                 break;
@@ -1133,7 +1137,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->findGoodGods = n;
+                    s->findGoodGods = n;
                 }
 
                 break;
@@ -1158,7 +1162,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->iterate = n;
+                    s->iterate = n;
                 }
 
                 break;
@@ -1178,7 +1182,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->goodGodsCandN = n;
+                    s->goodGodsCandN = n;
                 }
 
                 break;
@@ -1198,7 +1202,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    hi->settings->resumeAbortedLeeway = r;
+                    s->resumeAbortedLeeway = r;
                                                       //min( r, 1.01 );  // ??
                 }
 
@@ -1209,11 +1213,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
                     {
-                        hi->settings->printBoundUsed = false;
+                        s->printBoundUsed = false;
                     }
                     else if ( strcmp( optarg, "yes" ) == 0 )
                     {
-                        hi->settings->printBoundUsed = true;
+                        s->printBoundUsed = true;
                     }
                     else
                     {
@@ -1227,7 +1231,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    hi->settings->printBoundUsed = true;
+                    s->printBoundUsed = true;
                 }
 
                 break;
@@ -1266,10 +1270,10 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->outFile = fopen( optarg, "w" );
-                    hi->settings->outFileName = name;
+                    s->outFile = fopen( optarg, "w" );
+                    s->outFileName = name;
 
-                    if ( hi->settings->outFile == NULL )
+                    if ( s->outFile == NULL )
                     {
                         fprintf( stderr, "\nError: output file %s couldn't "
                                          "be opened.\n", optarg );
@@ -1281,8 +1285,8 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    hi->settings->outFile = stdout;
-                    hi->settings->outFileName = NULL;
+                    s->outFile = stdout;
+                    s->outFileName = NULL;
                 }
 
                 break;
@@ -1309,7 +1313,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 return 2;
 
             case 'q':
-                hi->settings->verbosityVector = 0;
+                s->verbosityVector = 0;
 
                 break;
 
@@ -1348,8 +1352,8 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->seed = seed;
-                    common_srand(hi->settings->seed);
+                    s->seed = seed;
+                    common_srand(s->seed);
                 }
 
                 break;
@@ -1414,7 +1418,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    //hi->settings->verbosityVector = 0xffffffffffffffff;
+                    //s->verbosityVector = 0xffffffffffffffff;
                     setVerbosityLevel( hi, 8 );
                 }
 
@@ -1425,11 +1429,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
                     {
-                        hi->settings->updateBoundsFile = false;
+                        s->updateBoundsFile = false;
                     }
                     else if ( strcmp( optarg, "yes" ) == 0 )
                     {
-                        hi->settings->updateBoundsFile = true;
+                        s->updateBoundsFile = true;
                     }
                     else
                     {
@@ -1443,7 +1447,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    hi->settings->updateBoundsFile = true;
+                    s->updateBoundsFile = true;
                 }
 
                 break;
@@ -1452,18 +1456,56 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     double ciz;
 
-                    if ( readReal( optarg, &ciz ) )
+                    if ( readSignedReal( optarg, &ciz ) )
                     {
                         fprintf( stderr,
                                  "\nError: the argument to command line "
                                  "options -z and --CIz\n"
-                                 "must be a real on form '1.2', '3.' or '4'. "
-                                 "You supplied %s.\n\n", optarg );
+                                 "must be a real on form '1.2', '3.' or '4', "
+                                 "or '-99'. You supplied %s.\n\n", optarg );
 
                         return 1;
                     }
- 
-                    hi->settings->ciz = ciz;
+
+                    if ( ciz == -80 )
+                    {
+                        s->ciz = 1.282;
+                    } 
+                    else if ( ciz == -85 )
+                    {   
+                        s->ciz = 1.440;
+                    }
+                    else if ( ciz == -90 )
+                    {   
+                        s->ciz = 1.645;
+                    } 
+                    else if ( ciz == -95 )
+                    {
+                        s->ciz = 1.96;
+                    }
+                    else if ( ciz == -99 )
+                    {
+                        s->ciz = 2.576;
+                    }
+                    else if ( ciz == -999 )
+                    {
+                        s->ciz = 3.291;
+                    }
+                    else
+                    {
+                        s->ciz = ciz;
+                    }
+                }
+
+                if ( s->ciz <= 0 )
+                {
+                    fprintf( stderr,
+                             "\nError: the argument to command line "
+                              "options -z and --CIz\n"
+                              "must be > 0, or e.g. -99. You supplied %g.\n\n", 
+                              s->ciz );
+
+                    return 1;
                 }
 
                 break;
@@ -1479,12 +1521,12 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
                     {
-                        hi->settings->verbosityVector &=
+                        s->verbosityVector &=
                             ~HardVerbosity_printMore;
                     }
                     else if ( strcmp( optarg, "yes" ) == 0 )
                     {
-                        hi->settings->verbosityVector |=
+                        s->verbosityVector |=
                             HardVerbosity_printMore;
                     }
                     else
@@ -1499,7 +1541,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
                 else
                 {
-                    hi->settings->verbosityVector |=
+                    s->verbosityVector |=
                         HardVerbosity_printMore;
                 }
 
@@ -1526,7 +1568,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
 
-                    hi->settings->verbosityVector = vv;
+                    s->verbosityVector = vv;
                 }
 
                 break;
@@ -1557,10 +1599,10 @@ static int parseCommandLineOptions( HardInstance * hi,
                     return 1;
                 }
 
-                hi->settings->outFile = fopen( argV[optind], "w" );
-                hi->settings->outFileName = name;
+                s->outFile = fopen( argV[optind], "w" );
+                s->outFileName = name;
 
-                if ( hi->settings->outFile == NULL )
+                if ( s->outFile == NULL )
                 {
                     fprintf( stderr, "\nError: file %s couldn't "
                                      "be opened.\n", argV[optind] );
@@ -1572,8 +1614,8 @@ static int parseCommandLineOptions( HardInstance * hi,
             }
             else
             {
-                hi->settings->outFile = stdout;
-                hi->settings->outFileName = NULL;
+                s->outFile = stdout;
+                s->outFileName = NULL;
             }
 
             outFileIsSet = true;
