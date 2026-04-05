@@ -62,21 +62,27 @@ stdout,
 "'How to Solve \"The Hardest Logic Puzzle Ever\" and Its Generalization'.\n"
 "  Gods are named g0, g1, ...\n"
 "  To succinctly reproduce a solution, or see its questions, you can do a long\n"
-"search, note the seed, the upper bound, and maybe the best lvl 0 pos estimate,\n"
-"for the one best sub-search, and then rerun with that seed (-s), that upper bound (-u),\n"
-"and that best lvl 0 pos estimate (-E), and with -v for the questions, and maybe -i 0.\n"
+"search, note the seed, the upper bound, and maybe leaways -a and -e,\n"
+"for the one best sub-search, and then rerun with that seed (-s), that upper\n"
+"bound (-u), and those leaways, and with -v for the questions, and maybe -i 0.\n"
            );
+//"the best lvl 0 pos estimate,\n"
+//at best lvl 0 pos estimate (-E), 
 
     fprintf( 
 stdout, 
 "\nExamples:\n" 
 "  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0  reproduces optimal solution, with questions\n"
-"  ./hardest -f 0 -t 6 -r 5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.49 -i 200 -k 11 -b 2 -i 0\n"
-"    -s 12443524816424922443  reproduces a current upper bound.\n"
-"  ./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0\n"
-"    -s 13683506237796025932  reproduces an other current upper bound.\n"
+"  ./hardest -f 2 -t 2 -r 3 -b 4 -i 999 -a 1.00001 -e 1.00 -K 1960 -S 8 -z -99 -U 4 "
+"-s 6179805106105280146 -i 0 -u 8.9940099999999994 -M 1 -a 1.0000100000000001 -e 1\n"
+"    reproduces a current upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
-"    and why all solver solutions to problems with just one random god are optimal.\n"           );
+"    and why all solver solutions to problems with just one random god are optimal.\n"
+           );
+//"  ./hardest -f 0 -t 6 -r 5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.49 -i 200 -k 11 -b 2 -i 0\n"
+//"    -s 12443524816424922443  reproduces a current upper bound.\n"
+//"  ./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0\n"
+//"    -s 13683506237796025932  reproduces an other current upper bound.\n"
 
     fprintf(
 stdout,
@@ -173,7 +179,8 @@ stdout,
 "  -l --resume-aborted-leeway <float>\n"
 "                          When the result estimate at a node is <\n"
 "                          resume-aborted-leeway * upperBound, aborts\n"
-"                          will be caught and search resumed. [%f]\n"
+"                          will be caught and search resumed. [%g]\n"
+"                            -1 means that the -a value is used. -2 means the -e value.\n"
 "  -L --top-local-reset-level <unsigned integer>\n"
 "                          The top level where we'll switch from a global hash\n"
 "                          reset to a local reset. [%u]\n"
@@ -302,7 +309,7 @@ stdout,
 "                          Set the verbosity vector. [%#llx]\n"
 "                          The integer can be bin (0b), hex (0x),\n"
 "                          octal (0), or plain decimal.\n"
-"  --version               Print the version number.\n"
+"  --version               Print the version number, %s.\n"
 "  -w --update-bounds[=no|yes]\n"
 "                          If true, then improved upper bounds are written to\n"
 "                          the csv bounds file. [%s]\n"
@@ -326,6 +333,7 @@ stdout,
 hi->hard->upperBound,
 s->maxUnbal,
 (unsigned long long int)s->verbosityVector,
+hardestVersion,
 s->updateBoundsFile ? "yes" : "no",
 s->estWeight,
 s->changeFactor,
@@ -1191,12 +1199,13 @@ static int parseCommandLineOptions( HardInstance * hi,
                 {
                     double r;
 
-                    if ( readReal( optarg, &r ) )
+                    if ( readSignedReal( optarg, &r ) )
                     {
                         fprintf( stderr,
                                  "\nError: the argument to command line "
                                  "options -l and --resume-aborted-leeway\n"
-                                 "must be a real on form '1.2', '3.' or '4'. "
+                                 "must be a real on form '1.2', '3.' or '4', "
+                                 "or -1 or -2. "
                                  "You supplied %s.\n\n", optarg );
 
                         return 1;
@@ -1204,6 +1213,19 @@ static int parseCommandLineOptions( HardInstance * hi,
  
                     s->resumeAbortedLeeway = r;
                                                       //min( r, 1.01 );  // ??
+                }
+
+                if ( s->resumeAbortedLeeway <= 0   &&
+                     s->resumeAbortedLeeway != -1  &&
+                     s->resumeAbortedLeeway != -2 )
+                {
+                    fprintf( stderr,
+                             "\nError: the argument to command line "
+                              "options -l and --resume-aborted-leeway\n"
+                              "must be > 0, or e.g. -1. You supplied %g.\n\n", 
+                              s->resumeAbortedLeeway );
+
+                    return 1;
                 }
 
                 break;

@@ -96,7 +96,7 @@ HardInstance * hard_newInstance(void)
     // End should maybe be smaller on easier problems. And larger on harder.
     s->abortLeewayEnd = 1.01;  // ??
     s->dontAbortUntil = 10;  // ??
-    s->resumeAbortedLeeway = 1.01;  // ?? Good if >1.0, atm.
+    s->resumeAbortedLeeway = -1;  // 1.001;  // ??
     s->catchAbortsN = 8;  // ??
     s->maxCatchDepth = 1;  // ??
     s->oddBias = 0;  // ??
@@ -3945,12 +3945,28 @@ static uint8_t find1( HardInstance * hi )
     //uint64_t posSubresSum;
 
     // The estimates are, now, decent. We should maybe use the global
-    // upper bound here, instead of bestPositiveEstimates[0]?? Let's 
+    // upper bound here, instead of bestPositiveEstimates[0]? Let's 
     // do it as an option:
     if ( s->globalBound )
     {
+        double leeway;  // The leeway to be used.
+
+        // See what leeway we should be using.
+        if ( s->resumeAbortedLeeway == -2 )
+        {
+            leeway = s->abortLeewayEnd;
+        }
+        else if ( s->resumeAbortedLeeway == -1 )
+        {
+            leeway = s->abortLeewayStart;
+        }
+        else
+        {
+            leeway = s->resumeAbortedLeeway;
+        }
+
         if ( (double)(h->subresSum) / h->subresultsFound  <
-            h->upperBound * s->resumeAbortedLeeway )
+             h->upperBound * leeway )
         {
             stateIsPromising = true;
 
@@ -3958,15 +3974,15 @@ static uint8_t find1( HardInstance * hi )
             if ( hi->settings->verbosityVector & HardVerbosity_printAll )
             {
                 fprintf( s->outFile, "\nstate is promising: estimated result:"
-                                    " %f\n",
-                        (double)(h->subresSum) / h->subresultsFound );
+                                     " %f\n",
+                         (double)(h->subresSum) / h->subresultsFound );
             }
         }
     }
     else
-    {    
+    {
         if ( (double)(h->subresSum) / h->subresultsFound  <
-            h->bestPositiveEstimates[0] * s->resumeAbortedLeeway )
+             h->bestPositiveEstimates[0] * s->resumeAbortedLeeway )
         {
             stateIsPromising = true;
 
@@ -3974,8 +3990,8 @@ static uint8_t find1( HardInstance * hi )
             if ( hi->settings->verbosityVector & HardVerbosity_printAll )
             {
                 fprintf( s->outFile, "\nstate is promising: estimated result:"
-                                    " %f\n",
-                        (double)(h->subresSum) / h->subresultsFound );
+                                     " %f\n",
+                         (double)(h->subresSum) / h->subresultsFound );
             }
         }
     }

@@ -1139,7 +1139,7 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
     // Print info.
     if ( s->verbosityVector & HardVerbosity_printInfo )
     {
-        fprintf( s->outFile, "Updated bounds file with new bound: %f\n\n", bound );
+        fprintf( s->outFile, "@@@ Updated bounds file with new bound: %f @@@\n\n", bound );
     }
 
 

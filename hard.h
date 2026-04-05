@@ -336,6 +336,7 @@ typedef struct Settings_
 
     // When the result estimate at a node is < resumeAbortedLeeway *
     // upperBound, aborts will be caught and search resumed.
+    //   -1 means that abortLeewayStart is used. -2 means -End.
     double resumeAbortedLeeway;
 
     // Catch this many aborts.
