@@ -1,5 +1,5 @@
 // Module finding fewest questions that solve the generalization of
-// "The hardest logic puzzle ever".
+// The Hardest Logic Puzzle Ever.
 
 
 /*
@@ -2323,10 +2323,9 @@ static void shuffleConjunctions( uint64_t start, uint64_t end, Hard * h )
 
 
 
-// Finds one solution to the generalization of "Hardest Logic Puzzle Ever". 
+// Finds one solution to the generalization of The Hardest Logic Puzzle Ever. 
 //   The algorithm will be derived from the paper
-// 'How to Solve "The Hardest Logic Puzzle Ever" and Its
-// Generalization'.
+// Solving The Hardest Logic Puzzle Ever and its generalizations.
 //   Like find1 but with no initialization, but with recursive calls at the
 // end. See find1 first.
 //   start is the start of the disjunction that holds, end is the 
@@ -3374,10 +3373,9 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
 
 
 
-// Finds one solution to the generalization of "Hardest Logic Puzzle Ever". 
+// Finds one solution to the generalization of Hardest Logic Puzzle Ever. 
 //   The algorithm will be derived from the paper
-// 'How to Solve "The Hardest Logic Puzzle Ever" and Its
-// Generalization'.
+// Solving The Hardest Logic Puzzle Ever and its generalizations.
 //   Returns Hard_outOfMemory iff there wasn't enough memory. Returns
 // Hard_aborted iff the search was aborted. Returns Hard_resultFound
 // otherwise.
@@ -4174,8 +4172,7 @@ static bool solve( HardInstance * hi )
 // Hard_aborted iff the search was aborted. Returns Hard_resultFound
 // otherwise.
 //   The algorithm will be derived from the paper
-// 'How to Solve "The Hardest Logic Puzzle Ever" and Its
-// Generalization'.
+// Solving The Hardest Logic Puzzle Ever and its generalizations.
 uint8_t hard_solve( HardInstance * hi )
 {
     Settings * s = hi->settings;

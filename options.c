@@ -58,8 +58,8 @@ static void printHelpMessage( HardInstance * hi )
 stdout,
 "\nUsage: hardest [options] [outfile]\n"
 "hardest tries to find the fewest questions that solve the generalization of\n"
-"\"The hardest logic puzzle ever\". The algorithm is derived from the paper\n"
-"'How to Solve \"The Hardest Logic Puzzle Ever\" and Its Generalization'.\n"
+"The Hardest Logic Puzzle Ever. The algorithm is derived from the paper\n"
+"Solving The Hardest Logic Puzzle Ever and its generalizations.\n"
 "  Gods are named g0, g1, ...\n"
 "  To succinctly reproduce a solution, or see its questions, you can do a long\n"
 "search, note the seed, the upper bound, and maybe leaways -a and -e,\n"
