@@ -1,8 +1,8 @@
-# hardest — a solver for "The Hardest Logic Puzzle Ever" and its generalization
+# hardest — a solver for The Hardest Logic Puzzle Ever and its generalization
 
-📄 **Paper**: [How to Solve "The Hardest Logic Puzzle Ever" and Its Generalization](https://arxiv.org/abs/2201.09801) ([PDF](https://arxiv.org/pdf/2201.09801.pdf)) by Daniel Vallstrom
+📄 **Paper**: [Solving The Hardest Logic Puzzle Ever and its generalizations](https://arxiv.org/abs/2201.09801) ([PDF](https://arxiv.org/pdf/2201.09801.pdf)) by Daniel Vallstrom
 
-**hardest** is a solver for the classic "Hardest Logic Puzzle Ever" and its generalization to arbitrary numbers of gods.
+**hardest** is a solver for the classic Hardest Logic Puzzle Ever and its generalization to arbitrary numbers of gods.
 
 ## The Puzzle
 
@@ -31,8 +31,8 @@ Current version: **0.16.21** — Default compiler: `gcc`
 ```
 Usage: hardest [options] [outfile]
 hardest tries to find the fewest questions that solve the generalization of
-"The hardest logic puzzle ever". The algorithm is derived from the paper
-'How to Solve "The Hardest Logic Puzzle Ever" and Its Generalization'.
+The Hardest Logic Puzzle Ever. The algorithm is derived from the paper
+Solving The Hardest Logic Puzzle Ever and its generalizations.
   Gods are named g0, g1, ...
   To succinctly reproduce a solution, or see its questions, you can do a long
 search, note the seed, the upper bound, and maybe the best lvl 0 pos estimate,
@@ -101,4 +101,4 @@ daniel.vallstrom@gmail.com
 
 If you use this solver or the results in your work, please cite the paper:
 
-Daniel Vallstrom. *How to Solve "The Hardest Logic Puzzle Ever" and Its Generalization*. arXiv:2201.09801. https://arxiv.org/abs/2201.09801
+Daniel Vallstrom. *Solving The Hardest Logic Puzzle Ever and its generalizations*. arXiv:2201.09801. https://arxiv.org/abs/2201.09801
