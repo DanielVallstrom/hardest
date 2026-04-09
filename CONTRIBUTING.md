@@ -2,7 +2,7 @@
 
 Contributions of improved upper bounds are very welcome!
 
-To improve an upper bound, now, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -k m. Then you trade -b n for -i k --- start with -b 0. See the replication commands in [`best_known_bounds.csv`](best_known_bounds.csv). 
+To improve an upper bound, now, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0. See the replication commands in [`best_known_bounds.csv`](best_known_bounds.csv). 
 
 ## How to Submit Improved Bounds
 
