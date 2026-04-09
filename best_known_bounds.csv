@@ -393,7 +393,7 @@ false_gods,true_gods,random_gods,expected_questions,status,independent_replicati
 1,9,8,22.327358,upper_bound,0,,0.16.13,./hardest -f 1 -t 9 -r 8 -b 0 -i 0 -l 1.01 -s 1774425725 -i 0
 2,8,8,24.545134,upper_bound,0,,0.16.13,./hardest -f 2 -t 8 -r 8 -b 0 -i 0 -l 1.01 -s 1774425902 -i 0
 3,7,8,26.000150,upper_bound,0,,0.16.13,./hardest -f 3 -t 7 -r 8 -b 0 -i 0 -l 1.01 -s 1774426746 -i 0
-4,6,8,999.9,upper_bound,0,placeholder,,
+4,6,8,26.792715,upper_bound,0,,0.17.12,./hardest -f 4 -t 6 -r 8 -b 0 -i 0 -S 6 -s 1775563729 -i 0 -u 888.8 -M 1 -a 1.02 -e 1.01
 5,5,8,999.9,upper_bound,0,placeholder,,
 0,18,1,4.368421,optimal,0,,,
 1,17,1,8.555556,optimal,0,,0.16.6,./hardest -f 1 -t 17 -r 1 -b 1 -u 12 -i 1000 -b 9 -l 1.01 -s 1774094772 -i 0
@@ -1462,7 +1462,7 @@ false_gods,true_gods,random_gods,expected_questions,status,independent_replicati
 4,24,1,19.268534,optimal,0,,0.16.13,./hardest -f 4 -t 24 -r 1 -b 0 -i 0 -l 1.01 -s 1774448049 -i 0
 5,23,1,21.562859,optimal,0,,0.16.13,./hardest -f 5 -t 23 -r 1 -b 0 -i 0 -l 1.01 -s 1774448050 -i 0
 6,22,1,23.498875,optimal,0,,0.16.13,./hardest -f 6 -t 22 -r 1 -b 0 -i 0 -l 1.01 -s 1774448053 -i 0
-7,21,1,999.9,upper_bound,0,placeholder,,
+7,21,1,25.080073,optimal,0,,0.17.12,./hardest -f 7 -t 21 -r 1 -b 0 -i 0 -S 6 -k 2 -s 1775738321 -i 0 -u 888.8 -M 1 -a 1.02 -e 1.01
 8,20,1,999.9,upper_bound,0,placeholder,,
 9,19,1,999.9,upper_bound,0,placeholder,,
 10,18,1,999.9,upper_bound,0,placeholder,,
@@ -1623,7 +1623,7 @@ false_gods,true_gods,random_gods,expected_questions,status,independent_replicati
 4,25,1,19.561710,optimal,0,,0.16.13,./hardest -f 4 -t 25 -r 1 -b 0 -i 0 -l 1.01 -s 1774448073 -i 0
 5,24,1,21.856034,optimal,0,,0.16.13,./hardest -f 5 -t 24 -r 1 -b 0 -i 0 -l 1.01 -s 1774448074 -i 0
 6,23,1,23.856034,optimal,0,,0.16.13,./hardest -f 6 -t 23 -r 1 -b 0 -i 0 -l 1.01 -s 1774448077 -i 0
-7,22,1,999.9,upper_bound,0,placeholder,,
+7,22,1,25.600100,optimal,0,,0.17.12,./hardest -f 7 -t 22 -r 1 -b 0 -i 0 -S 6 -k 2 -s 1775738416 -i 0 -u 888.8 -M 1 -a 1.02 -e 1.01
 8,21,1,999.9,upper_bound,0,placeholder,,
 9,20,1,999.9,upper_bound,0,placeholder,,
 10,19,1,999.9,upper_bound,0,placeholder,,
