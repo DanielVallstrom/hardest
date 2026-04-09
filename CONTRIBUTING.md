@@ -2,13 +2,15 @@
 
 Contributions of improved upper bounds are very welcome!
 
+To improve an upper bound, now, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S8, you also test different, small, values of -k m. Then you trade -b n for -i k --- start with -b 0. See the replication commands in [`best_known_bounds.csv`](best_known_bounds.csv). 
+
 ## How to Submit Improved Bounds
 
 There are three ways to submit an improved bound:
 
 ### 1. Pull Request (preferred)
 
-Update [`best_known_bounds.csv`](best_known_bounds.csv) and [`LEADERBOARD.md`](LEADERBOARD.md) with your improved bound, including full reproduction information (see below). Open a pull request with these changes. Easiest is to just run the program and upload [`best_known_bounds.csv`](best_known_bounds.csv) if you find any improvement; [`best_known_bounds.csv`](best_known_bounds.csv) is updated automatically with default options.
+Update [`best_known_bounds.csv`](best_known_bounds.csv) and [`LEADERBOARD.md`](LEADERBOARD.md) with your improved bound, including full reproduction information (see below). Open a pull request with these changes. Easiest is to just run the program and upload [`best_known_bounds.csv`](best_known_bounds.csv) if you find any improvement; [`best_known_bounds.csv`](best_known_bounds.csv) is updated automatically with default options. Then you also need to update [`LEADERBOARD.md`](LEADERBOARD.md), which you do with, e.g., "make leaderboard".
 
 ### 2. GitHub Issue
 
