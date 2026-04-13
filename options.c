@@ -160,7 +160,10 @@ stdout,
 "                          The search will be repeated this many times. [%u]\n"
 "  -I --inc-sample <unsigned integer>\n"
 "                          Increase sample size by this each time a new sample\n"
-"                          run ends. [%u]\n",
+"                          run ends. [%u]\n"
+"  -J --note <string without comma and space>\n"
+"                          String to be written to the note field in the csv bounds\n"
+"                          file if an improvement is found.\n",
 s->findGoodGods,
 s->globalBound,
 s->estimateHeuristic,
@@ -497,6 +500,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "global-bound",           required_argument, NULL, 'G' },
             { "estimate-heuristic",     required_argument, NULL, 'H' },
             { "inc-sample",             required_argument, NULL, 'I' },
+            { "note",                   required_argument, NULL, 'J' },
             { "abort-promille-goal",    required_argument, NULL, 'K' },
             { "top-local-reset-level",  required_argument, NULL, 'L' },
             { "use-file-bound",         required_argument, NULL, 'M' },
@@ -544,7 +548,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:C:D:E:F:G:H:I:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
+                             "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
 
@@ -732,6 +736,26 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     s->minSampleInc = n;
+                }
+
+                break;
+
+            case 'J':
+                {
+                    if ( strchr( optarg, ',' )  != NULL  ||
+                         strchr( optarg, ' ' )  != NULL  ||
+                         strchr( optarg, '\t' ) != NULL )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -J and --note must be\n"
+                                 "a string without commas and spaces. "
+                                 "You supplied: %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    s->note = optarg;
                 }
 
                 break;

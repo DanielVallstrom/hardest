@@ -488,6 +488,12 @@ typedef struct Settings_
 
     double ciz;  // The z-value used for CIs.
 
+    // A user option note to be written to the note field in the csv bounds
+    // file if an improvement is found.
+    //   Must not contain commas. We'll forbid any space too, to not mess with
+    // the reproduction command.
+    char * note;
+
 } Settings;
 
 

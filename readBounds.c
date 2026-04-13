@@ -759,7 +759,15 @@ static bool append( HardInstance * hi, double bound, uint64_t seed,
     
     // Notes. Now it's empty. Do we want it to include anything? You could 
     // place an identifier for the one who found the upper bound here, perhaps?
-    fprintf( file, "," );
+    //   Now there is some support for adding notes:
+    if ( s->note != NULL )
+    {
+        fprintf( file, "%s,", s->note );
+    }
+    else
+    {
+        fprintf( file, "," );
+    }
 
     fprintf( file, "%s,", hardestVersion );
 
@@ -1004,8 +1012,16 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
         // This is the ind. rep. count.
         fprintf( newFile, "0,");
 
-        // Here are notes. We could add "by XY" here.
-        putc( ',', newFile );
+        // Here are notes. We could add e.g. "by XY" here.
+        //   Now there is some support for adding notes:
+        if ( s->note != NULL )
+        {
+            fprintf( newFile, "%s,", s->note );
+        }
+        else
+        {
+            putc( ',', newFile );
+        }
 
         fprintf( newFile, "%s,", hardestVersion );
 

@@ -128,6 +128,8 @@ HardInstance * hard_newInstance(void)
     s->minSampleInc = 1;  // ??
     s->ciz = DefaultCIz;
 
+    s->note = NULL;  // ""??
+
     s->lvlReps = calloc( 256, sizeof(uint16_t) );
 
     if ( s->lvlReps == NULL )
