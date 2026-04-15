@@ -129,6 +129,7 @@ HardInstance * hard_newInstance(void)
     s->ciz = DefaultCIz;
 
     s->note = NULL;  // ""??
+    s->rebalance = true;
 
     s->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -188,6 +189,8 @@ HardInstance * hard_newInstance(void)
     hi->hard->ht = NULL;
     hi->hard->gGCandsPos = NULL;
     hi->hard->gGCandsNeg = NULL;
+
+    hi->hard->rebalancingCounter = 0;
 
     return hi;
 }
@@ -2909,6 +2912,56 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
                 giRs += countRs( h, start+gi, rs );  // Unchanged. Maybe save
                 gjRs += countRs( h, start+gj, rs );  // values instead.
 
+                // If one side both has more disjuncts and randoms, then
+                // we'll probably want to rebalance, if strong side doesn't
+                // have 0 randoms. Actually, we'll try to rebalance even
+                // if strong side has 0 randoms since then, if we succeed,
+                // weak side will get 0 randoms, which is even better. If we
+                // don't succeed, nothing happens.
+                if ( fstHasOneMoreConj  &&  giRs == gjRs+1  &&
+                     s->rebalance )
+                {
+                    swapConjunctionsG2a( h,   gi,   start + rs * n, qConjs + fstHasOneMoreConj,
+                                            /*gj,*/ midStart,       qConjs + sndHasOneMoreConj,
+                                            1 );
+
+                    // Re-count randoms in conclusions at gi for positive case, 
+                    // and gj for negative case, after the balancing.
+                    //   Random starting conjunctions will not be ignored.
+                    giRs = countRs( h, start + rs * n + gi, 
+                                    qConjs + fstHasOneMoreConj );
+                    gjRs = countRs( h, midStart + gj, 
+                                    qConjs + sndHasOneMoreConj );
+                    giRs += countRs( h, start+gi, rs );  // Unchanged. Maybe save
+                    gjRs += countRs( h, start+gj, rs );  // values instead. Again!
+
+                    if ( giRs != gjRs + 1 )
+                    {
+                        h->rebalancingCounter++;
+                    }
+                }
+                else if ( sndHasOneMoreConj  &&  giRs+1 == gjRs  && 
+                          s->rebalance )
+                {
+                    swapConjunctionsG2b( h, /*gi,*/ start + rs * n, qConjs + fstHasOneMoreConj,
+                                              gj,   midStart,       qConjs + sndHasOneMoreConj,
+                                            1 );
+
+                    // Re-count randoms in conclusions at gi for positive case, 
+                    // and gj for negative case, after the balancing.
+                    //   Random starting conjunctions will not be ignored.
+                    giRs = countRs( h, start + rs * n + gi, 
+                                    qConjs + fstHasOneMoreConj );
+                    gjRs = countRs( h, midStart + gj, 
+                                    qConjs + sndHasOneMoreConj );
+                    giRs += countRs( h, start+gi, rs );  // Unchanged. Maybe save
+                    gjRs += countRs( h, start+gj, rs );  // values instead. Again!
+
+                    if ( giRs + 1 != gjRs )
+                    {
+                        h->rebalancingCounter++;
+                    }
+                }
 
                 // Print info.
                 if ( hi->settings->verbosityVector & HardVerbosity_printAll )
@@ -4534,6 +4587,11 @@ uint8_t hard_solve( HardInstance * hi )
                      "depth %u: %f\n", 
                      n, h->bestPositiveEstimates[n] );
         }
+
+        // Print rebalancing info.
+        fprintf( s->outFile,
+                 "total successful rebalancings: %lu\n", 
+                 h->rebalancingCounter );
     }
   
 

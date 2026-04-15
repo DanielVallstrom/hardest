@@ -313,6 +313,9 @@ stdout,
 "                          The integer can be bin (0b), hex (0x),\n"
 "                          octal (0), or plain decimal.\n"
 "  --version               Print the version number, %s.\n"
+"  -V --rebalance[=no|yes]\n"
+"                          If one side both has more disjuncts and randoms, then\n"
+"                          we'll rebalance, if this value is true. [%s]\n"
 "  -w --update-bounds[=no|yes]\n"
 "                          If true, then improved upper bounds are written to\n"
 "                          the csv bounds file. [%s]\n"
@@ -337,6 +340,7 @@ hi->hard->upperBound,
 s->maxUnbal,
 (unsigned long long int)s->verbosityVector,
 hardestVersion,
+s->rebalance ? "yes" : "no",
 s->updateBoundsFile ? "yes" : "no",
 s->estWeight,
 s->changeFactor,
@@ -511,6 +515,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "swap",                   required_argument, NULL, 'S' },
             { "indent",                 required_argument, NULL, 'T' },
             { "max-unbal",              required_argument, NULL, 'U' },
+            { "rebalance",              optional_argument, NULL, 'V' },
             { "estimate-weight",        required_argument, NULL, 'W' },
             { "change-factor",          required_argument, NULL, 'X' },
             { "abort-leeway-change",    required_argument, NULL, 'Y' },
@@ -548,7 +553,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:W:X:Y:Z:"
+                             "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
 
@@ -967,6 +972,34 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     s->maxUnbal = n;
+                }
+
+                break;
+
+            case 'V':
+                if ( optarg )
+                {
+                    if ( strcmp( optarg, "no" ) == 0 )
+                    {
+                        s->rebalance = false;
+                    }
+                    else if ( strcmp( optarg, "yes" ) == 0 )
+                    {
+                        s->rebalance = true;
+                    }
+                    else
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -V and --rebalance must be\n"
+                                 "no or yes. You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+                }
+                else
+                {
+                    s->rebalance = true;
                 }
 
                 break;

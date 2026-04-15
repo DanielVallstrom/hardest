@@ -214,6 +214,10 @@ typedef struct Hard_
     God * gGCandsPos;  // For the positive case. 
     God * gGCandsNeg;  // For the negative case.
 
+    // This is just a "global" counter stat, to print info about how many
+    // times a rebalancing takes place.
+    uint64_t rebalancingCounter;
+
 } Hard;
 
 
@@ -493,6 +497,10 @@ typedef struct Settings_
     //   Must not contain commas. We'll forbid any space too, to not mess with
     // the reproduction command.
     char * note;
+
+    // If one side both has more disjuncts and randoms, then
+    // we'll rebalance, if this value is true.
+    bool rebalance;
 
 } Settings;
 
