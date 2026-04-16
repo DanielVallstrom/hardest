@@ -74,7 +74,7 @@ stdout,
 "\nExamples:\n" 
 "  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0  reproduces optimal solution, with questions\n"
 "  ./hardest -f 2 -t 2 -r 3 -b 4 -i 999 -a 1.00001 -e 1.00 -K 1960 -S 8 -z -99 -U 4 "
-"-s 6179805106105280146 -i 0 -u 8.9940099999999994 -M 1 -a 1.0000100000000001 -e 1\n"
+"-l 1.01 -Vno -s 6179805106105280146 -i 0 -u 8.9940099999999994 -M 1 -a 1.0000100000000001 -e 1\n"
 "    reproduces a current upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
 "    and why all solver solutions to problems with just one random god are optimal.\n"
