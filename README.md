@@ -65,14 +65,9 @@ Reproduce the optimal solution for the classic puzzle (with questions shown):
 ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0
 ```
 
-Reproduce a current upper bound (0 false, 6 true, 5 random gods):
+Reproduce a current upper bound (2 false, 2 true, 3 random gods):
 ```sh
-./hardest -f 0 -t 6 -r 5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.49 -i 200 -b 2 -i 0 -s 12443524816424922443 
-```
-
-Reproduce another current upper bound (1 false, 5 true, 4 random gods):
-```sh
-./hardest -f 2 -t 3 -r 3 -b 4 -B 0:5 -H 1 -S 7 -a 1.02 -e 1.01 -u 10.0 -i 0 -s 13683506237796025932
+./hardest -f 2 -t 2 -r 3 -b 4 -i 999 -a 1.00001 -e 1.00 -K 1960 -S 8 -z -99 -U 4 -l 1.01 -Vno -s 6179805106105280146 -i 0 -u 8.9940099999999994 -M 1 -a 1.0000100000000001 -e 1
 ```
 
 Show why the solution is optimal (1 false, 3 true, 1 random):
@@ -85,7 +80,7 @@ Show why the solution is optimal (1 false, 3 true, 1 random):
 The [leaderboard](LEADERBOARD.md) tracks the best known upper bounds on the expected number of questions needed to solve the generalized puzzle. Community contributions of improved bounds are very welcome!
 
 - See [LEADERBOARD.md](LEADERBOARD.md) for current best known values.
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for how to submit improved bounds, and a discussion of what options to use.
 - Use [GitHub Discussions](../../discussions) to share ideas or ask questions.
 - Use [GitHub Issues](../../issues) to report improved bounds or bugs.
 
