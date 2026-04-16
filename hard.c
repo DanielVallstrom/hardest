@@ -4452,7 +4452,7 @@ uint8_t hard_solve( HardInstance * hi )
                                 "abort-leeway-start: %g\n", s->abortLeewayStart );
 
                         fprintf( s->outFile,
-                                "abort-leeway-end: %g\n\n", s->abortLeewayEnd );
+                                "abort-leeway-end: %g\n", s->abortLeewayEnd );
                     }
 
                     // Print best estimates.
@@ -4577,7 +4577,7 @@ uint8_t hard_solve( HardInstance * hi )
                  "abort-leeway-start: %g\n", s->abortLeewayStart );
 
         fprintf( s->outFile,
-                 "abort-leeway-end: %g\n\n", s->abortLeewayEnd );
+                 "abort-leeway-end: %g\n", s->abortLeewayEnd );
 
         // Print best estimates.
         for ( uint8_t n = 0; n != s->maxCatchDepth; n++ )
