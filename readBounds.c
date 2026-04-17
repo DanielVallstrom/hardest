@@ -981,10 +981,64 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
         // This is the row for the instance.
 
+        entries++;
+
+        // Check so that not a better bound has been found elsewhere,
+        // by some other process, after the file first was read here.
+
+        // Read upper bound from file, again.
+
+        double boundInFile;
+        if ( getReal( file, &boundInFile ) )
+        {
+            fprintf( stderr, "Parse error reading bound on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        if ( boundInFile != s->upperBoundInFile )
+        {
+            fprintf( stderr, "Warning: bound in csv file has changed since it was first read! "
+                             "If your new bound is still lower than current bound in file, "
+                             "file will be updated with your new bound. Otherwise your bound "
+                             "will not be written to file.\n\n" );
+
+            if ( boundInFile < s->upperBoundInFile )
+            {
+                s->upperBoundInFile = boundInFile;
+
+                // We could update h->upperBound too. However, you can have
+                // any h->upperBound. And in this case it ought to be okay to retain
+                // h->upperBound. This should almost never happen anyway.
+            }
+
+            if ( boundInFile < bound )
+            {
+                fprintf( stderr, "Warning: your new bound, %g, is greater than a newly "
+                                 "added bound, %g, in the bounds file. Your bound "
+                                 "will not be written to file.\n\n",
+                                 bound, boundInFile );
+
+                // Write line and continue.
+
+                // Print gods.
+                fprintf( newFile, "%u,%u,%u,", f, t, r );
+
+                // Print upper bound.
+                fprintf( newFile, "%.*f,", s->precision, boundInFile );
+
+                printUntilChar( file, '\n', newFile );
+                putc( '\n', newFile );
+
+                continue;                
+            }
+        }
+
+
         // Skip the rest of the line in the old file.
         eatLine(file);
 
-        entries++;
 
         // If this isn't the first entry, just skip the row, without
         // printing anything.
@@ -1140,22 +1194,25 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
 
     // Update s with new values.
 
-    if ( h->rGodsN == 1 )
+    if (  bound < s->upperBoundInFile )
     {
-        s->boundStatus = HardBoundStatus_optimal;
-    }
-    else
-    {
-        s->boundStatus = HardBoundStatus_upperBound;
-    }
+        if ( h->rGodsN == 1 )
+        {
+            s->boundStatus = HardBoundStatus_optimal;
+        }
+        else
+        {
+            s->boundStatus = HardBoundStatus_upperBound;
+        }
 
-    s->upperBoundInFile = bound;
+        s->upperBoundInFile = bound;
 
 
-    // Print info.
-    if ( s->verbosityVector & HardVerbosity_printInfo )
-    {
-        fprintf( s->outFile, "\n@@@ Updated bounds file with new bound: %f @@@\n\n\n", bound );
+        // Print info.
+        if ( s->verbosityVector & HardVerbosity_printInfo )
+        {
+            fprintf( s->outFile, "\n@@@ Updated bounds file with new bound: %f @@@\n\n\n", bound );
+        }
     }
 
 
