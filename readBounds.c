@@ -35,6 +35,10 @@
 #include <ctype.h>
 
 
+#ifndef hardestVersion
+#define hardestVersion "<no version number available>"
+#endif
+
 
 // Eats up a line.
 static inline void eatLine( FILE * file )
@@ -1015,8 +1019,8 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
             if ( boundInFile < bound )
             {
-                fprintf( stderr, "Warning: your new bound, %g, is greater than a newly "
-                                 "added bound, %g, in the bounds file. Your bound "
+                fprintf( stderr, "Warning: your new bound, %f, is greater than a newly "
+                                 "added bound, %f, in the bounds file. Your bound "
                                  "will not be written to file.\n\n",
                                  bound, boundInFile );
 
@@ -1266,8 +1270,8 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
     {
         fprintf( stderr, "\nError: Could not open bounds file.\n\n" );
 
-        remove(tmpFileName);
         fclose(newFile);
+        remove(tmpFileName);
 
         return true;
     }
@@ -1411,9 +1415,42 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
         // Print gods.
         fprintf( newFile, "%u,%u,%u,", f, t, r );
 
+        // We better check that the upper bound hasn't changed in file during
+        // the search.
+
+        // Read upper bound from file, again.
+
+        double boundInFile;
+        if ( getReal( file, &boundInFile ) )
+        {
+            fprintf( stderr, "Parse error reading bound on line %u in csv file.\n\n",
+                             rows );
+
+            return true;
+        }
+
+        if ( boundInFile != s->upperBoundInFile )
+        {
+            fprintf( stderr, "Warning: bound in csv file has changed since it was first read! "
+                             "Your independent replication of the old upper bound will not be noted.\n"
+                             "The new bound is %f. Your newly found bound is %f.\n\n",
+                             boundInFile, s->upperBoundInFile );
+
+            s->upperBoundInFile = boundInFile;
+
+            // Write line and continue.
+
+            // Print upper bound.
+            fprintf( newFile, "%.*f,", s->precision, boundInFile );
+
+            printUntilChar( file, '\n', newFile );
+            putc( '\n', newFile );
+
+            continue;                
+        }
+
         // Print upper bound.
-        printUntilChar( file, ',', newFile );
-        putc( ',', newFile );
+        fprintf( newFile, "%.*f,", s->precision, boundInFile );
 
         // Print status.
         printUntilChar( file, ',', newFile );
