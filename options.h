@@ -40,8 +40,10 @@
 // 1 is returned iff something went wrong. 0 is returned otherwise.
 //   Also saves the command line in case we want to write it to the 
 // bounds file.
+//   mode should be 0 in first, normal, call. In further calls, set mode
+// to > 0.
 int options_parseCommandLineOptions( HardInstance * hi,
-                                     int argC, char * * argV );
+                                     int argC, char * * argV, uint8_t mode );
 
 
 #endif // options_H

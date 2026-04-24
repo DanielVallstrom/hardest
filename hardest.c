@@ -73,7 +73,7 @@ int main( int argc, char * * argv )
 
     // Read the command line options.
     {
-        result = options_parseCommandLineOptions( hi, argc, argv );
+        result = options_parseCommandLineOptions( hi, argc, argv, 0 );
 
         if ( result > 0 )
         {
@@ -87,8 +87,8 @@ int main( int argc, char * * argv )
     {
         if ( hi->settings->verbosityVector & HardVerbosity_printErrors )
         {
-            fprintf( stderr, "Error: wrong number of gods, or "
-                             "not enough memory\n" );
+            fprintf( stderr, "Error, aborting\n\n" );
+            // wrong number of gods, or not enough memory, or something else
         }
 
         return 1;

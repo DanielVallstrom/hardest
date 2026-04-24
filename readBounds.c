@@ -512,6 +512,12 @@ static bool parseBody( HardInstance * hi )
 
         // Now comes the reproduction command. We'll extract any seed used.
         // Otherwise we'll just print the command.
+        //   Now that we can save and parse the reproduction command fully
+        // and easily, it would be better to call the option parser to
+        // extract the seed.
+
+        // However, if we are to milk this solution, we'll also save
+        // the reproduction command.
 
         chr = getc(file);
 
@@ -527,6 +533,26 @@ static bool parseBody( HardInstance * hi )
         if ( chr != '\n'  &&  chr != EOF )
         {
             uint64_t nSeed;  // Seed can be 64 bits.
+
+
+            // If we are to milk, save the file position, and
+            // return after printing, to save the whole command.
+            //   Also save the first character ('.').
+            fpos_t repPos; 
+            long repStart;  // Rep. com. start.
+            char fstChar = chr;  // Missed first character in the command.
+            if ( s->milk )
+            {
+                repStart = ftell(file);
+
+                if ( fgetpos( file, &repPos )  ||  repStart == -1L )
+                {
+                    fprintf( stderr, "Error: couldn't get file position.\n\n" );
+
+                    return true;
+                }
+            }
+
 
             if ( s->verbosityVector & HardVerbosity_printInfo )
             {
@@ -663,6 +689,102 @@ static bool parseBody( HardInstance * hi )
                     }
 
                     chr = eatUntilCharLF( file, '-' );
+                }
+            }
+
+
+            // Save reproduction command if we are to milk it.
+            if ( s->milk )
+            {
+                // Calculate how long the command is. We'll add 2 for LF and
+                // \0, just in case. And 1 for the first missed char.
+                long repEnd = ftell(file);
+                if ( repEnd == -1L  ||  repStart == -1L )
+                {
+                    fprintf( stderr, "Error: couldn't get file position.\n\n" );
+ 
+                    return true;
+                }
+                long repSize = repEnd - repStart + 3;
+
+                s->reproductionCommand = malloc( repSize );
+
+                if ( s->reproductionCommand == NULL )
+                {
+                    fprintf( stderr, "Error: couldn't allocate memory.\n\n" );
+
+                    return true;
+                }
+
+                // Set file position back to command start.
+                if ( fsetpos( file, &repPos ) )
+                {
+                    fprintf( stderr, "Error: couldn't set file position.\n\n" );
+
+                    return true;
+                }
+
+                // Copy command.
+
+                int c;  // For characters read from file.
+                char * com = s->reproductionCommand;
+                int argC = 0;
+
+                // Write first, missed, character.
+                *com = fstChar;
+                com++;
+
+                do
+                {
+                    // Do one lexeme.
+
+                    c = getc(file);  // The first character in the lexeme.
+                    do
+                    {
+                        *com = c;
+                        com++;
+                        c = getc(file);
+                    }
+                    while ( c != ' '  &&  c != '\n'  &&  c != EOF );
+
+                    *com = '\0';
+                    com++;
+                    argC++;
+
+                } while ( c != '\n'  &&  c != EOF );
+
+                // Check if CR was used.
+                if ( com[-2] == '\r' )
+                {
+                    com[-2] = '\0';  // Overwrite CR.
+                }
+
+                s->argCRep = argC;
+                s->argVRep = malloc( sizeof(char*) * (argC+1) );
+                // Last argv string should be NULL.
+
+                if ( s->argVRep == NULL )
+                {
+                    fprintf( stderr, "Error: couldn't allocate memory.\n\n" );
+
+                    return true;
+                }
+
+                s->argVRep[argC] = NULL;
+
+                // Set argVRep.
+                com = s->reproductionCommand;
+                s->argVRep[0] = com;
+                for ( uint16_t k = 1; k != argC; k++ )
+                {
+                    do  // Find next start.
+                    {
+                        com++;
+                    }
+                    while ( *com != '\0' );
+
+                    com++;
+                    s->argVRep[k] = com;
                 }
             }
         }
@@ -816,6 +938,8 @@ static bool append( HardInstance * hi, double bound, uint64_t seed,
 //   Rows will end with CRLF, following some csv definition or convention,
 // apparently. 
 //   Will also remove duplicates of the instance.
+//   If the solution was milked, this will be noted, by "milked" in the notes
+// field.
 static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
                          double boundUsed )
 {
@@ -1072,7 +1196,11 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
         // Here are notes. We could add e.g. "by XY" here.
         //   Now there is some support for adding notes:
-        if ( s->note != NULL )
+        if ( s->milk )
+        {
+            fprintf( newFile, "milked," );  // We'll ignore s->note.
+        }
+        else if ( s->note != NULL )
         {
             fprintf( newFile, "%s,", s->note );
         }
@@ -1085,30 +1213,74 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
         // Here comes the replication command. We'll add seed and -i 0 last,
         // and maybe the bound used. And leeways.
+        //   If the solution was milked, we'll add original options too, first.
+        // And turn the command into normal, non-milking, mode.
 
-        for ( int c = 0; c != argc; c++ )
+        if (s->milk )
         {
-            fprintf( newFile, "%s ", argv[c] );
+            int argcOrig = s->argCRep;
+            char * * argvOrig = s->argVRep;
+
+            // Print original command.
+            for ( int c = 0; c != argcOrig; c++ )
+            {
+                fprintf( newFile, "%s ", argvOrig[c] );
+            }
+
+            // Print new options.
+            for ( int c = 1; c != argc; c++ )
+            {
+                fprintf( newFile, "%s ", argv[c] );
+            }
+
+            // Undo the milk option.
+            fprintf( newFile, "-1no ");
+
+            // Print -B options, up to and including -i. The rest are
+            // taken care of by the printing of the new options above.
+            for ( uint8_t k = 0; k != s->iterate + 1; k++ )
+            {
+                fprintf( newFile, "-B %u:%u ", k, s->lvlReps[k] );
+            }
+
+            // We could here print the same endings as in the non-milking case.
+            // However, the whole point of the milking is that those 
+            // parameters should be the same as in the base solution. So let's
+            // not print those values. Now they are the same as the base values,
+            // which are printed already. If these milking assumptions change,
+            // that would break the replication command. But it seems better
+            // to then add the changed parameters, here, instead of clutter
+            // the replication command with theoretically pointless parameters.
+            // Let's just end with the -i option, which is needed.
+
+            fprintf( newFile, "-i 0");
         }
-
-        fprintf( newFile, "-s %lu -i 0", seed );    
-
-        // Handle bound used.
-        if ( s->printBoundUsed )
+        else
         {
-            if ( boundUsed > 888.8 )
+            for ( int c = 0; c != argc; c++ )
             {
-                fprintf( newFile, " -u 888.8 -M 1" );        
+                fprintf( newFile, "%s ", argv[c] );
             }
-            else
-            {
-                fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
-            }
-        }
 
-        // Print leeways.
-        fprintf( newFile, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
-                 s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
+            fprintf( newFile, "-s %lu -i 0", seed );    
+
+            // Handle bound used.
+            if ( s->printBoundUsed )
+            {
+                if ( boundUsed > 888.8 )
+                {
+                    fprintf( newFile, " -u 888.8 -M 1" );        
+                }
+                else
+                {
+                    fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, boundUsed );        
+                }
+            }
+
+            // Print leeways.
+            fprintf( newFile, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
+                    s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
+        }
 
         // End with CRLF.
         fprintf( newFile, "\r\n" );
@@ -1152,6 +1324,8 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 // apparently. 
 //   Uses tmpnam, which is deprecated. However, there is no standard C
 // alternative.
+//   If the solution was milked, this will be noted, by "milked" in the notes
+// field.
 bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
                        double boundUsed )
 {

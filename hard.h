@@ -495,12 +495,26 @@ typedef struct Settings_
     // A user option note to be written to the note field in the csv bounds
     // file if an improvement is found.
     //   Must not contain commas. We'll forbid any space too, to not mess with
-    // the reproduction command.
+    // the reproduction command. '-' is also forbidden, to make milk parses
+    // easier.
     char * note;
 
     // If one side both has more disjuncts and randoms, then
     // we'll rebalance, if this value is true.
     bool rebalance;
+
+    // The solution in the bounds file will be milked iff this is true.
+    bool milk;
+
+    // The reproduction command, as a string, for milking.
+    char * reproductionCommand;
+
+    // argc and argv for the reproduction command in the bounds file.
+    int argCRep; 
+    char * * argVRep;
+
+    // A copy of lvlReps. Used for milking.
+    uint16_t * lvlRepsOrig;  //[MaxDepth];
 
 } Settings;
 

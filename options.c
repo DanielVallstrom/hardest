@@ -73,8 +73,8 @@ stdout,
 stdout, 
 "\nExamples:\n" 
 "  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0  reproduces optimal solution, with questions\n"
-"  ./hardest -f 2 -t 2 -r 3 -b 4 -i 999 -a 1.00001 -e 1.00 -K 1960 -S 8 -z -99 -U 4 "
-"-l 1.01 -Vno -s 6179805106105280146 -i 0 -u 8.9940099999999994 -M 1 -a 1.0000100000000001 -e 1\n"
+"  ./hardest -f 2 -t 2 -r 3 -b 3 -B 0:4 -i 999 -a 0.984 -e 0.983 -K 1960 -S 8 -z -99 -U 4 -H 1 "
+"-s 12779109849863880712 -i 0 -u 8.9581850000000003 -M 1 -a 0.98399999999999999 -e 0.98299999999999998\n"
 "    reproduces a current upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
 "    and why all solver solutions to problems with just one random god are optimal.\n"
@@ -87,6 +87,20 @@ stdout,
     fprintf(
 stdout,
 "\nOptions, with defaults in [ ]:\n"
+           );
+
+    fprintf(
+stdout,
+"  -1 --milk[=no|yes]      Milk the solution in the bounds file. [%s]\n"
+"                          Parameters are based on the solution in the bounds file\n"
+"                          but -B combinations upto and including your -B options\n"
+"                          are used instead of the -B options in the bounds file,\n"
+"                          down to and including level -i.\n"
+"                          Any -J option will be ignored.\n"
+"                          Options that you supply will be overwritten\n"
+"                          by options in the replication command, except these:\n"
+"                          -1, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n",
+s->milk ? "yes" : "no"
            );
 
     fprintf(
@@ -125,7 +139,9 @@ stdout,
 "                          side, but typically it's only supplied here to reproduce a\n"
 "                          search. Only used if -G 0 is set. [%g]\n"
 "  -f --false-gods <unsigned integer>\n"
-"                          Set number of false gods.\n",
+"                          Set number of false gods.\n"
+"  -F --precision <unsigned integer>\n"
+"                          Set precision used when printing floats. [%u]\n",
 s->abortLeewayStart,
 s->dontAbortUntil,
 s->lvlReps[0], s->lvlReps[1], s->lvlReps[2], s->lvlReps[3], s->lvlReps[4], 
@@ -134,7 +150,8 @@ s->catchAbortsN,
 s->noteReplications,
 s->memIncFactor,
 s->abortLeewayEnd,
-s->bestLvl0PosEst
+s->bestLvl0PosEst,
+s->precision
            );
 
     fprintf(
@@ -245,8 +262,6 @@ stdout,
 "                          bound will be retained regardless.\n"
 "  -P --print-info[=no|yes]\n"
 "                          Print info if possible. [%s]\n"
-"  -F --precision <unsigned integer>\n"
-"                          Set precision used when printing floats.\n"
 "  --print-options         Print option settings and then quit.\n"
 "                          To fine-tune the verbosity, run e.g.\n"
 "                          './hardest -v3 --print-options'\n"
@@ -478,8 +493,10 @@ static bool printPlaceholders( /*HardInstance * hi,*/ GodsN lowSum, GodsN highSu
 //   Returns 0 iff everything went fine and you should continue on.
 // Returns 1 iff there was an error. Returns > 1 for e.g. --help and you
 // should stop.
+//   mode should be 0 in first, normal, call. In further calls, set mode
+// to > 0.
 static int parseCommandLineOptions( HardInstance * hi,
-                                    int argC, char * * argV )
+                                    int argC, char * * argV, uint8_t mode )
 {
     #ifndef NoGetopt
 
@@ -495,6 +512,7 @@ static int parseCommandLineOptions( HardInstance * hi,
 
         static struct option longOptions[] =
         {
+            { "milk",                   no_argument,       NULL, '1' },
             { "dont-abort-until",       required_argument, NULL, 'A' },
             { "iterate-sub-search-lvl", required_argument, NULL, 'B' },
             { "inc-ind-rep-count",      required_argument, NULL, 'C' },
@@ -553,6 +571,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
+                             "1::"
                              "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
@@ -564,6 +583,39 @@ static int parseCommandLineOptions( HardInstance * hi,
 
             switch ( c )
             {
+            case '1':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
+                if ( optarg )
+                {
+                    if ( strcmp( optarg, "no" ) == 0 )
+                    {
+                        s->milk = false;
+                    }
+                    else if ( strcmp( optarg, "yes" ) == 0 )
+                    {
+                        s->milk = true;
+                    }
+                    else
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -1 and --milk must be\n"
+                                 "no or yes. You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+                }
+                else
+                {
+                    s->milk = true;
+                }
+
+                break;
+
             case 'A':
                 {
                     unsigned int n;
@@ -585,6 +637,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'B':
+                if ( mode == 0 )
                 {
                     unsigned int n;
                     unsigned int k;
@@ -606,6 +659,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'C':
+                if ( mode == 0 )
                 {
                     unsigned int n;
 
@@ -666,6 +720,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'F':
+                if ( mode == 0 )
                 {
                     unsigned int n;
 
@@ -746,9 +801,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'J':
+                if ( mode == 0 )
                 {
                     if ( strchr( optarg, ',' )  != NULL  ||
                          strchr( optarg, ' ' )  != NULL  ||
+                         //strchr( optarg, '-' )  != NULL  ||
                          strchr( optarg, '\t' ) != NULL )
                     {
                         fprintf( stderr,
@@ -977,6 +1034,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'V':
+                if ( mode > 0 )  // This could be needed for replication.
+                {
+                    //break;
+                }
+                
                 if ( optarg )
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
@@ -1105,6 +1167,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'b':
+                if ( mode == 0 )
                 {
                     unsigned int n;
 
@@ -1213,6 +1276,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 return 2;
 
             case 'i':
+                if ( mode == 0 )
                 {
                     unsigned int n;
 
@@ -1268,8 +1332,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                         return 1;
                     }
  
-                    s->resumeAbortedLeeway = r;
-                                                      //min( r, 1.01 );  // ??
+                    s->resumeAbortedLeeway = r;     //min( r, 1.01 );  // ??
                 }
 
                 if ( s->resumeAbortedLeeway <= 0   &&
@@ -1336,6 +1399,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'o':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
                 outFileIsSet = true;
 
                 if ( strcmp( optarg, "-" ) != 0 )
@@ -1392,7 +1460,10 @@ static int parseCommandLineOptions( HardInstance * hi,
                 return 2;
 
             case 'q':
-                s->verbosityVector = 0;
+                if ( mode == 0 )
+                {
+                    s->verbosityVector = 0;
+                }
 
                 break;
 
@@ -1478,6 +1549,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'v':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
                 if ( optarg )
                 {
                     unsigned int vl;
@@ -1504,6 +1580,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case 'w':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
                 if ( optarg )
                 {
                     if ( strcmp( optarg, "no" ) == 0 )
@@ -1632,6 +1713,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 return 2;
 
             case CHAR_MAX+5:
+                if ( mode == 0 )
                 {
                     unsigned long long int vv;
 
@@ -1665,7 +1747,7 @@ static int parseCommandLineOptions( HardInstance * hi,
     // first leftover argument is assumed to be that file.
     if ( optind < argC )
     {
-        if ( !outFileIsSet )
+        if ( !outFileIsSet  &&  mode == 0 )
         {
             if ( strcmp( argV[optind], "-" ) != 0 )
             {
@@ -1703,6 +1785,8 @@ static int parseCommandLineOptions( HardInstance * hi,
         }
 
         // Any additional argument is an error.
+        //   However, we'll not return error if mode > 0; there an unflagged
+        // outfile could be here, maybe(?), and not be an error.
         if ( optind != argC )
         {
             fprintf( stderr, "\nError: non-option argv elements "
@@ -1716,12 +1800,16 @@ static int parseCommandLineOptions( HardInstance * hi,
 
             fprintf( stderr, "See hardest --help.\n\n" );
 
-            return 1;
+            if ( mode == 0 )
+            {
+                return 1;
+            }
         }
     }
 
 
     #endif // #ifndef NoGetopt
+    
 
     return 0;
 }
@@ -1733,13 +1821,18 @@ static int parseCommandLineOptions( HardInstance * hi,
 // should stop.
 //   Also saves the command line in case we want to write it to the 
 // bounds file.
+//   mode should be 0 in first, normal, call. In further calls, set mode
+// to > 0.
 int options_parseCommandLineOptions( HardInstance * hi,
-                                     int argC, char * * argV )
+                                     int argC, char * * argV, uint8_t mode )
 {
-    int result = parseCommandLineOptions( hi, argC, argV );
+    int result = parseCommandLineOptions( hi, argC, argV, mode );
 
-    hi->settings->argC = argC;
-    hi->settings->argV = argV;
+    if ( mode == 0 )
+    {
+        hi->settings->argC = argC;
+        hi->settings->argV = argV;
+    }
 
     #ifndef NoGetopt
 
@@ -1747,9 +1840,18 @@ int options_parseCommandLineOptions( HardInstance * hi,
     // can be made. An alternative would be to set optind to 1 at the start
     // of parseCommandLineOptions. Best would be though to dump getopt
     // altogether and write something else instead.
-    optind = 1;  // Is this enough???
 
-    #endif // #ifndef NoGetopt
+    #ifdef __GNU_LIBRARY__
+    optind = 0;  // Use 0 for GNU systems to re-trigger initialization.
+    #else
+    optind = 1; // POSIX standard.
+    #endif
+
+    #if defined(__FreeBSD__) || defined(__APPLE__)
+    optreset = 1;  // Required for BSD and macOS.
+    #endif
+
+    #endif  // #ifndef NoGetopt
 
     return result;
 }

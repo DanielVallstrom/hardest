@@ -27,6 +27,7 @@
 #include "common.h"
 #include "compilerMacros.h"
 #include "readBounds.h"
+#include "options.h"
 
 
 #include <stdlib.h>
@@ -130,6 +131,11 @@ HardInstance * hard_newInstance(void)
 
     s->note = NULL;  // ""??
     s->rebalance = true;
+    s->milk = false;
+    s->reproductionCommand = NULL;
+    s->argCRep = 0;     // Undefined value.
+    s->argVRep = NULL;  // Undefined value.
+    s->lvlRepsOrig = NULL;
 
     s->lvlReps = calloc( 256, sizeof(uint16_t) );
 
@@ -345,10 +351,11 @@ static uint64_t godsSize( Hard * h, uint64_t poss0R0 )
 //   Also checks and sets the number of different gods.
 //   Calculates possN too.
 //   Returns true iff there wasn't enough memory, or if god sanity 
-// check failed.
+// check failed, or a milk parse went wrong.
 //   Also prints info.
 //   Also handles the bounds file, closes it.
 //   Also handles minSampleSize, if 0.
+//   Also sets up milking, if s->milk is true.
 bool hard_allocArrays( HardInstance * hi )
 {
     Hard * h = hi->hard;
@@ -535,6 +542,39 @@ bool hard_allocArrays( HardInstance * hi )
 
         s->minSampleSize = size;
     }
+
+
+    // Check if we are to milk.
+    if ( s->milk )
+    {
+        if ( s->argVRep == NULL )
+        {
+            fprintf( stderr, "\nError: no replication command to milk.\n\n" );
+
+            return true;
+        }
+        
+        // Parse command line in bounds file.
+        int res = options_parseCommandLineOptions( hi, s->argCRep, s->argVRep, 1 );
+
+        if ( res == 1 )
+        {
+            return true;
+        }
+
+        // Set up lvlRepsOrig.
+        s->lvlRepsOrig = malloc( 256 * sizeof(uint16_t) );
+
+        if ( s->lvlRepsOrig == NULL )
+        {
+            fprintf( stderr, "\nError: not enough memory.\n\n" );
+
+            return true;
+        }
+
+        memcpy( s->lvlRepsOrig, s->lvlReps, 256 * sizeof(uint16_t) );
+    }
+
 
     return false;
 }
@@ -4210,25 +4250,13 @@ static uint8_t find1( HardInstance * hi )
 
 
 
-/*
-// Finds optimal questions.
-static bool solve( HardInstance * hi )
-{
-
-
-    return false;
-}
-*/
-
-
-
 // Solves the generalization of "the hardest puzzle ever".
 //   Returns Hard_outOfMemory iff there wasn't enough memory. Returns
 // Hard_aborted iff the search was aborted. Returns Hard_resultFound
 // otherwise.
 //   The algorithm will be derived from the paper
 // Solving The Hardest Logic Puzzle Ever and its generalizations.
-uint8_t hard_solve( HardInstance * hi )
+static uint8_t solve( HardInstance * hi )
 {
     Settings * s = hi->settings;
     Hard * h = hi->hard;
@@ -4252,7 +4280,7 @@ uint8_t hard_solve( HardInstance * hi )
     uint32_t solutions = 0;  // Number of non-aborts since abort heuristic batch start.
 
 
-    // We'll search at least one --- besides, 'iterate 0 times' means
+    // We'll search at least once --- besides, 'iterate 0 times' means
     // one search, I guess.
     /*
     if ( s->iterate == 0 )
@@ -4358,7 +4386,7 @@ uint8_t hard_solve( HardInstance * hi )
     //double changeFactor = 1; 
 
     // Abort heuristic variables.
-    //   We'll do searches until a non-aborted search happen,
+    //   We'll do searches until a non-aborted search happens,
     // and maybe an aborted one too. Then we calculate abort probabilities, 
     // and adjust values depending on how far away we are, and perhaps certainty
     // intervals.
@@ -4595,6 +4623,7 @@ uint8_t hard_solve( HardInstance * hi )
     }
   
 
+    // Print result.
     if ( bestResult != DBL_MAX )
     {
         // Print result.
@@ -4667,6 +4696,321 @@ uint8_t hard_solve( HardInstance * hi )
         }
 
         return Hard_aborted;
+    }
+}
+
+
+
+// Increments the "B number" (see milk function).
+//   Returns true iff overflow occurred.
+static bool incB( Settings * s )
+{
+    uint32_t Si = s->iterate + 1;
+    uint16_t * B = s->lvlReps;
+    uint16_t * B0 = s->lvlRepsOrig;
+
+    // d is the digit position to be incremented.
+    for ( uint8_t d = 0; d != Si; d++ )
+    {
+        if ( B[d] < B0[d] )
+        {
+            B[d]++;
+
+            return false;
+        }
+
+        B[d] = 0;
+    }
+
+    return true;
+}
+
+
+
+// Milks the solution from the bounds file.
+//   Returns Hard_outOfMemory iff there wasn't enough memory. 
+//   Searches with combinations of -B values up to and including -B option,
+// down to level -i.
+static uint8_t milk( HardInstance * hi )
+{
+    Settings * s = hi->settings;
+    Hard * h = hi->hard;
+
+    uint8_t retVal;  // The return value of searches.
+    double bestResult = DBL_MAX;  // The best result found so far.
+
+    // The seed should be s->seed.
+    //uint64_t seedForBestResult;  // The seed for the one best search. 
+    //uint64_t currentSeed = common_currentSeed();
+
+    // We also have to save other settings to be able to recreate a
+    // finding. Not. These should be the same as at the start. But if
+    // some of them are changed somewhere, like the seed, then we
+    // need to reset them.
+    //double lvl0PosEstForBest;
+    double currentBestLvl0PosEst = h->bestPositiveEstimates[0];
+    //double upperBoundForBest = h->upperBound;
+    //double abortLeewayStartForBest = s->abortLeewayStart;
+    //double abortLeewayEndForBest = s->abortLeewayEnd;
+
+    uint32_t searchesN = 0;  // Number of searches made.
+
+    fputc( '\n', s->outFile );
+
+
+    // Loop through all combinations of -B values, down to and including 
+    // level -i.
+    //   We'll treat the combinations as a mixed-radix number with -i + 1
+    // digits, where the base of digit position d is the corresponding
+    // original -B value for that level (that is, lvlRepsOrig[d] or B0[d]),
+    // and level 0 is the least significant digit. Then we'll increment
+    // the number for each search, starting at number 0, i.e. -b 0 up to
+    // and including level i. See incB.
+    //   -i can be anything, and it might be useful for the user to set it.
+    // However, the max of -i should be the deepest level where it makes a
+    // difference. And that is the deepest level where an asked god can be
+    // random --- or maybe one less. This level should be calculated,
+    // somehow. In practice though, this won't matter, probably, because
+    // the complexity is high and you want and need to set -i small regardless.
+
+    // Set -B number to -b 0 for <= -i. (Equivalent to incB(s).)
+    for ( uint8_t k = 0; k != s->iterate + 1; k++ )
+    {
+        s->lvlReps[k] = 0;
+    }
+
+    do
+    {
+        // Save the state.
+        //currentSeed = common_currentSeed();
+        currentBestLvl0PosEst = h->bestPositiveEstimates[0];
+    
+        retVal = find1(hi);
+
+        if ( retVal == Hard_outOfMemory )
+        {
+            return Hard_outOfMemory;
+        }
+
+        searchesN++;
+
+        if ( retVal == Hard_resultFound )
+        {
+            double result = conjHash_questionAvg(hi->hard);
+
+            if ( result < bestResult )
+            {
+                bestResult = result;
+                //seedForBestResult = currentSeed;
+                //lvl0PosEstForBest = currentBestLvl0PosEst;
+                //abortLeewayStartForBest = s->abortLeewayStart;
+                //abortLeewayEndForBest = s->abortLeewayEnd;
+
+                if ( bestResult < h->upperBound )
+                {
+                    //upperBoundForBest = h->upperBound;
+                    //h->upperBound = bestResult;
+                    // Upper bound shouldn't be updated, to not mess with
+                    // the replication (with slight alterations, but not
+                    // the upper bound).
+                }
+
+                if ( s->verbosityVector & HardVerbosity_printInfo )
+                {
+                    fprintf( s->outFile,
+                             "Result after %u searches: average number of questions "
+                             "asked to solve the problem: %3.*f\n", 
+                             searchesN, s->precision, bestResult );
+
+                    // Print state before search so that it can succinctly
+                    // be recreated (in case of an abort of the whole run;
+                    // this info is also printed at the end).
+                    if ( s->verbosityVector & HardVerbosity_printSeed )
+                    {
+                        if ( s->globalBound )
+                        {
+                            fprintf( s->outFile,
+                                    "Start state: seed: %lu, upper bound (-u): %.*g\n", 
+                                    s->seed, 
+                                    DBL_DECIMAL_DIG, h->upperBound );
+                        }
+                        else
+                        {
+                            fprintf( s->outFile,
+                                    "Start state: seed: %lu, best lvl 0 pos est (-E): %.*g, upper bound (-u): %.*g\n", 
+                                    s->seed, DBL_DECIMAL_DIG, currentBestLvl0PosEst,
+                                    DBL_DECIMAL_DIG, h->upperBound );
+                        }
+
+                        fprintf( s->outFile,
+                                "abort-leeway-start: %g\n", s->abortLeewayStart );
+
+                        fprintf( s->outFile,
+                                "abort-leeway-end: %g\n", s->abortLeewayEnd );
+
+                        // Print -B values, up to and including -i. 
+                        for ( uint8_t k = 0; k != s->iterate + 1; k++ )
+                        {
+                            fprintf( s->outFile, " -B %u:%u", k, s->lvlReps[k] );
+                        }
+                        fputc( '\n', s->outFile );
+                    }
+
+                    // Print best estimates.
+                    for ( uint8_t n = 0; n != s->maxCatchDepth; n++ )
+                    {
+                        fprintf( s->outFile,
+                                "Best estimated result for the positive case, "
+                                "depth %u: %f\n", 
+                                n, h->bestPositiveEstimates[n] );
+                    }
+
+                    // Print estimate.
+                    fprintf( s->outFile, "Estimated result: %f\n", 
+                             (double)(h->subresSum) / h->subresultsFound);
+
+                    fprintf( s->outFile, "number of aborts caught: %lu\n",
+                             s->catchAbortsN - h->catchAbortsN );
+
+                     fputc( '\n', s->outFile );
+                }
+
+                // See if the bound is an absolute improvement, or a replication.
+                if ( bestResult + BoundsFilePrecision < s->upperBoundInFile  &&
+                     s->updateBoundsFile )
+                {
+                    readBounds_write( hi, bestResult, s->seed,
+                                      bestResult );
+                }
+                else if ( bestResult - BoundsFilePrecision < s->upperBoundInFile  &&
+                          s->noteReplications >= 1  &&  
+                          s->seed != s->boundsFileSeed )
+                {
+                    // It's not independent enough to warrant a note.
+                    //readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+                }
+            }
+            else if ( result - BoundsFilePrecision < s->upperBoundInFile  &&
+                      s->noteReplications >= 1  &&  
+                      s->seed != s->boundsFileSeed )
+            {   
+                // It's not independent enough to warrant a note.
+                //readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+            }
+        }
+
+
+        // Reset h to prepare for a repeated call to find1.
+
+        h->cellsUsed = 0;
+        h->slotsUsed = 0;
+        h->godsInConj = 0;
+        h->godsInPrefix = 0;
+        h->subresultsFound = 0;
+        h->subresSum = 0;
+        h->abortLeeway = s->abortLeewayStart;
+        h->catchAbortsN = s->catchAbortsN;
+
+        // Reset seed, to the seed in the bounds file, which should equal
+        // the common s->seed.
+        common_srand(s->boundsFileSeed);
+
+        // Reset other parameters that might have changed.
+        h->bestPositiveEstimates[0] = currentBestLvl0PosEst;
+
+
+        // For the hash table, we'll just delete it and remake it from
+        // scratch. This is a bit wasteful, but not much, and easier.
+        conjHash_delete(h->ht);
+        h->ht = conjHash_new(h);
+        
+        if ( h->ht == NULL )
+        {
+            fprintf( stderr, "\nError: not enough memory.\n\n" );
+
+            return Hard_outOfMemory;
+        }
+
+    } while ( !incB(s) );
+
+
+    // Print result.
+    if ( bestResult != DBL_MAX )
+    {
+        // Print result.
+
+        if ( s->verbosityVector & HardVerbosity_printSeed )
+        {
+            fprintf( s->outFile, "Start state for the one search that found "
+                     "the best result:\n");
+
+            fprintf( s->outFile, "  seed: %lu\n", s->seed );
+
+            fprintf( s->outFile,
+                     "  abort-leeway-start: %g\n", s->abortLeewayStart );
+
+            fprintf( s->outFile,
+                     "  abort-leeway-end: %g\n", s->abortLeewayEnd );
+        }
+
+        if ( s->verbosityVector & HardVerbosity_printSeed  &&
+             !s->globalBound )
+        {
+            fprintf( s->outFile,
+                     "  best lvl 0 positive estimate (-E): %.*g\n", 
+                     DBL_DECIMAL_DIG, currentBestLvl0PosEst );
+        }
+
+        if ( s->verbosityVector & HardVerbosity_printSeed )
+        {
+            fprintf( s->outFile,
+                     "  upper bound (-u): %.*g\n\n",
+                     DBL_DECIMAL_DIG, h->upperBound );
+        }
+
+
+        if ( s->verbosityVector & HardVerbosity_printResult )
+        {
+            fprintf( s->outFile,
+                     "Best result found: average number of questions "
+                     "asked to solve the problem: %3.*f\n\n", 
+                     s->precision, bestResult );
+        }
+        
+        return Hard_resultFound;
+    }
+    else
+    {
+        // Print result.
+        if ( s->verbosityVector & HardVerbosity_printResult )
+        {
+            fprintf( s->outFile,
+                     "All searches were aborted.\n\n" ); 
+        }
+
+        return Hard_aborted;
+    }
+}
+
+
+
+// Solves the generalization of "the hardest puzzle ever".
+//   Returns Hard_outOfMemory iff there wasn't enough memory. Returns
+// Hard_aborted iff the search was aborted. Returns Hard_resultFound
+// otherwise.
+//   The algorithm will be derived from the paper
+// Solving The Hardest Logic Puzzle Ever and its generalizations.
+uint8_t hard_solve( HardInstance * hi )
+{
+    Settings * s = hi->settings;
+
+    if ( s->milk )
+    {
+        return milk(hi);
+    }
+    else
+    {
+        return solve(hi);
     }
 }
 
