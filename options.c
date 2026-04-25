@@ -91,16 +91,30 @@ stdout,
 
     fprintf(
 stdout,
+"  -0 --b-floor <unsigned integer>\n"
+"                          Like the -b option but the floor, for the milking\n"
+"                          mode, -1. The default is -0 0.\n"
+"                          -0 b-<c>, e.g. -0 b-1, is acceptable and will set all\n"
+"                          floor values to c less than the B values, or to 0\n"
+"                          if there is underflow.\n"
 "  -1 --milk[=no|yes]      Milk the solution in the bounds file. [%s]\n"
 "                          Parameters are based on the solution in the bounds file\n"
 "                          but -B combinations upto and including your -B options\n"
 "                          are used instead of the -B options in the bounds file,\n"
 "                          down to and including level -i.\n"
+"                          The -B combinations will not start at 0 but instead use\n"
+"                          floors set by the -2 and -0 options.\n"
 "                          Any -J option will be ignored.\n"
 "                          Options that you supply will be overwritten\n"
 "                          by options in the replication command, except these:\n"
-"                          -1, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n",
-s->milk ? "yes" : "no"
+"                          -1, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
+"  -2 -B-floor <unsigned integer>:<unsigned integer>\n"
+"                          Like -0 but for a level. E.g. -2 1:5 sets lvl 1\n"
+"                          to 5. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n",
+s->milk ? "yes" : "no",
+s->lvlRepsFloor[0], s->lvlRepsFloor[1], s->lvlRepsFloor[2], s->lvlRepsFloor[3],
+s->lvlRepsFloor[4], s->lvlRepsFloor[5], s->lvlRepsFloor[6], s->lvlRepsFloor[7],
+s->lvlRepsFloor[8], s->lvlRepsFloor[9]
            );
 
     fprintf(
@@ -512,7 +526,9 @@ static int parseCommandLineOptions( HardInstance * hi,
 
         static struct option longOptions[] =
         {
-            { "milk",                   no_argument,       NULL, '1' },
+            { "b-floor",                required_argument, NULL, '0' },
+            { "milk",                   optional_argument, NULL, '1' },
+            { "B-floor",                required_argument, NULL, '2' },
             { "dont-abort-until",       required_argument, NULL, 'A' },
             { "iterate-sub-search-lvl", required_argument, NULL, 'B' },
             { "inc-ind-rep-count",      required_argument, NULL, 'C' },
@@ -571,7 +587,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "1::"
+                             "0:1::2:"
                              "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
@@ -583,6 +599,66 @@ static int parseCommandLineOptions( HardInstance * hi,
 
             switch ( c )
             {
+            case '0':
+                {
+                    unsigned int n;
+                    bool offsetMode = *optarg == 'b';
+
+                    if ( *optarg == 'b' )
+                    {
+                        if ( optarg[1] == '-' )
+                        {
+                            optarg += 2;
+                        }
+                        else
+                        {
+                            fprintf( stderr,
+                                     "\nError: the argument to command line "
+                                     "options -0 and --b-floor must be\n"
+                                     "an unsigned integer, or b-<c>. "
+                                     "You supplied %s.\n\n", optarg );
+                        
+                            return 1;
+                        }
+                    }
+
+                    if ( readUInt( optarg, &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -0 and --b-floor must be\n"
+                                 "an unsigned integer, or b-<c>. "
+                                 "You supplied %s%s.\n\n", 
+                                 offsetMode ? "b-" : "", optarg );
+
+                        return 1;
+                    }
+
+                    if ( offsetMode )
+                    {
+                        for ( uint16_t k = 0; k != MaxDepth; k++ )
+                        {
+                            if ( s->lvlReps[k] >= n )
+                            {
+                                s->lvlRepsFloor[k] = s->lvlReps[k] - n;
+                            }
+                            else
+                            {
+                                s->lvlRepsFloor[k] = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for ( uint16_t k = 0; k != MaxDepth; k++ )
+                        {
+                            s->lvlRepsFloor[k] = n;
+                        }
+                    }
+                }
+            
+                break;
+
             case '1':
                 if ( mode > 0 )
                 {
@@ -612,6 +688,27 @@ static int parseCommandLineOptions( HardInstance * hi,
                 else
                 {
                     s->milk = true;
+                }
+
+                break;
+
+            case '2':
+                {
+                    unsigned int n;
+                    unsigned int k;
+
+                    if ( readUintCharUint( optarg, &k, ':', &n ) )
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -2 and --B-floor must be\n"
+                                 "<unsigned integer>:<unsigned integer>. "
+                                 "You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+
+                    s->lvlRepsFloor[k] = n;
                 }
 
                 break;

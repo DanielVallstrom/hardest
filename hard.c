@@ -137,9 +137,10 @@ HardInstance * hard_newInstance(void)
     s->argVRep = NULL;  // Undefined value.
     s->lvlRepsOrig = NULL;
 
-    s->lvlReps = calloc( 256, sizeof(uint16_t) );
+    s->lvlReps = calloc( MaxDepth, sizeof(uint16_t) );
+    s->lvlRepsFloor = calloc( MaxDepth, sizeof(uint16_t) );
 
-    if ( s->lvlReps == NULL )
+    if ( s->lvlReps == NULL  ||  s->lvlRepsFloor == NULL )
     {
         fprintf( stderr, "\nError: not enough memory.\n\n" );
 
@@ -563,7 +564,7 @@ bool hard_allocArrays( HardInstance * hi )
         }
 
         // Set up lvlRepsOrig.
-        s->lvlRepsOrig = malloc( 256 * sizeof(uint16_t) );
+        s->lvlRepsOrig = malloc( MaxDepth * sizeof(uint16_t) );
 
         if ( s->lvlRepsOrig == NULL )
         {
@@ -572,7 +573,7 @@ bool hard_allocArrays( HardInstance * hi )
             return true;
         }
 
-        memcpy( s->lvlRepsOrig, s->lvlReps, 256 * sizeof(uint16_t) );
+        memcpy( s->lvlRepsOrig, s->lvlReps, MaxDepth * sizeof(uint16_t) );
     }
 
 
@@ -4703,6 +4704,7 @@ static uint8_t solve( HardInstance * hi )
 
 // Increments the "B number" (see milk function).
 //   Returns true iff overflow occurred.
+//   We'll use lvlRepsFloor instead of 0 for the smallest digits.
 static bool incB( Settings * s )
 {
     uint32_t Si = s->iterate + 1;
@@ -4719,7 +4721,7 @@ static bool incB( Settings * s )
             return false;
         }
 
-        B[d] = 0;
+        B[d] = s->lvlRepsFloor[d];
     }
 
     return true;
@@ -4766,6 +4768,7 @@ static uint8_t milk( HardInstance * hi )
     // and level 0 is the least significant digit. Then we'll increment
     // the number for each search, starting at number 0, i.e. -b 0 up to
     // and including level i. See incB.
+    //   We'll use lvlRepsFloor instead of 0 for the smallest digits.
     //   -i can be anything, and it might be useful for the user to set it.
     // However, the max of -i should be the deepest level where it makes a
     // difference. And that is the deepest level where an asked god can be
@@ -4774,9 +4777,11 @@ static uint8_t milk( HardInstance * hi )
     // the complexity is high and you want and need to set -i small regardless.
 
     // Set -B number to -b 0 for <= -i. (Equivalent to incB(s).)
+    //   Actually, we'll use lvlRepsFloor instead of 0 for the smallest digits.
+    // It's still equivalent to incB(s), though.
     for ( uint8_t k = 0; k != s->iterate + 1; k++ )
     {
-        s->lvlReps[k] = 0;
+        s->lvlReps[k] = s->lvlRepsFloor[k];
     }
 
     do

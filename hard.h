@@ -516,6 +516,9 @@ typedef struct Settings_
     // A copy of lvlReps. Used for milking.
     uint16_t * lvlRepsOrig;  //[MaxDepth];
 
+    // The lowest values that lvlRep should take, when milking.
+    uint16_t * lvlRepsFloor;  //[MaxDepth];
+
 } Settings;
 
 
