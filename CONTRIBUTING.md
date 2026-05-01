@@ -4,6 +4,8 @@ Contributions of improved upper bounds are very welcome!
 
 To improve an upper bound, now, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in [`best_known_bounds.csv`](best_known_bounds.csv). 
 
+After you find a bound, you can milk the solution: Use the milk mode, -1. You'll want to base your milking on the solution, but e.g. up the number of sub-searches that you take the most promising search from, i.e. upping -B settings. Again, see [`best_known_bounds.csv`](best_known_bounds.csv).
+
 Regarding which estimate heuristic, -H, to use, while the probabilistic -H 0 might be more theoretically sound and appealing, and maybe more accurate, -H 1 might sometimes be more robust --- less random. You are not looking for accuracy anyway, but rather robustness and consistency, usefulness. Accuracy is as hard as the underlying problem in any case.
 
 Maybe don't mess with the upper bound -u option, partly because it's good to read upper bounds from the bounds file. You can use leeway options -a and -e instead. You can set them to less than 1 if you want, e.g. when you use an estimate heuristic that is biased low, e.g. -H 1. 
