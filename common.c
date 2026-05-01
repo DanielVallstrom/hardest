@@ -78,6 +78,7 @@ const uint64_t LCG_A = 6364136223846793005ULL;
 const uint64_t LCG_C = 1442695040888963407ULL;
 
 
+// Sets the seed.
 void common_srand( uint64_t seed ) 
 {
     current_seed = seed;
@@ -206,9 +207,9 @@ bool readLL( char * s, long long int * n )
 
 // Converts s into a double which is placed in x. Returns true iff a 
 // parse error has occurred. Trailing non-number characters in s will result in
-// parse error. s must not be negative and have no exponent. E.g. "55.666"
-// "55." and "242" are valid strings. The string must begin with a digit so
-// e.g. ".666" isn't valid.
+// parse error. s must not be negative and have no exponent. E.g. "12.345"
+// "55." and "123" are valid strings. The string must begin with a digit so
+// e.g. ".456" isn't valid.
 bool readReal( char * s, double * x )
 {
     // Contains the accumulated number.

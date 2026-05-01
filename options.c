@@ -107,7 +107,7 @@ stdout,
 "                          Any -J option will be ignored.\n"
 "                          Options that you supply will be overwritten\n"
 "                          by options in the replication command, except these:\n"
-"                          -1, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
+"                          -0, -1, -2, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
 "  -2 -B-floor <unsigned integer>:<unsigned integer>\n"
 "                          Like -0 but for a level. E.g. -2 1:5 sets lvl 1\n"
 "                          to 5. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n",
@@ -177,7 +177,7 @@ stdout,
 "                          1 means a linear search.\n"
 "                          2 means a search quadratic-cubicish in the -k value.\n"
 "                          >2 means 2.\n"
-"  -G --global-bound <unsigne integer>\n"
+"  -G --global-bound <unsigned integer>\n"
 "                          If 1, we'll use the upper bound globally. Otherwise\n"
 "                          local bounds will be used. [%u]\n"
 "  -h --help               Print this message.\n"
@@ -214,7 +214,7 @@ stdout,
 "                          When the result estimate at a node is <\n"
 "                          resume-aborted-leeway * upperBound, aborts\n"
 "                          will be caught and search resumed. [%g]\n"
-"                            -1 means that the -a value is used. -2 means the -e value.\n"
+"                          -1 means that the -a value is used. -2 means the -e value.\n"
 "  -L --top-local-reset-level <unsigned integer>\n"
 "                          The top level where we'll switch from a global hash\n"
 "                          reset to a local reset. [%u]\n"
@@ -277,10 +277,6 @@ stdout,
 "  -P --print-info[=no|yes]\n"
 "                          Print info if possible. [%s]\n"
 "  --print-options         Print option settings and then quit.\n"
-"                          To fine-tune the verbosity, run e.g.\n"
-"                          './hardest -v3 --print-options'\n"
-"                          and then tune the printed verbosity vector.\n"
-"                          Not very supported.\n"
 "  --print-more[=no|yes]   Print more info. [%s]\n"
 "  -q --quiet --silent     Run silently; only print error messages.\n",
 (s->verbosityVector & HardVerbosity_printInfo) ? "yes" : "no",
@@ -440,11 +436,108 @@ static void setVerbosityLevel( HardInstance * hi, unsigned int vl )
 
 
 
-// Prints option settings.
-static void printSettings( HardInstance * hi )
+// Prints settings.
+void options_printSettings( HardInstance * hi )
 {
     Settings * s = hi->settings;
+    FILE * f = s->outFile;
 
+    fprintf( f, "settings:\n" );
+    
+    fprintf( f, "outfile: %s\n", f == stdout ? "stdout" : 
+             ( f == stderr ? "stderr" : s->outFileName ) );
+    fprintf( f, "precision: %u\n", s->precision );
+    fprintf( f, "seed (-s): %lu\n", s->seed );
+    fprintf( f, "swapping (-S): %u\n", s->doSwaps );
+    fprintf( f, "good-gods (-g): %u\n", s->findGoodGods );
+    fprintf( f, "optimize-non-r (-O): %u\n", s->optimizeNonR );
+    fprintf( f, "shuffle-conjunctions (-R): %u\n", s->shuffleConjunctions );
+    fprintf( f, "odd-bias (-N): %u\n", s->oddBias );
+    fprintf( f, "iterate (-i): %u\n", s->iterate );
+    fprintf( f, "abort-leeway-start (-a): %g\n", s->abortLeewayStart );
+    fprintf( f, "abort-leeway-end   (-e): %g\n", s->abortLeewayEnd );
+    fprintf( f, "dont-abort-until (-A): %lu\n", s->dontAbortUntil );
+    fprintf( f, "resume-aborted-leeway (-l): %g\n", s->resumeAbortedLeeway );
+    fprintf( f, "catch-aborts (-c): %lu\n", s->catchAbortsN );
+    fprintf( f, "number of levels that are caught: %u\n", s->maxCatchDepth );
+
+    // Print -B values. 
+    for ( uint8_t k = 0; k != 20; k++ )
+    {
+        fprintf( f, " -B %u:%u", k, s->lvlReps[k] );
+    }
+    fprintf( f, " ...\n" );
+
+    fprintf( f, "indent (-T): %u \n", s->indent );
+    fprintf( f, "estimate-heuristic (-H): %u\n", s->estimateHeuristic );
+    fprintf( f, "best-lvl-0-pos-est (-E): %g\n", s->bestLvl0PosEst );
+    fprintf( f, "topLocalResetLevel (-L): %u\n", s->topLocalResetLevel );
+    fprintf( f, "globalBound (-G): %u\n", s->globalBound );
+    fprintf( f, "goodGodsCandN (-k): %u\n", s->goodGodsCandN );
+    fprintf( f, "max-unbal (-U): %lu\n", s->maxUnbal );
+    fprintf( f, "estWeight (-W): %g\n", s->estWeight );
+
+    fprintf( f, "bounds file: %s\n", s->boundsFileName );
+    fprintf( f, "updateBoundsFile (-w): %u\n", s->updateBoundsFile );
+    fprintf( f, "upper bound in csv file: %g\n", s->upperBoundInFile );
+    fprintf( f, "bound status in csv file: %u\n", s->boundStatus );
+    fprintf( f, "backup bounds file: %s\n", s->backupBoundsFileName );
+
+    // Print command line.
+    fprintf( f, "command line:\n" );
+    for ( int c = 0; c != s->argC; c++ )
+    {
+        fprintf( f, "%s ", s->argV[c] );
+    }
+    fputc( '\n', f );
+
+    fprintf( f, "useBoundFromFile (-M): %u\n", s->useBoundFromFile );
+    fprintf( f, "printBoundUsed (-m): %u\n", s->printBoundUsed );
+    fprintf( f, "noteReplications (-C): %u\n", s->noteReplications );
+    fprintf( f, "boundsFileSeed: %lu\n", s->boundsFileSeed );
+    fprintf( f, "abortPromilleGoal (-K): %u\n", s->abortPromilleGoal );
+    fprintf( f, "abortLeewayChange (-Y): %g\n", s->abortLeewayChange );
+    fprintf( f, "changeFactor (-X): %g\n", s->changeFactor );
+    fprintf( f, "minSampleSize (-Z): %u\n", s->minSampleSize );
+    fprintf( f, "minSampleInc (-I): %u\n", s->minSampleInc );
+    fprintf( f, "ciz (-z): %g\n", s->ciz );
+    fprintf( f, "note (-J): %s\n", s->note != NULL ? s->note : "" );
+    fprintf( f, "rebalance (-V): %u\n", s->rebalance );
+    fprintf( f, "milk (-1): %u\n", s->milk );
+
+    // Print reproduction command.
+    fprintf( f, "reproduction command:\n" );
+    for ( int c = 0; c != s->argCRep; c++ )
+    {
+        fprintf( f, "%s ", s->argVRep[c] );
+    }
+    fputc( '\n', f );
+
+    if ( s->lvlRepsOrig != NULL )
+    {
+        fprintf( f, "original B values:\n" );
+        for ( uint8_t k = 0; k != 20; k++ )
+        {
+            fprintf( f, " -B %u:%u", k, s->lvlRepsOrig[k] );
+        }
+        fprintf( f, " ...\n" );
+    }
+
+    if ( s->lvlRepsFloor != NULL )
+    {
+        fprintf( f, "B floor values (-0 or -2):\n" );
+        for ( uint8_t k = 0; k != 20; k++ )
+        {
+            fprintf( f, " -2 %u:%u", k, s->lvlRepsFloor[k] );
+        }
+        fprintf( f, " ...\n" );
+    } 
+
+    fprintf( f, "upper bound (state ('h')) (-u): %g\n\n", 
+             hi->hard->upperBound );
+
+
+    /*
     printf(
 "  --print-info=%s",
 (s->verbosityVector & HardVerbosity_printInfo) ? "yes" : "no"
@@ -456,6 +549,7 @@ static void printSettings( HardInstance * hi )
           );
 
     putc( '\n', stdout );
+    */
 }
 
 
@@ -600,6 +694,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             switch ( c )
             {
             case '0':
+                if ( mode == 0 )
                 {
                     unsigned int n;
                     bool offsetMode = *optarg == 'b';
@@ -693,6 +788,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case '2':
+                if ( mode == 0 )
                 {
                     unsigned int n;
                     unsigned int k;
@@ -1805,7 +1901,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                 break;
 
             case CHAR_MAX+4:
-                printSettings( hi );
+                options_printSettings( hi );
 
                 return 2;
 

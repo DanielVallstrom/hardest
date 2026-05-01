@@ -226,16 +226,23 @@ typedef struct Hard_
 // printed when appropriate. See below for what each bit means.
 typedef uint32_t HardVerbosityVector;
 
-#define HardVerbosity_printErrors  ( (HardVerbosityVector)1 << 0 )
-#define HardVerbosity_printResult  ( (HardVerbosityVector)1 << 1 )
-#define HardVerbosity_printInfo    ( (HardVerbosityVector)1 << 2 )
-#define HardVerbosity_printMore    ( (HardVerbosityVector)1 << 3 )
-#define HardVerbosity_printSeed    ( (HardVerbosityVector)1 << 4 )
-#define HardVerbosity_printY       ( (HardVerbosityVector)1 << 5 )
-#define HardVerbosity_printTime    ( (HardVerbosityVector)1 << 6 )
-#define HardVerbosity_printAll     ( (HardVerbosityVector)1 << 7 )
-#define HardVerbosity_printZ       ( (HardVerbosityVector)1 << 8 )
+#define HardVerbosity_printErrors    ( (HardVerbosityVector)1 << 0 )
+#define HardVerbosity_printResult    ( (HardVerbosityVector)1 << 1 )
+#define HardVerbosity_printInfo      ( (HardVerbosityVector)1 << 2 )
+#define HardVerbosity_printMore      ( (HardVerbosityVector)1 << 3 )
+#define HardVerbosity_printSeed      ( (HardVerbosityVector)1 << 4 )
+#define HardVerbosity_printY         ( (HardVerbosityVector)1 << 5 )
+#define HardVerbosity_printTime      ( (HardVerbosityVector)1 << 6 )
+#define HardVerbosity_printAll       ( (HardVerbosityVector)1 << 7 )
 
+// Extra info that maybe is unnecessary, more of a debug flavor.
+#define HardVerbosity_printExtra     ( (HardVerbosityVector)1 << 8 )
+
+// Prints settings.
+#define HardVerbosity_printSettings  ( (HardVerbosityVector)1 << 9 )
+
+// Prints the state --- mostly h-> variables.
+#define HardVerbosity_printState     ( (HardVerbosityVector)1 << 10 )
 
 // Max support for some things when it comes to (nested) questions
 // when there are still randoms.
@@ -398,6 +405,7 @@ typedef struct Settings_
     bool updateBoundsFile;
 
     // We'll use the options from the bounds file for the instance, iff this is true.
+    // Not really used --- milking and modes are used instead, now.
     bool useBoundsFileOptions;
 
     // The upper bound listed in the bounds file, for the current instance.
@@ -485,10 +493,11 @@ typedef struct Settings_
 
     // If > 0, the -b option will be set to 0 initially, until good abort
     // heuristic values have been found.
-    //   If > 1, the abort values, -a and -e, will be lower a little, 
+    //   If > 1, the abort values, -a and -e, will be lowered a little, 
     // depending on the -b jump, since the -b increase is expected to lower
     // the expected number of questions.
-    uint8_t bInit;
+    //   Not supported, yet.
+    //uint8_t bInit;
 
     double ciz;  // The z-value used for CIs.
 
@@ -507,6 +516,9 @@ typedef struct Settings_
     bool milk;
 
     // The reproduction command, as a string, for milking.
+    // Spaces in it will be replaced with '\0'; argVRep will
+    // point into this string instead, and cover the whole 
+    // reproduction command.
     char * reproductionCommand;
 
     // argc and argv for the reproduction command in the bounds file.
@@ -514,10 +526,13 @@ typedef struct Settings_
     char * * argVRep;
 
     // A copy of lvlReps. Used for milking.
-    uint16_t * lvlRepsOrig;  //[MaxDepth];
+    uint16_t * lvlRepsOrig;  // [MaxDepth];
 
     // The lowest values that lvlRep should take, when milking.
-    uint16_t * lvlRepsFloor;  //[MaxDepth];
+    uint16_t * lvlRepsFloor;  // [MaxDepth];
+
+    // A buffer used for rounding.
+    char * buf;  // [precision + 5]
 
 } Settings;
 

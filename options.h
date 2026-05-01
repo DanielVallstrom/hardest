@@ -46,4 +46,8 @@ int options_parseCommandLineOptions( HardInstance * hi,
                                      int argC, char * * argV, uint8_t mode );
 
 
+// Prints settings.
+void options_printSettings( HardInstance * hi );
+
+
 #endif // options_H

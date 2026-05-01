@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.18.19
+version = 0.18.32
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -452,5 +452,6 @@ $(objDir)/options.o: options.c options.h hard.h conjHash.h common.h
 $(objDir)/common.o: common.c common.h compilerMacros.h
 $(objDir)/conjHash.o: conjHash.c conjHash.h hard.h common.h \
  compilerMacros.h
-$(objDir)/readBounds.o: readBounds.c readBounds.h hard.h conjHash.h
+$(objDir)/readBounds.o: readBounds.c readBounds.h hard.h conjHash.h \
+ common.h
 

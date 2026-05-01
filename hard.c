@@ -140,7 +140,9 @@ HardInstance * hard_newInstance(void)
     s->lvlReps = calloc( MaxDepth, sizeof(uint16_t) );
     s->lvlRepsFloor = calloc( MaxDepth, sizeof(uint16_t) );
 
-    if ( s->lvlReps == NULL  ||  s->lvlRepsFloor == NULL )
+    s->buf = malloc( s->precision + 5 );
+
+    if ( s->lvlReps == NULL  ||  s->lvlRepsFloor == NULL  ||  s->buf == NULL )
     {
         fprintf( stderr, "\nError: not enough memory.\n\n" );
 
@@ -207,6 +209,7 @@ HardInstance * hard_newInstance(void)
 // Returns the number of possible god configurations.
 //   n is total number of gods, f is false gods, t is true gods.
 //   Overflows with n around 20 and greater.
+#if 0
 static uint64_t poss( GodsN n, GodsN f, GodsN t )
 {
     // Calculate number of possibilities, k, for the gods.
@@ -232,6 +235,7 @@ static uint64_t poss( GodsN n, GodsN f, GodsN t )
 
     return k;
 }
+#endif
 
 
 // Returns the number of possible god configurations.
@@ -288,7 +292,7 @@ static uint64_t possSafe( GodsN n, GodsN f, GodsN t )
     }
 
 
-    assert3( n <= 20 ? k == poss( n, f, t ) : true );
+    //assert3( n <= 20 ? k == poss( n, f, t ) : true );
 
 
     return k;
@@ -344,6 +348,38 @@ static uint64_t godsSize( Hard * h, uint64_t poss0R0 )
 
     return (s + 20) * h->conjSize;
     */
+}
+
+
+
+// Prints the state --- mostly h-> variables.
+static void printState( HardInstance * hi )
+{
+    Settings * s = hi->settings;
+    FILE * f = s->outFile;
+    Hard * h = hi->hard;
+
+    fprintf( f, "state:\n" );
+
+    fprintf( f, "-f %u -t %u -r %u -n %u  possibilities: %lu\n",
+             h->fGodsN, h->tGodsN, h->rGodsN, h->godsN, h->possN );
+
+    fprintf( f, "slots: %lu  + %u cells\n", h->slotsUsed, h->cellsUsed );
+
+    fprintf( f, "upper bound: %g\n", h->upperBound );
+
+    fprintf( f, "heuristic number of sub-results: %lu, " 
+                "heuristic sum of sub-results: %g\n",
+             h->subresultsFound, h->subresSum );
+    fprintf( f, "estimated result: %g\n", 
+                (double)(h->subresSum) / h->subresultsFound);   
+                
+    fprintf( f, "abortLeeway: %g\n", h->abortLeeway );                
+    fprintf( f, "abortLeewayDecrement: %g\n", h->abortLeewayDecrement );                
+    fprintf( f, "catchAbortsN: %lu\n", h->catchAbortsN );                
+    fprintf( f, "rebalancingCounter: %lu\n", h->rebalancingCounter ); 
+    
+    fprintf( f, "current seed: %lu\n", common_currentSeed() );
 }
 
 
@@ -424,12 +460,10 @@ bool hard_allocArrays( HardInstance * hi )
     //GodsN rGodsN = h->rGodsN;
 
 
-    s->goodGodsCandN = min( s->goodGodsCandN, godsN );
-    
-
     h->possN = possSafe( godsN, fGodsN, tGodsN );
 
-    #if AssertionLevel >= 4
+    #if 0
+    //#if AssertionLevel >= 4
     for ( uint8_t i = 2; i != 20; i+=2 )
     {
         assert4( poss( i+1, 0, i   )  ==  possSafe( i+1, 0, i ) );
@@ -501,51 +535,10 @@ bool hard_allocArrays( HardInstance * hi )
         return true;
     }
 
-    h->bestPositiveEstimates[0] = s->bestLvl0PosEst;
-    for ( uint8_t n = 1; n != s->maxCatchDepth; n++ )
-    {
-        h->bestPositiveEstimates[n] = DBL_MAX;
-    }
-
-    // Not used.
-    //memset( h->gods, God_Max, sizeof(God) * h->godsSize );
-
-
-    // Set abort leeway decrements.
-    h->abortLeewayDecrement = ( s->abortLeewayStart - s->abortLeewayEnd ) /
-                              h->possN * 1.000000001;  // ??
-
-
-    h->abortLeeway = s->abortLeewayStart;
-    h->catchAbortsN = s->catchAbortsN;
-      
-
-    // If the minimal sample size for updating abort heuristics is 0,
-    // then we'll try to set it to something reasonable, conservatively.
-    //   Depending on iterations, abort-goal.
-    if ( s->minSampleSize == 0 )
-    {
-        // This sample size might be roughly suitable.
-        double size = s->abortPromilleGoal >= 500 ? 
-                      5 / ( 1 - ( s->abortPromilleGoal / 1000.0 ) ) : 
-                      5 / ( s->abortPromilleGoal / 1000.0 );                    
-
-        size /= 2;
-
-        if ( s->iterate > 20000 )
-        {
-            size *= 2;
-        }
-        else
-        {
-            size += size * ( (double)s->iterate / 20000 ); 
-        }
-
-        s->minSampleSize = size;
-    }
-
 
     // Check if we are to milk.
+    //   This needs to be done before we set things that depend on 
+    // options from the csv options.
     if ( s->milk )
     {
         if ( s->argVRep == NULL )
@@ -574,6 +567,65 @@ bool hard_allocArrays( HardInstance * hi )
         }
 
         memcpy( s->lvlRepsOrig, s->lvlReps, MaxDepth * sizeof(uint16_t) );
+    }
+
+
+    s->goodGodsCandN = min( s->goodGodsCandN, godsN );
+
+    h->bestPositiveEstimates[0] = s->bestLvl0PosEst;
+    for ( uint8_t n = 1; n != s->maxCatchDepth; n++ )
+    {
+        h->bestPositiveEstimates[n] = DBL_MAX;
+    }
+
+    // Not used.
+    //memset( h->gods, God_Max, sizeof(God) * h->godsSize );
+
+    // Set abort leeway decrements.
+    h->abortLeewayDecrement = ( s->abortLeewayStart - s->abortLeewayEnd ) /
+                              h->possN * 1.000000001;  // ??
+
+
+    h->abortLeeway = s->abortLeewayStart;
+    h->catchAbortsN = s->catchAbortsN;
+      
+
+    // If the minimal sample size for updating abort heuristics is 0,
+    // then we'll try to set it to something reasonable, conservatively.
+    //   Depending on iterations, abort-goal.
+    if ( s->minSampleSize == 0 )
+    {
+        if ( s->abortPromilleGoal == 1000 )
+        {
+            // Set size to something small? It doesn't make much
+            // sense either way.
+            s->minSampleSize = 2;  // ??
+        }
+        else if ( s->abortPromilleGoal > 1000 )
+        {
+            // Abort changes are turned of; set size to anything,
+            s->minSampleSize = UINT32_MAX;
+        }
+        else
+        {
+            // This sample size might be roughly suitable.
+            double size = s->abortPromilleGoal >= 500 ? 
+                        5 / ( 1 - ( s->abortPromilleGoal / 1000.0 ) ) : 
+                        5 / ( s->abortPromilleGoal / 1000.0 );                    
+
+            size /= 2;
+
+            if ( s->iterate > 20000 )
+            {
+                size *= 2;
+            }
+            else
+            {
+                size += size * ( (double)s->iterate / 20000 ); 
+            }
+
+            s->minSampleSize = size;
+        }
     }
 
 
@@ -4038,29 +4090,30 @@ static uint8_t find1( HardInstance * hi )
     //uint64_t posSubresultsFound;
     //uint64_t posSubresSum;
 
+    double resumeAbortedLeeway;  // The resumeAbortedLeeway to be used.
+
+    // See what leeway we should be using.
+    if ( s->resumeAbortedLeeway == -2 )
+    {
+        resumeAbortedLeeway = s->abortLeewayEnd;
+    }
+    else if ( s->resumeAbortedLeeway == -1 )
+    {
+        resumeAbortedLeeway = s->abortLeewayStart;
+    }
+    else
+    {
+        resumeAbortedLeeway = s->resumeAbortedLeeway;
+    }
+
+
     // The estimates are, now, decent. We should maybe use the global
     // upper bound here, instead of bestPositiveEstimates[0]? Let's 
     // do it as an option:
     if ( s->globalBound )
     {
-        double leeway;  // The leeway to be used.
-
-        // See what leeway we should be using.
-        if ( s->resumeAbortedLeeway == -2 )
-        {
-            leeway = s->abortLeewayEnd;
-        }
-        else if ( s->resumeAbortedLeeway == -1 )
-        {
-            leeway = s->abortLeewayStart;
-        }
-        else
-        {
-            leeway = s->resumeAbortedLeeway;
-        }
-
         if ( (double)(h->subresSum) / h->subresultsFound  <
-             h->upperBound * leeway )
+             h->upperBound * resumeAbortedLeeway )
         {
             stateIsPromising = true;
 
@@ -4076,7 +4129,7 @@ static uint8_t find1( HardInstance * hi )
     else
     {
         if ( (double)(h->subresSum) / h->subresultsFound  <
-             h->bestPositiveEstimates[0] * s->resumeAbortedLeeway )
+             h->bestPositiveEstimates[0] * resumeAbortedLeeway )
         {
             stateIsPromising = true;
 
@@ -4729,6 +4782,24 @@ static bool incB( Settings * s )
 
 
 
+// Returns the total number of searches to be made. See milk function.
+static uint32_t totalSearchesN( Settings * s )
+{
+    uint32_t Si = s->iterate + 1;
+    uint16_t * B0 = s->lvlRepsOrig;
+    uint32_t totSearches = 1;  // The return value.
+
+    // d is the digit position to be incremented.
+    for ( uint8_t d = 0; d != Si; d++ )
+    {
+        totSearches *= B0[d] + 1 - s->lvlRepsFloor[d];
+    }
+
+    return totSearches;
+}
+
+
+
 // Milks the solution from the bounds file.
 //   Returns Hard_outOfMemory iff there wasn't enough memory. 
 //   Searches with combinations of -B values up to and including -B option,
@@ -4756,8 +4827,13 @@ static uint8_t milk( HardInstance * hi )
     //double abortLeewayEndForBest = s->abortLeewayEnd;
 
     uint32_t searchesN = 0;  // Number of searches made.
+    uint32_t totalSearches = totalSearchesN(s);  // Total number of searches to be made.
 
-    fputc( '\n', s->outFile );
+    if ( s->verbosityVector & HardVerbosity_printInfo )
+    {
+        fprintf( s->outFile, "\nnumber of searches to be made: %u\n\n",
+                 totalSearches );
+    }
 
 
     // Loop through all combinations of -B values, down to and including 
@@ -4842,23 +4918,38 @@ static uint8_t milk( HardInstance * hi )
                         else
                         {
                             fprintf( s->outFile,
-                                    "Start state: seed: %lu, best lvl 0 pos est (-E): %.*g, upper bound (-u): %.*g\n", 
-                                    s->seed, DBL_DECIMAL_DIG, currentBestLvl0PosEst,
-                                    DBL_DECIMAL_DIG, h->upperBound );
+                                     "Start state: seed: %lu, best lvl 0 pos est (-E): %.*g, upper bound (-u): %.*g\n", 
+                                     s->seed, DBL_DECIMAL_DIG, currentBestLvl0PosEst,
+                                     DBL_DECIMAL_DIG, h->upperBound );
                         }
 
                         fprintf( s->outFile,
-                                "abort-leeway-start: %g\n", s->abortLeewayStart );
+                                 "abort-leeway-start: %g\n",
+                                 s->abortLeewayStart );
 
                         fprintf( s->outFile,
-                                "abort-leeway-end: %g\n", s->abortLeewayEnd );
+                                 "abort-leeway-end: %g\n", 
+                                 s->abortLeewayEnd );
 
                         // Print -B values, up to and including -i. 
                         for ( uint8_t k = 0; k != s->iterate + 1; k++ )
                         {
-                            fprintf( s->outFile, " -B %u:%u", k, s->lvlReps[k] );
+                            fprintf( s->outFile, " -B %u:%u", k, 
+                                     s->lvlReps[k] );
                         }
                         fputc( '\n', s->outFile );
+
+                        if ( s->verbosityVector & HardVerbosity_printExtra )
+                        {
+                            // Print more -B values. 
+                            uint8_t iEnd = s->upperBoundInFile;
+                            for ( uint8_t k = s->iterate + 1; k <= iEnd; k++ )
+                            {
+                                fprintf( s->outFile, " -B %u:%u", 
+                                         k, s->lvlReps[k] );
+                            }
+                            fputc( '\n', s->outFile );
+                        }                        
                     }
 
                     // Print best estimates.
@@ -4901,6 +4992,32 @@ static uint8_t milk( HardInstance * hi )
             {   
                 // It's not independent enough to warrant a note.
                 //readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+            }
+            else
+            {
+                // Print result, occasionally.
+                if ( ( totalSearches >= 8  &&  
+                       searchesN % ( totalSearches / 8 ) == 0  ||
+                       totalSearches < 8 )  &&
+                     s->verbosityVector & HardVerbosity_printInfo )
+                {
+                    fprintf( s->outFile,
+                             "Search number %u didn't find an improvement.\n\n",
+                             searchesN );
+                }
+            }
+        }
+        else
+        {
+            // Print result, occasionally.
+            if ( ( totalSearches >= 8  &&  
+                   searchesN % ( totalSearches / 8 ) == 0  ||
+                   totalSearches < 8 )  &&
+                 s->verbosityVector & HardVerbosity_printInfo )
+            {
+                fprintf( s->outFile,
+                         "Search number %u aborted.\n\n",
+                         searchesN );
             }
         }
 
@@ -5009,6 +5126,21 @@ uint8_t hard_solve( HardInstance * hi )
 {
     Settings * s = hi->settings;
 
+    // Maybe print settings and state before search.
+    if ( s->verbosityVector & HardVerbosity_printExtra )
+    {
+        if ( s->verbosityVector & HardVerbosity_printSettings )
+        {
+            options_printSettings(hi);
+        }                        
+
+        if ( s->verbosityVector & HardVerbosity_printState )
+        {
+            printState(hi);
+        }                        
+    }                        
+
+    
     if ( s->milk )
     {
         return milk(hi);

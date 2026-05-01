@@ -114,6 +114,7 @@ unsigned int randomN( unsigned int n );
 // and provide a way to get the currently used seed. Otherwise they
 // function like the standard versions.
 
+// Sets the seed.
 void common_srand( uint64_t seed );
 
 uint64_t common_rand( void );
@@ -147,9 +148,9 @@ bool readLL( char * s, long long int * n );
 
 // Converts s into a double which is placed in x. Returns true iff a 
 // parse error has occurred. Trailing non-number characters in s will result in
-// parse error. s must not be negative and must have no exponent. E.g. "55.666"
-// "55." and "242" are valid strings. The string must begin with a digit so
-// e.g. ".666" isn't valid.
+// parse error. s must not be negative and must have no exponent. E.g. "12.345"
+// "55." and "123" are valid strings. The string must begin with a digit so
+// e.g. ".456" isn't valid.
 bool readReal( char * s, double * x );
 
 // Like readReal except that an optional '-' prefix is allowed.

@@ -24,6 +24,7 @@
 
 #include "readBounds.h"
 #include "hard.h"
+#include "common.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -738,7 +739,7 @@ static bool parseBody( HardInstance * hi )
                 {
                     // Do one lexeme.
 
-                    c = getc(file);  // The first character in the lexeme.
+                    c = getc(file);  // The first character in the lexeme (or 2nd in 1st).
                     do
                     {
                         *com = c;
@@ -1254,6 +1255,36 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
             // Let's just end with the -i option, which is needed.
 
             fprintf( newFile, "-i 0");
+
+            // Maybe print command to outfile too.
+            if ( s->verbosityVector & HardVerbosity_printExtra )
+            {
+                fprintf( s->outFile, "reproduction command:\n" );
+
+                // Print original command.
+                for ( int c = 0; c != argcOrig; c++ )
+                {
+                    fprintf( s->outFile, "%s ", argvOrig[c] );
+                }
+
+                // Print new options.
+                for ( int c = 1; c != argc; c++ )
+                {
+                    fprintf( s->outFile, "%s ", argv[c] );
+                }
+
+                // Undo the milk option.
+                fprintf( s->outFile, "-1no ");
+
+                // Print -B options, up to and including -i. The rest are
+                // taken care of by the printing of the new options above.
+                for ( uint8_t k = 0; k != s->iterate + 1; k++ )
+                {
+                    fprintf( s->outFile, "-B %u:%u ", k, s->lvlReps[k] );
+                }
+
+                fprintf( s->outFile, "-i 0\n\n");
+            }                        
         }
         else
         {
@@ -1279,7 +1310,7 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
             // Print leeways.
             fprintf( newFile, " -a %.*g -e %.*g", DBL_DECIMAL_DIG, 
-                    s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
+                     s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );        
         }
 
         // End with CRLF.
@@ -1383,8 +1414,11 @@ bool readBounds_write( HardInstance * hi, double bound, uint64_t seed,
             s->boundStatus = HardBoundStatus_upperBound;
         }
 
-        s->upperBoundInFile = bound;
-
+        // Update upperBoundInFile. We have to lose precision for this.
+        // Easiest, after all, might be to print bound to a string, read
+        // string, and save value. That's what we'll do.
+        snprintf( s->buf, 5 + s->precision, "%.*f", s->precision, bound );
+        readReal( s->buf, &(s->upperBoundInFile) );
 
         // Print info.
         if ( s->verbosityVector & HardVerbosity_printInfo )
