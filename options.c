@@ -107,14 +107,20 @@ stdout,
 "                          Any -J option will be ignored.\n"
 "                          Options that you supply will be overwritten\n"
 "                          by options in the replication command, except these:\n"
-"                          -0, -1, -2, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
+"                          -0, -1, -2, -3, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
 "  -2 -B-floor <unsigned integer>:<unsigned integer>\n"
 "                          Like -0 but for a level. E.g. -2 1:5 sets lvl 1\n"
-"                          to 5. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n",
+"                          to 5. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n"
+"  -3 --skip-rep-com[=no|yes]\n"
+"                          If flag is set, then the replication command in\n"
+"                          the bounds file will be ignore, when milking.\n"
+"                          Hence, you'll need to provide intended options\n"
+"                          yourself, but they won't be overwritten. [%s]\n",
 s->milk ? "yes" : "no",
 s->lvlRepsFloor[0], s->lvlRepsFloor[1], s->lvlRepsFloor[2], s->lvlRepsFloor[3],
 s->lvlRepsFloor[4], s->lvlRepsFloor[5], s->lvlRepsFloor[6], s->lvlRepsFloor[7],
-s->lvlRepsFloor[8], s->lvlRepsFloor[9]
+s->lvlRepsFloor[8], s->lvlRepsFloor[9],
+s->skipRepCom ? "yes" : "no"
            );
 
     fprintf(
@@ -623,6 +629,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "b-floor",                required_argument, NULL, '0' },
             { "milk",                   optional_argument, NULL, '1' },
             { "B-floor",                required_argument, NULL, '2' },
+            { "skip-rep-com",           optional_argument, NULL, '3' },
             { "dont-abort-until",       required_argument, NULL, 'A' },
             { "iterate-sub-search-lvl", required_argument, NULL, 'B' },
             { "inc-ind-rep-count",      required_argument, NULL, 'C' },
@@ -681,7 +688,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "0:1::2:"
+                             "0:1::2:3::"
                              "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
@@ -805,6 +812,39 @@ static int parseCommandLineOptions( HardInstance * hi,
                     }
 
                     s->lvlRepsFloor[k] = n;
+                }
+
+                break;
+
+            case '3':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
+                if ( optarg )
+                {
+                    if ( strcmp( optarg, "no" ) == 0 )
+                    {
+                        s->skipRepCom = false;
+                    }
+                    else if ( strcmp( optarg, "yes" ) == 0 )
+                    {
+                        s->skipRepCom = true;
+                    }
+                    else
+                    {
+                        fprintf( stderr,
+                                 "\nError: the argument to command line "
+                                 "options -1 and --skip-rep-com must be\n"
+                                 "no or yes. You supplied %s.\n\n", optarg );
+
+                        return 1;
+                    }
+                }
+                else
+                {
+                    s->skipRepCom = true;
                 }
 
                 break;

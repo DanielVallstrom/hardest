@@ -114,7 +114,7 @@ HardInstance * hard_newInstance(void)
     s->backupBoundsFileName = "best_known_bounds.csv~";
     s->boundsFile = NULL;
     s->updateBoundsFile = true;  // ??
-    s->useBoundsFileOptions = false;  // ??
+    s->skipRepCom = false;  // ??
     s->upperBoundInFile = DBL_MAX;  // Undefined.
     s->boundStatus = HardBoundStatus_undefined;
     s->useBoundFromFile = 1;  // ??
@@ -541,19 +541,24 @@ bool hard_allocArrays( HardInstance * hi )
     // options from the csv options.
     if ( s->milk )
     {
-        if ( s->argVRep == NULL )
+        // If skipRepCom is true, then we'll ignore the replication command, and
+        // trust that the user provided intended options.
+        if ( !(s->skipRepCom) )
         {
-            fprintf( stderr, "\nError: no replication command to milk.\n\n" );
+            if ( s->argVRep == NULL )
+            {
+                fprintf( stderr, "\nError: no replication command to milk.\n\n" );
 
-            return true;
-        }
-        
-        // Parse command line in bounds file.
-        int res = options_parseCommandLineOptions( hi, s->argCRep, s->argVRep, 1 );
+                return true;
+            }
+            
+            // Parse command line in bounds file.
+            int res = options_parseCommandLineOptions( hi, s->argCRep, s->argVRep, 1 );
 
-        if ( res == 1 )
-        {
-            return true;
+            if ( res == 1 )
+            {
+                return true;
+            }
         }
 
         // Set up lvlRepsOrig.

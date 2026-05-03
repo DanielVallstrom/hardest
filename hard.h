@@ -404,9 +404,9 @@ typedef struct Settings_
     // We'll update the bounds file if an improvement is found, iff this is true.
     bool updateBoundsFile;
 
-    // We'll use the options from the bounds file for the instance, iff this is true.
-    // Not really used --- milking and modes are used instead, now.
-    bool useBoundsFileOptions;
+    // When milking, we'll use the options from the bounds file for the 
+    // instance, iff this this is false.
+    bool skipRepCom;
 
     // The upper bound listed in the bounds file, for the current instance.
     double upperBoundInFile;
