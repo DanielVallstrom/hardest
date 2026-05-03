@@ -24,7 +24,7 @@ Source files: `hardest.c`, `hard.c`, `options.c`, `common.c`, `conjHash.c`, `rea
 
 Headers: `hard.h`, `conjHash.h`, `options.h`, `common.h`, `compilerMacros.h`, `readBounds.h`
 
-Current version: **0.18.16** — Default compiler: `gcc`
+Current version: **0.18.31** — Default compiler: `gcc`
 
 ## Usage
 
