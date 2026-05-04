@@ -1214,8 +1214,15 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
 
         // Here comes the replication command. We'll add seed and -i 0 last,
         // and maybe the bound used. And leeways.
-        //   If the solution was milked, we'll add original options too, first.
-        // And turn the command into normal, non-milking, mode.
+        //   If the solution was milked, we'll add original options too, first,
+        // if used. And turn the command into normal, non-milking, mode.
+        //   If milk command line includes meaningless, overwritten, options,
+        // then the used original options might be overwritten by non-used
+        // milk options. You could fix this by e.g. running options through
+        // the command parser, with some mode set, maybe. But for now it's 
+        // up to the user to not supply meaningless options. You can 
+        // recreate a working replication command from the printed replication
+        // commmand, anyway.
 
         if (s->milk )
         {
@@ -1223,13 +1230,16 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
             char * * argvOrig = s->argVRep;
 
             // Print original command.
-            for ( int c = 0; c != argcOrig; c++ )
+            if ( !s->skipRepCom )
             {
-                fprintf( newFile, "%s ", argvOrig[c] );
+                for ( int c = 0; c != argcOrig; c++ )
+                {
+                    fprintf( newFile, "%s ", argvOrig[c] );
+                }
             }
 
             // Print new options.
-            for ( int c = 1; c != argc; c++ )
+            for ( int c = !s->skipRepCom; c != argc; c++ )
             {
                 fprintf( newFile, "%s ", argv[c] );
             }
@@ -1253,6 +1263,33 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
             // to then add the changed parameters, here, instead of clutter
             // the replication command with theoretically pointless parameters.
             // Let's just end with the -i option, which is needed.
+            //   However, if replication command is ignored, then there might
+            // not be sufficient info in the options printed so far to 
+            // reproduce the bound. So in that case we'll print state, to be
+            // sure. It will usually be spammy, but better safe than sorry.
+            // The whole situation shouldn't happen often, anyway.
+            if ( s->skipRepCom )
+            {
+                fprintf( newFile, "-s %lu -i 0", seed );    
+
+                // Handle bound used.
+                if ( s->printBoundUsed )
+                {
+                    if ( boundUsed > 888.8 )
+                    {
+                        fprintf( newFile, " -u 888.8 -M 1" );        
+                    }
+                    else
+                    {
+                        fprintf( newFile, " -u %.*g -M 1", DBL_DECIMAL_DIG, 
+                                 boundUsed );        
+                    }
+                }
+
+                // Print leeways.
+                fprintf( newFile, " -a %.*g -e %.*g ", DBL_DECIMAL_DIG, 
+                        s->abortLeewayStart, DBL_DECIMAL_DIG, s->abortLeewayEnd );                
+            }            
 
             fprintf( newFile, "-i 0");
 
@@ -1262,13 +1299,16 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
                 fprintf( s->outFile, "reproduction command:\n" );
 
                 // Print original command.
-                for ( int c = 0; c != argcOrig; c++ )
+                if ( !s->skipRepCom )
                 {
-                    fprintf( s->outFile, "%s ", argvOrig[c] );
+                    for ( int c = 0; c != argcOrig; c++ )
+                    {
+                        fprintf( s->outFile, "%s ", argvOrig[c] );
+                    }
                 }
 
                 // Print new options.
-                for ( int c = 1; c != argc; c++ )
+                for ( int c = !s->skipRepCom; c != argc; c++ )
                 {
                     fprintf( s->outFile, "%s ", argv[c] );
                 }
@@ -1282,6 +1322,33 @@ static bool updateBound( HardInstance * hi, double bound, uint64_t seed,
                 {
                     fprintf( s->outFile, "-B %u:%u ", k, s->lvlReps[k] );
                 }
+
+                if ( s->skipRepCom )
+                {
+                    fprintf( s->outFile, "-s %lu -i 0", seed );    
+
+                    // Handle bound used.
+                    if ( s->printBoundUsed )
+                    {
+                        if ( boundUsed > 888.8 )
+                        {
+                            fprintf( s->outFile, " -u 888.8 -M 1" );        
+                        }
+                        else
+                        {
+                            fprintf( s->outFile, " -u %.*g -M 1",
+                                     DBL_DECIMAL_DIG, boundUsed );        
+                        }
+                    }
+
+                    // Print leeways.
+                    fprintf( s->outFile, " -a %.*g -e %.*g ",
+                             DBL_DECIMAL_DIG, 
+                             s->abortLeewayStart, DBL_DECIMAL_DIG, 
+                             s->abortLeewayEnd );                
+                }            
+
+
 
                 fprintf( s->outFile, "-i 0\n\n");
             }                        

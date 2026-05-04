@@ -510,6 +510,7 @@ void options_printSettings( HardInstance * hi )
     fprintf( f, "note (-J): %s\n", s->note != NULL ? s->note : "" );
     fprintf( f, "rebalance (-V): %u\n", s->rebalance );
     fprintf( f, "milk (-1): %u\n", s->milk );
+    fprintf( f, "skip-rep-com (-3): %u\n", s->skipRepCom );
 
     // Print reproduction command.
     fprintf( f, "reproduction command:\n" );

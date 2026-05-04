@@ -4981,7 +4981,7 @@ static uint8_t milk( HardInstance * hi )
                      s->updateBoundsFile )
                 {
                     readBounds_write( hi, bestResult, s->seed,
-                                      bestResult );
+                                      h->upperBound );
                 }
                 else if ( bestResult - BoundsFilePrecision < s->upperBoundInFile  &&
                           s->noteReplications >= 1  &&  
