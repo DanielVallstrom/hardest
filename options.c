@@ -75,7 +75,7 @@ stdout,
 "  ./hardest -v -f 0 -t 3 -r 2 -i 0 -b 0  reproduces optimal solution, with questions\n"
 "  ./hardest -f 2 -t 2 -r 3 -b 3 -B 0:4 -i 999 -a 0.984 -e 0.983 -K 1960 -S 8 -z -99 -U 4 -H 1 "
 "-s 12779109849863880712 -i 0 -u 8.9581850000000003 -M 1 -a 0.98399999999999999 -e 0.98299999999999998\n"
-"    reproduces a current upper bound.\n"
+"    reproduces an upper bound.\n"
 "  ./hardest -f 1 -t 3 -r 1 -i 0 -b 0 -v  shows why the solution is optimal,\n"
 "    and why all solver solutions to problems with just one random god are optimal.\n"
            );
@@ -115,7 +115,12 @@ stdout,
 "                          If flag is set, then the replication command in\n"
 "                          the bounds file will be ignore, when milking.\n"
 "                          Hence, you'll need to provide intended options\n"
-"                          yourself, but they won't be overwritten. [%s]\n",
+"                          yourself, but they won't be overwritten. [%s]\n"
+"                          Typically, this means taking a search command\n"
+"                          that you want to base the milking on, add seed\n"
+"                          and upper bound for the one best sub-search, and \n"
+"                          maybe -a and -e options, like in a replication\n"
+"                          command. Then add b, B, 0, or 2 options.\n",
 s->milk ? "yes" : "no",
 s->lvlRepsFloor[0], s->lvlRepsFloor[1], s->lvlRepsFloor[2], s->lvlRepsFloor[3],
 s->lvlRepsFloor[4], s->lvlRepsFloor[5], s->lvlRepsFloor[6], s->lvlRepsFloor[7],

@@ -4868,6 +4868,8 @@ static uint8_t milk( HardInstance * hi )
     do
     {
         // Maybe print settings and state before search.
+        //   Prints at half way (which, if you use an even b-2 setting, might
+        // be the normal search that this milking is based on).
         if ( s->verbosityVector & HardVerbosity_printExtra  &&
              searchesN == totalSearches / 2  &&  totalSearches != 1 )
         {
@@ -5003,7 +5005,8 @@ static uint8_t milk( HardInstance * hi )
                           s->seed != s->boundsFileSeed )
                 {
                     // It's not independent enough to warrant a note.
-                    //readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+                    // Err, now it might be, and is with the seed check.
+                    readBounds_noteRep( hi, s->seed, h->upperBound );
                 }
             }
             else if ( result - BoundsFilePrecision < s->upperBoundInFile  &&
@@ -5011,7 +5014,8 @@ static uint8_t milk( HardInstance * hi )
                       s->seed != s->boundsFileSeed )
             {   
                 // It's not independent enough to warrant a note.
-                //readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+                // Err, now it might be, and is with the seed check.
+                readBounds_noteRep( hi, s->seed, h->upperBound );
             }
             else
             {
