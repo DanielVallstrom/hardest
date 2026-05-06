@@ -379,7 +379,7 @@ static void printState( HardInstance * hi )
     fprintf( f, "catchAbortsN: %lu\n", h->catchAbortsN );                
     fprintf( f, "rebalancingCounter: %lu\n", h->rebalancingCounter ); 
     
-    fprintf( f, "current seed: %lu\n", common_currentSeed() );
+    fprintf( f, "current seed: %lu\n\n", common_currentSeed() );
 }
 
 
@@ -4819,7 +4819,7 @@ static uint8_t milk( HardInstance * hi )
 
     // The seed should be s->seed.
     //uint64_t seedForBestResult;  // The seed for the one best search. 
-    //uint64_t currentSeed = common_currentSeed();
+    //uint64_t currentSeed;  // = common_currentSeed();
 
     // We also have to save other settings to be able to recreate a
     // finding. Not. These should be the same as at the start. But if
@@ -4867,6 +4867,21 @@ static uint8_t milk( HardInstance * hi )
 
     do
     {
+        // Maybe print settings and state before search.
+        if ( s->verbosityVector & HardVerbosity_printExtra  &&
+             searchesN == totalSearches / 2  &&  totalSearches != 1 )
+        {
+            if ( s->verbosityVector & HardVerbosity_printSettings )
+            {
+                options_printSettings(hi);
+            }                        
+
+            if ( s->verbosityVector & HardVerbosity_printState )
+            {
+                printState(hi);
+            }                        
+        }                        
+
         // Save the state.
         //currentSeed = common_currentSeed();
         currentBestLvl0PosEst = h->bestPositiveEstimates[0];
@@ -5039,8 +5054,9 @@ static uint8_t milk( HardInstance * hi )
         h->catchAbortsN = s->catchAbortsN;
 
         // Reset seed, to the seed in the bounds file, which should equal
-        // the common s->seed.
-        common_srand(s->boundsFileSeed);
+        // the common s->seed. Unless -3 option is used. So, just reset to
+        // s->seed.
+        common_srand(s->seed);
 
         // Reset other parameters that might have changed.
         h->bestPositiveEstimates[0] = currentBestLvl0PosEst;
