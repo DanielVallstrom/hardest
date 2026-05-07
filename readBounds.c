@@ -1539,7 +1539,7 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
         return true;
     }
 
-    s->boundsFile = fopen( s->boundsFileName, "r");
+    s->boundsFile = fopen( s->boundsFileName, "r" );
 
     if ( s->boundsFile == NULL )
     {

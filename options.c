@@ -107,7 +107,8 @@ stdout,
 "                          Any -J option will be ignored.\n"
 "                          Options that you supply will be overwritten\n"
 "                          by options in the replication command, except these:\n"
-"                          -0, -1, -2, -3, -b, -B, -C, -F, -i, -o, -q, -v, -w, and --verbosity-vector.\n"
+"                          -0, -1, -2, -3, -9, -b, -B, -C, -F, -i, -o, -q, -v,\n"
+"                          -w, and --verbosity-vector.\n"
 "  -2 -B-floor <unsigned integer>:<unsigned integer>\n"
 "                          Like -0 but for a level. E.g. -2 1:5 sets lvl 1\n"
 "                          to 5. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n"
@@ -126,6 +127,15 @@ s->lvlRepsFloor[0], s->lvlRepsFloor[1], s->lvlRepsFloor[2], s->lvlRepsFloor[3],
 s->lvlRepsFloor[4], s->lvlRepsFloor[5], s->lvlRepsFloor[6], s->lvlRepsFloor[7],
 s->lvlRepsFloor[8], s->lvlRepsFloor[9],
 s->skipRepCom ? "yes" : "no"
+           );
+
+    fprintf(
+stdout,
+"  -9 --bounds-file <file>\n"
+"                          Specify the bounds file. [%s]\n"
+"                          There will also be a backup with the same name\n"
+"                          but with a ~ at the end.\n",
+s->boundsFileName
            );
 
     fprintf(
@@ -636,6 +646,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "milk",                   optional_argument, NULL, '1' },
             { "B-floor",                required_argument, NULL, '2' },
             { "skip-rep-com",           optional_argument, NULL, '3' },
+            { "bounds-file",            required_argument, NULL, '9' },
             { "dont-abort-until",       required_argument, NULL, 'A' },
             { "iterate-sub-search-lvl", required_argument, NULL, 'B' },
             { "inc-ind-rep-count",      required_argument, NULL, 'C' },
@@ -694,7 +705,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         while ( true )
         {
             c = getopt_long( argC, argV,
-                             "0:1::2:3::"
+                             "0:1::2:3::9:"
                              "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
@@ -851,6 +862,34 @@ static int parseCommandLineOptions( HardInstance * hi,
                 else
                 {
                     s->skipRepCom = true;
+                }
+
+                break;
+
+            case '9':
+                if ( mode > 0 )
+                {
+                    break;
+                }
+
+                {
+                    char * name = allocStrCopy(optarg);
+                    uint16_t nameLen = strlen(optarg) + 1;
+                    char * bkname = malloc( nameLen + 1 );
+
+                    if ( name == NULL  ||  bkname == NULL )
+                    {
+                        fprintf( stderr, "\nError: not enough memory.\n" );
+
+                        return 1;
+                    }
+
+                    memcpy( bkname, name, nameLen-1 );
+                    bkname[nameLen-1] = '~';
+                    bkname[nameLen] = '\0';
+
+                    s->boundsFileName = name;
+                    s->backupBoundsFileName = bkname;
                 }
 
                 break;
