@@ -147,9 +147,12 @@ stdout,
 "  -A --dont-abort-until <unsigned integer>\n"
 "                          Don't abort until at least this many sub-\n"
 "                          results are found. [%lu]\n"
-"  -b --iterate-sub-search <unsigned integer>\n"
+"  -b --iterate-sub-searches <unsigned integer>\n"
 "                          Set number of extra sub-searches; the best result\n"
 "                          will be used.\n"
+"                          -b b+<c>, e.g. -b b+1, is acceptable and will increment\n"
+"                          B values by c, from B[0] up to and including B[i],\n"
+"                          where i is the current i option value.\n"
 "  -B --iterate-sub-search-lvl <unsigned integer>:<unsigned integer>\n"
 "                          Like -b but for a level. E.g. -B 1:7 sets lvl 1\n"
 "                          to 7. [0:%u, 1:%u, 2:%u, 3:%u, 4:%u, 5:%u, 6:%u, 7:%u, 8:%u, 9:%u, ...]\n"
@@ -723,7 +726,7 @@ static int parseCommandLineOptions( HardInstance * hi,
                     unsigned int n;
                     bool offsetMode = *optarg == 'b';
 
-                    if ( *optarg == 'b' )
+                    if ( offsetMode )
                     {
                         if ( optarg[1] == '-' )
                         {
@@ -1448,21 +1451,53 @@ static int parseCommandLineOptions( HardInstance * hi,
                 if ( mode == 0 )
                 {
                     unsigned int n;
+                    bool offsetMode = *optarg == 'b';
+
+                    if ( offsetMode )
+                    {
+                        if ( optarg[1] == '+' )
+                        {
+                            optarg += 2;
+                        }
+                        else
+                        {
+                            fprintf( stderr,
+                                     "\nError: the argument to command line "
+                                     "options -0 and --b-floor must be\n"
+                                     "an unsigned integer, or b+<c>. "
+                                     "You supplied %s.\n\n", optarg );
+                        
+                            return 1;
+                        }
+                    }
 
                     if ( readUInt( optarg, &n ) )
                     {
                         fprintf( stderr,
                                  "\nError: the argument to command line "
                                  "options -b and --iterate-sub-searches must be\n"
-                                 "an unsigned integer. "
-                                 "You supplied %s.\n\n", optarg );
+                                 "an unsigned integer, or b+<c>. "
+                                 "You supplied %s%s.\n\n",
+                                 offsetMode ? "b+" : "", optarg );
 
                         return 1;
                     }
 
-                    for ( uint16_t k = 0; k != MaxDepth; k++ )
+                    if ( offsetMode )
                     {
-                        s->lvlReps[k] = n;
+                        // Increment B values by n, up to and including i.
+                        uint16_t i = min( s->iterate + 1, 59 );
+                        for ( uint16_t k = 0; k != i; k++ )
+                        {
+                            s->lvlReps[k] += n;
+                        }
+                    }
+                    else
+                    {
+                        for ( uint16_t k = 0; k != MaxDepth; k++ )
+                        {
+                            s->lvlReps[k] = n;
+                        }
                     }
                 }
 
