@@ -380,7 +380,7 @@ stdout,
 "                          adjusted, to achive abort-promille-goal. [%g]\n"
 "  -z --CIz <float>        Set z-value for CIs. Default is 95%% CIs. [%f]\n"
 "                          -99 is interpreted as the z-value for 99%% CIs. -80, -90,\n"
-"                          -95, -99, -999 are also supported.\n"
+"                          -95, -99, -999 are supported.\n"
 "  -Z --min-sample-size <unsigned integer>\n"
 "                          The minimal sample size in order to update abort heuristics.\n"
 "                          If 0, then we'll try to set it to something reasonable,\n"
