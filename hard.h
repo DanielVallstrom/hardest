@@ -218,6 +218,11 @@ typedef struct Hard_
     // times a rebalancing takes place.
     uint64_t rebalancingCounter;
 
+    // The deepest level where the asked gods can be random. For the current
+    // search. Used for milking, to know when to stop iterating over B
+    // levels.
+    uint8_t maxRLevel;
+
 } Hard;
 
 
@@ -231,7 +236,10 @@ typedef uint32_t HardVerbosityVector;
 #define HardVerbosity_printInfo      ( (HardVerbosityVector)1 << 2 )
 #define HardVerbosity_printMore      ( (HardVerbosityVector)1 << 3 )
 #define HardVerbosity_printSeed      ( (HardVerbosityVector)1 << 4 )
-#define HardVerbosity_printY         ( (HardVerbosityVector)1 << 5 )
+
+// Prints the deepest level where the asked gods can be random.
+#define HardVerbosity_printRLvl      ( (HardVerbosityVector)1 << 5 )
+
 #define HardVerbosity_printTime      ( (HardVerbosityVector)1 << 6 )
 #define HardVerbosity_printAll       ( (HardVerbosityVector)1 << 7 )
 

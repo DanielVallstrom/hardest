@@ -201,6 +201,8 @@ HardInstance * hard_newInstance(void)
 
     hi->hard->rebalancingCounter = 0;
 
+    hi->hard->maxRLevel = 0;
+
     return hi;
 }
 
@@ -3207,6 +3209,12 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
     // Repeat and keep best try.
     if ( giRs != 0  &&  s->lvlReps[qs] != 0 )
     {
+        // Update maxRLevel.
+        if ( h->maxRLevel < qs )
+        {
+            h->maxRLevel = qs;
+        }
+
         // Save best state.
         uint64_t bestSubResN = h->subresultsFound;
         double bestSubResSum = h->subresSum;
@@ -3408,6 +3416,12 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
     // Repeat and keep best try.
     if ( gjRs != 0  &&  s->lvlReps[qs] != 0 )
     {
+        // Update maxRLevel.
+        if ( h->maxRLevel < qs )
+        {
+            h->maxRLevel = qs;
+        }
+
         // Save best state.
         uint64_t bestSubResN = h->subresultsFound;
         double bestSubResSum = h->subresSum;
@@ -4402,6 +4416,9 @@ static uint8_t solve( HardInstance * hi )
             fprintf( s->outFile, "number of aborts caught: %lu\n",
                      s->catchAbortsN - h->catchAbortsN );
 
+            fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+                     h->maxRLevel );
+
             fputc( '\n', s->outFile );
         }
 
@@ -4465,6 +4482,7 @@ static uint8_t solve( HardInstance * hi )
         h->subresSum = 0;
         h->abortLeeway = s->abortLeewayStart;
         h->catchAbortsN = s->catchAbortsN;
+        h->maxRLevel = 0;
 
 
         // For the hash table, we'll just delete it and remake it from
@@ -4558,7 +4576,10 @@ static uint8_t solve( HardInstance * hi )
                     fprintf( s->outFile, "number of aborts caught: %lu\n",
                              s->catchAbortsN - h->catchAbortsN );
 
-                     fputc( '\n', s->outFile );
+                    fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+                             h->maxRLevel );
+
+                    fputc( '\n', s->outFile );
                 }
 
                 // See if the bound is an absolute improvement, or a replication.
@@ -4933,7 +4954,7 @@ static uint8_t milk( HardInstance * hi )
                         if ( s->globalBound )
                         {
                             fprintf( s->outFile,
-                                    "Start state: seed: %lu, upper bound (-u): %.*g\n", 
+                                    "Start state: seed: %lu  upper bound (-u): %.*g\n", 
                                     s->seed, 
                                     DBL_DECIMAL_DIG, h->upperBound );
                         }
@@ -4990,7 +5011,10 @@ static uint8_t milk( HardInstance * hi )
                     fprintf( s->outFile, "number of aborts caught: %lu\n",
                              s->catchAbortsN - h->catchAbortsN );
 
-                     fputc( '\n', s->outFile );
+                    fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+                             h->maxRLevel );
+
+                    fputc( '\n', s->outFile );
                 }
 
                 // See if the bound is an absolute improvement, or a replication.
@@ -5056,6 +5080,7 @@ static uint8_t milk( HardInstance * hi )
         h->subresSum = 0;
         h->abortLeeway = s->abortLeewayStart;
         h->catchAbortsN = s->catchAbortsN;
+        h->maxRLevel = 0;
 
         // Reset seed, to the seed in the bounds file, which should equal
         // the common s->seed. Unless -3 option is used. So, just reset to

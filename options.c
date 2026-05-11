@@ -442,6 +442,7 @@ static void setVerbosityLevel( HardInstance * hi, unsigned int vl )
     case 6:
         vv |= HardVerbosity_printTime;
     case 5:
+        vv |= HardVerbosity_printRLvl;
         vv |= HardVerbosity_printInfo;
     case 4:
         vv |= HardVerbosity_printSeed;
