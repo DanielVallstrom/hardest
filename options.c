@@ -60,6 +60,9 @@ stdout,
 "hardest tries to find the fewest questions that solve the generalization of\n"
 "The Hardest Logic Puzzle Ever. The algorithm is derived from the paper\n"
 "Solving The Hardest Logic Puzzle Ever and its generalizations.\n"
+"The puzzle has truthful, lying, and random gods who answer yes or no\n"
+"questions with words that we don't know the meaning of. The challenge is to\n"
+"figure out which type each god is.\n"
 "  Gods are named g0, g1, ...\n"
 "  To succinctly reproduce a solution, or see its questions, you can do a long\n"
 "search, note the seed, the upper bound, and maybe leaways -a and -e,\n"
@@ -309,6 +312,11 @@ stdout,
 
     fprintf(
 stdout,
+"  -Q --how-to             Print disqussion on how to find new bounds, then quit.\n"
+           );
+
+    fprintf(
+stdout,
 "  -r --random-gods <unsigned integer>\n"
 "                          Set number of random gods.\n"
 "  -R --shuffle-conjunctions <unsigned integer>\n"
@@ -420,6 +428,49 @@ stdout,
            );
 }
 
+
+
+static void printHowToFindNewBounds( void )
+{
+    fprintf(
+stdout,
+"On How to Find New Bounds\n"
+"\n"
+"To improve an upper bound, currently, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in best_known_bounds.csv.\n"
+"\n"
+"After you find a bound, you can milk the solution: Use the milk mode, -1. You'll want to base your milking on the solution, but alter the number of sub-searches that you take the most promising search from a little, i.e. changing the -B settings. For example, if -b 3 was used to find the bound, try combinations around that setting, for a few levels, e.g. -1 -b 3 -i 3 -B 0:4 -B 1:4 -B 2:4 -B 3:4 -2 b-2. Again, see best_known_bounds.csv.\n"
+"\n"
+"If your bound didn't make it into the bounds file, you can still milk it by using the -3 option, and providing base command options yourself. Typically, this means taking a search command that you want to base the milking on, add seed, and maybe upper bound, for the one best sub-search, and perhaps -a and -e options, like in a replication command. Then add b, B, 0, or 2 options, and -i (and the milking option, -1). For instance, to try +-1 combinations of your B settings for a few, 4, levels, start with your base search command, add seed, and then add -1 -3 -i 3 -b b+1 -0 b-2, where the order of the last three options matter.\n"
+"\n"
+"For example, the current replication command for the 0-8-4 problem is\n"
+"\n"
+"    ./hardest -f 0 -t 8 -r 4 -i 999 -b 5 -B 0:6 -S 8 -H 1 -U 3 -a 0.9952 -e 0.9951 -K 1960 -s 6532526679816657539 -1 -3 -i 5 -b b+1 -0 b-2 -1no -B 0:6 -B 1:5 -B 2:5 -B 3:5 -B 4:6 -B 5:5 -s 6532526679816657539 -i 0 -u 9.8343429999999987 -M 1 -a 0.99519999999999997 -e 0.99509999999999998 -i 0\n"
+"\n"
+"That came about by first doing a normal search, eventually settling on the command\n"
+"\n"
+"    ./hardest -f 0 -t 8 -r 4 -i 999 -b 5 -B 0:6 -S 8 -H 1 -U 3 -a 0.9952 -e 0.9951 -K 1960\n"
+"\n"
+"After a few tries a bound fairly close to, but still worse than, the then upper bound was found, with the one search that found the close bound having seed 6532526679816657539. After that, the new solution was milked, using the command\n"
+"\n"
+"    ./hardest -f 0 -t 8 -r 4 -i 999 -b 5 -B 0:6 -S 8 -H 1 -U 3 -a 0.9952 -e 0.9951 -K 1960 -s 6532526679816657539 -1 -3 -i 5 -b b+1 -0 b-2\n"
+"\n"
+"The milking then, eventually, found the current bound (adding the state at the start of the one search that found the new bound to the end of the replication command for a succinct replication).\n"
+"\n"
+           );
+    fprintf(
+stdout,
+"You can remilk a milked solution, all the way down to the level where the -B option has no effect, i.e. where asked gods are never random; the solver outputs the maximal level where the -B option still has an effect. For instance, the replication command for the 3-5-4 problem is\n"
+"\n"
+"    ./hardest -f 3 -t 5 -r 4 -i 2999 -b 1 -B 0:2 -S 8 -H 1 -U 3 -a 0.9991 -e 0.999 -K 1960 -s 15356446695531426074 -1 -3 -i 13 -b b+1 -0 b-2 -B 0:3 -B 1:2 -B 2:2 -B 3:1 -B 4:1 -2 0:3 -2 1:2 -2 2:2 -2 3:1 -2 4:1 -B 5:1 -B 6:0 -B 7:0 -B 8:0 -B 9:0 -2 5:1 -2 6:0 -2 7:0 -2 8:0 -2 9:0 -u 15.724351 -1no -B 0:3 -B 1:2 -B 2:2 -B 3:1 -B 4:1 -B 5:1 -B 6:0 -B 7:0 -B 8:0 -B 9:0 -B 10:2 -B 11:0 -B 12:0 -B 13:0 -s 15356446695531426074 -i 0 -u 15.724350999999997 -M 1 -a 0.99909999999999999 -e 0.999 -i 0\n"
+"\n"
+"That solution was found by first doing a normal search, then milking that solution by iterating over the first 5 B levels, then taking the first 5 B values in the search that found the best bound, namely -B 0:3 -B 1:2 -B 2:2 -B 3:1 -B 4:1, fixing them, and then iterating over the next 5 levels. That found an improved upper bound. However, you can milk that new bound further, by iterating over the last levels in play, and remembering to add the old upper bound to the options, -u 15.724351, since the new bound was written to the bounds file, which would push the search off the base path to be milked. This third milking produced the current bound. However, the last level where repeats were made was in fact level 10, so involving the three levels 11, 12, and 13 was unnecessary and wasteful.\n"
+"\n"
+"Regarding which estimate heuristic, -H, to use, while the probabilistic -H 0 might be more theoretically sound and appealing, and maybe more accurate, -H 1 might sometimes be more robust --- less random. You are not looking for accuracy anyway, but rather robustness and consistency, usefulness. Accuracy is as hard as the underlying problem in any case.\n"
+"\n"
+"Maybe don't mess with the upper bound -u option, partly because it's good to read upper bounds from the bounds file. You can use leeway options -a and -e instead. You can set them to less than 1 if you want, e.g. when you use an estimate heuristic that is biased low, e.g. -H 1."
+"\n"
+       );    
+}
 
 
 // Sets the verbosity level.
@@ -667,6 +718,7 @@ static int parseCommandLineOptions( HardInstance * hi,
             { "odd-bias",               required_argument, NULL, 'N' },
             { "optimize-non-r",         required_argument, NULL, 'O' },
             { "print-info",             optional_argument, NULL, 'P' },
+            { "how-to",                 no_argument,       NULL, 'Q' },
             { "shuffle-conjunctions",   required_argument, NULL, 'R' },
             { "swap",                   required_argument, NULL, 'S' },
             { "indent",                 required_argument, NULL, 'T' },
@@ -710,7 +762,7 @@ static int parseCommandLineOptions( HardInstance * hi,
         {
             c = getopt_long( argC, argV,
                              "0:1::2:3::9:"
-                             "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::R:S:T:U:V::W:X:Y:Z:"
+                             "A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P::QR:S:T:U:V::W:X:Y:Z:"
                              "a:b:c:e:f:g:hi:k:l:m::n:o:p:qr:s:t:u:v::w::z:",
                              longOptions, &optionIndex );
 
@@ -1234,6 +1286,11 @@ static int parseCommandLineOptions( HardInstance * hi,
                 }
 
                 break;
+
+            case 'Q':
+                printHowToFindNewBounds();
+
+                return 2;
 
             case 'R':
                 {

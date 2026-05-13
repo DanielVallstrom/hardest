@@ -380,6 +380,7 @@ static void printState( HardInstance * hi )
     fprintf( f, "abortLeewayDecrement: %g\n", h->abortLeewayDecrement );                
     fprintf( f, "catchAbortsN: %lu\n", h->catchAbortsN );                
     fprintf( f, "rebalancingCounter: %lu\n", h->rebalancingCounter ); 
+    fprintf( f, "maxRLevel: %u\n", h->maxRLevel ); 
     
     fprintf( f, "current seed: %lu\n\n", common_currentSeed() );
 }
@@ -4541,7 +4542,7 @@ static uint8_t solve( HardInstance * hi )
                         if ( s->globalBound )
                         {
                             fprintf( s->outFile,
-                                    "Start state: seed: %lu, upper bound (-u): %.*g\n", 
+                                    "Start state: seed: %lu  upper bound (-u): %.*g\n", 
                                     seedForBestResult, 
                                     DBL_DECIMAL_DIG, upperBoundForBest );
                         }
@@ -5039,7 +5040,12 @@ static uint8_t milk( HardInstance * hi )
             {   
                 // It's not independent enough to warrant a note.
                 // Err, now it might be, and is with the seed check.
-                readBounds_noteRep( hi, s->seed, h->upperBound );
+                // Err, this should only be done once, above, and not 
+                // here. This is not an issue if the seed gets written. However,
+                // with the -C 1 option, this seed won't get written, and
+                // noting replication more than once could happen, and would be
+                // wrong.
+                //readBounds_noteRep( hi, s->seed, h->upperBound );
             }
             else
             {
