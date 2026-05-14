@@ -436,7 +436,7 @@ static void printHowToFindNewBounds( void )
 stdout,
 "On How to Find New Bounds\n"
 "\n"
-"To improve an upper bound, currently, you typically first try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in best_known_bounds.csv.\n"
+"To improve an upper bound, currently, you typically first try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option, or tweaking -a and -e yourself, while using e.g. -K 1960. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in best_known_bounds.csv.\n"
 "\n"
 "After you find a bound, you can milk the solution: Use the milk mode, -1. You'll want to base your milking on the solution, but alter the number of sub-searches that you take the most promising search from a little, i.e. changing the -B settings. For example, if -b 3 was used to find the bound, try combinations around that setting, for a few levels, e.g. -1 -b 3 -i 3 -B 0:4 -B 1:4 -B 2:4 -B 3:4 -2 b-2. Again, see best_known_bounds.csv.\n"
 "\n"
@@ -459,7 +459,7 @@ stdout,
            );
     fprintf(
 stdout,
-"You can remilk a milked solution, all the way down to the level where the -B option has no effect, i.e. where asked gods are never random; the solver outputs the maximal level where the -B option still has an effect. For instance, the replication command for the 3-5-4 problem is\n"
+"You can remilk a milked solution, all the way down to the level where the -B option has no effect, i.e. where asked gods are never random; the solver outputs the maximal level where the -B option still has an effect. For instance, the current replication command for the 3-5-4 problem is\n"
 "\n"
 "    ./hardest -f 3 -t 5 -r 4 -i 2999 -b 1 -B 0:2 -S 8 -H 1 -U 3 -a 0.9991 -e 0.999 -K 1960 -s 15356446695531426074 -1 -3 -i 13 -b b+1 -0 b-2 -B 0:3 -B 1:2 -B 2:2 -B 3:1 -B 4:1 -2 0:3 -2 1:2 -2 2:2 -2 3:1 -2 4:1 -B 5:1 -B 6:0 -B 7:0 -B 8:0 -B 9:0 -2 5:1 -2 6:0 -2 7:0 -2 8:0 -2 9:0 -u 15.724351 -1no -B 0:3 -B 1:2 -B 2:2 -B 3:1 -B 4:1 -B 5:1 -B 6:0 -B 7:0 -B 8:0 -B 9:0 -B 10:2 -B 11:0 -B 12:0 -B 13:0 -s 15356446695531426074 -i 0 -u 15.724350999999997 -M 1 -a 0.99909999999999999 -e 0.999 -i 0\n"
 "\n"
