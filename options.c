@@ -386,7 +386,7 @@ stdout,
 "  -Y --abort-leeway-change <float>\n"
 "                          We'll add or subtract this from abort-leeway-start and -end,\n"
 "                          adjusted, to achive abort-promille-goal. [%g]\n"
-"  -z --CIz <float>        Set z-value for CIs. Default is 95%% CIs. [%f]\n"
+"  -z --CIz <float>        Set z-value for CIs. Default is 99%% CIs. [%f]\n"
 "                          -99 is interpreted as the z-value for 99%% CIs. -80, -90,\n"
 "                          -95, -99, -999 are supported.\n"
 "  -Z --min-sample-size <unsigned integer>\n"
@@ -436,7 +436,7 @@ static void printHowToFindNewBounds( void )
 stdout,
 "On How to Find New Bounds\n"
 "\n"
-"To improve an upper bound, currently, you typically, first, try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in best_known_bounds.csv.\n"
+"To improve an upper bound, currently, you typically first try to home in on good abort leeway values, aiming, maybe, to get almost all searches to abort, e.g. by using the -K 960 option. Then you can fix good abort parameters, with, say, -K 1960. Next you try to find out which of -S 7 and -S 8 is best --- or, possibly, even -S 6. For -S 8, you also test different, small, values of -U m. Then you trade -b n for -i k --- start with -b 0, maybe. See the replication commands in best_known_bounds.csv.\n"
 "\n"
 "After you find a bound, you can milk the solution: Use the milk mode, -1. You'll want to base your milking on the solution, but alter the number of sub-searches that you take the most promising search from a little, i.e. changing the -B settings. For example, if -b 3 was used to find the bound, try combinations around that setting, for a few levels, e.g. -1 -b 3 -i 3 -B 0:4 -B 1:4 -B 2:4 -B 3:4 -2 b-2. Again, see best_known_bounds.csv.\n"
 "\n"

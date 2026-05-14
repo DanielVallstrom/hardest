@@ -123,10 +123,10 @@ HardInstance * hard_newInstance(void)
     s->boundsFileSeed = UINT64_MAX;  // ?? undef. value?? (it's okayish)
 
     s->abortPromilleGoal = 960;  // ??
-    s->abortLeewayChange = 0.001;  // ??
+    s->abortLeewayChange = 0.0001;  // ??
     s->changeFactor = 1.01;  // ??
     s->minSampleSize = 0;  // ??
-    s->minSampleInc = 1;  // ??
+    s->minSampleInc = 2;  // ??
     s->ciz = DefaultCIz;
 
     s->note = NULL;  // ""??
@@ -4652,7 +4652,7 @@ static uint8_t solve( HardInstance * hi )
                     double change = 
                         s->changeFactor  * 
                         ( 1 + p - (double)s->abortPromilleGoal/1000 )  *
-                        ( 1 + 1 - moe )  *  // ??
+                        ( 1 - se )  *  // ??
                         s->abortLeewayChange;
                     s->abortLeewayStart += change;
                     s->abortLeewayEnd   += change;
@@ -4662,7 +4662,7 @@ static uint8_t solve( HardInstance * hi )
                     double change = 
                         s->changeFactor  *
                         ( 1 + (double)s->abortPromilleGoal/1000 - p )  *
-                        ( 1 + 1 - moe )  *  // ??
+                        ( 1 - se )  *  // ??
                         s->abortLeewayChange;
                     s->abortLeewayStart -= change;
                     s->abortLeewayEnd   -= change;
@@ -4671,6 +4671,8 @@ static uint8_t solve( HardInstance * hi )
                 // Reset.
                 aborts = 0;
                 solutions = 0;
+
+                s->minSampleSize += s->minSampleInc;
             }
         }
     }

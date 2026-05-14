@@ -46,8 +46,8 @@ typedef struct HardInstance_ HardInstance;
 // The default size of qPath. See below.
 #define DefaultqPathSize (300)
 
-// The default z-value for CIs. For 95 %. 99 % is 2.576.
-#define DefaultCIz (1.96)
+// The default z-value for CIs. 95 % is 1.96. 99 % is 2.576.
+#define DefaultCIz (2.576)
 
 
 // Types. -------------------------------------------------------------
