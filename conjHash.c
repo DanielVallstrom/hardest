@@ -683,8 +683,16 @@ uint8_t conjHash_add( uint64_t c, uint8_t qs, HardInstance * hi, uint8_t qs0 )
 
     // Update leeway and heuristic numbers.
 
-    h->abortLeeway = max( h->abortLeeway - h->abortLeewayDecrement,
-                          s->abortLeewayEnd );
+    if ( s->abortLeewayStart >= s->abortLeewayEnd )
+    {
+        h->abortLeeway = max( h->abortLeeway - h->abortLeewayDecrement,
+                              s->abortLeewayEnd );
+    }
+    else
+    {
+        h->abortLeeway = min( h->abortLeeway - h->abortLeewayDecrement,
+                              s->abortLeewayEnd );
+    }
 
     uint64_t powRs = (uint64_t)1 << randomAnswersN;    
 
@@ -831,8 +839,17 @@ uint8_t conjHash_addIf( uint64_t c, uint8_t qs, HardInstance * hi,
 
     // Update leeway and heuristic numbers.
 
-    h->abortLeeway = max( h->abortLeeway - h->abortLeewayDecrement,
-                          s->abortLeewayEnd );
+    if ( s->abortLeewayStart >= s->abortLeewayEnd )
+    {
+        h->abortLeeway = max( h->abortLeeway - h->abortLeewayDecrement,
+                              s->abortLeewayEnd );
+    }
+    else
+    {
+        h->abortLeeway = min( h->abortLeeway - h->abortLeewayDecrement,
+                              s->abortLeewayEnd );
+    }
+
 
     uint64_t powRs = (uint64_t)1 << randomAnswersN;
 

@@ -4601,7 +4601,7 @@ static uint8_t solve( HardInstance * hi )
                       s->noteReplications >= 1  &&  
                       seedForBestResult != s->boundsFileSeed )
             {   // Note replication.
-                readBounds_noteRep( hi, seedForBestResult, upperBoundForBest );
+                readBounds_noteRep( hi, currentSeed, h->upperBound );
             }
             
             solutions++;

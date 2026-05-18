@@ -1751,7 +1751,8 @@ bool readBounds_noteRep( HardInstance * hi, uint64_t seed, double boundUsed )
         if ( s->verbosityVector & HardVerbosity_printInfo )
         {
             fprintf( s->outFile, "independent replication counter "
-                                 "incremented, to: %u\n\n", n );
+                                 "incremented, to: %u\n", n );
+            fprintf( s->outFile, "seed used: %lu\n\n", seed );
         }
         
 
