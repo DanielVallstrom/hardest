@@ -34,6 +34,8 @@ Regarding which estimate heuristic, -H, to use, while the probabilistic -H 0 mig
 
 Maybe don't mess with the upper bound -u option, partly because it's good to read upper bounds from the bounds file. You can use leeway options -a and -e instead. You can set them to less than 1 if you want, e.g. when you use an estimate heuristic that is biased low, e.g. -H 1. 
 
+Bounds for problems < 2-6-5 should be pretty good (although all bounds were computed on a fairly slow computer). Bounds for promblems >= 2-6-5 should be straightforward to improve, following the guidelines here. Some placeholder bounds even just require a bit of RAM memory, 8+ GB.
+
 ## How to Submit Improved Bounds
 
 There are three ways to submit an improved bound:
