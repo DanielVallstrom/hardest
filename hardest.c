@@ -52,6 +52,19 @@ static void printMoreInfo( HardInstance * hi )
 
 
 
+// Prints a time period to stdout. s should be time in seconds.
+static void printTime( double s )
+{
+    uint64_t hours = s / 3600;
+    s -= 3600 * hours;
+    uint64_t minutes = s / 60;
+    s -= 60 * minutes;
+
+    printf("cpu time used: %luh %lum %.3fs\n\n", (unsigned long)hours, (unsigned long)minutes, s);
+}
+
+
+
 int main( int argc, char * * argv )
 {
     // For measuring cpu time used.
@@ -131,8 +144,7 @@ int main( int argc, char * * argv )
     // Print cpu time used.
     if ( hi->settings->verbosityVector & HardVerbosity_printTime )
     {
-        printf( "cpu time used, in seconds: %.3f\n\n",
-                (double)(clock()-clockStart) / CLOCKS_PER_SEC );
+        printTime( (double)(clock()-clockStart) / CLOCKS_PER_SEC );
     }
 
 
