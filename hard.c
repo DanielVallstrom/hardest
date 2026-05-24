@@ -3309,6 +3309,12 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         //conjHash_removeLastMark(h);
         stateIsMarked = true;
     }
+    // Update maxRLevel, or something similar. For now, we'll
+    // just update maxRLevel.
+    else if ( giRs != 0  &&  h->maxRLevel < qs )
+    {
+        h->maxRLevel = qs;
+    }
 
 
     // Update best estimates.
@@ -3519,6 +3525,12 @@ static uint8_t fnd1( HardInstance * hi, uint64_t start, uint64_t end,
         //conjHash_removeLastMark(h);
         stateIsMarked = true;
     }
+    // Update maxRLevel.
+    else if ( gjRs != 0  &&  h->maxRLevel < qs )
+    {
+        h->maxRLevel = qs;
+    }
+
 
     // Remove recent marks.
     for ( ; markCounter != 0; markCounter-- )
@@ -4417,7 +4429,7 @@ static uint8_t solve( HardInstance * hi )
             fprintf( s->outFile, "number of aborts caught: %lu\n",
                      s->catchAbortsN - h->catchAbortsN );
 
-            fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+            fprintf( s->outFile, "max level where repeats (-B) would be made: %u\n",
                      h->maxRLevel );
 
             fputc( '\n', s->outFile );
@@ -4577,7 +4589,7 @@ static uint8_t solve( HardInstance * hi )
                     fprintf( s->outFile, "number of aborts caught: %lu\n",
                              s->catchAbortsN - h->catchAbortsN );
 
-                    fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+                    fprintf( s->outFile, "max level where repeats (-B) would be made: %u\n",
                              h->maxRLevel );
 
                     fputc( '\n', s->outFile );
@@ -5014,7 +5026,7 @@ static uint8_t milk( HardInstance * hi )
                     fprintf( s->outFile, "number of aborts caught: %lu\n",
                              s->catchAbortsN - h->catchAbortsN );
 
-                    fprintf( s->outFile, "max level where repeats (-B) were made: %u\n",
+                    fprintf( s->outFile, "max level where repeats (-B) would be made: %u\n",
                              h->maxRLevel );
 
                     fputc( '\n', s->outFile );
