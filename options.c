@@ -467,9 +467,11 @@ stdout,
 "\n"
 "Regarding which estimate heuristic, -H, to use, while the probabilistic -H 0 might be more theoretically sound and appealing, and maybe more accurate, -H 1 might sometimes be more robust --- less random. You are not looking for accuracy anyway, but rather robustness and consistency, usefulness. Accuracy is as hard as the underlying problem in any case.\n"
 "\n"
-"Maybe don't mess with the upper bound -u option, partly because it's good to read upper bounds from the bounds file. You can use leeway options -a and -e instead. You can set them to less than 1 if you want, e.g. when you use an estimate heuristic that is biased low, e.g. -H 1."
+"Maybe don't mess with the upper bound -u option, partly because it's good to read upper bounds from the bounds file. You can use leeway options -a and -e instead. You can set them to less than 1 if you want, e.g. when you use an estimate heuristic that is biased low, e.g. -H 1.\n"
 "\n"
-       );    
+"Currently, bounds for problems with <= 13 gods should be reasonably good (although all bounds were computed on a fairly slow computer). Bounds for problems with > 13 gods should be straightforward to improve, following the guidelines here. Some placeholder bounds even just require a bit of RAM memory, 8+ GB."
+"\n"
+           );    
 }
 
 

@@ -2,7 +2,7 @@
 
 
 # The current version.
-version = 0.18.50
+version = 0.18.52
 
 
 # If CC or MODE are not defined the following defaults will be used:
@@ -448,10 +448,11 @@ deps:
 $(objDir)/hardest.o: hardest.c hard.h conjHash.h options.h common.h
 $(objDir)/hard.o: hard.c hard.h conjHash.h common.h compilerMacros.h \
  readBounds.h options.h
-$(objDir)/options.o: options.c options.h hard.h conjHash.h common.h
+$(objDir)/options.o: options.c options.h hard.h conjHash.h common.h \
+ makefile_core
 $(objDir)/common.o: common.c common.h compilerMacros.h
 $(objDir)/conjHash.o: conjHash.c conjHash.h hard.h common.h \
  compilerMacros.h
 $(objDir)/readBounds.o: readBounds.c readBounds.h hard.h conjHash.h \
- common.h
+ common.h makefile_core
 
