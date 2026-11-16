@@ -96,4 +96,4 @@ daniel.vallstrom@gmail.com
 
 If you use this solver or the results in your work, please cite the paper:
 
-Daniel Vallstrom. *Solving The Hardest Logic Puzzle Ever and its generalizations*. arXiv:2201.09801. https://arxiv.org/abs/2201.09801
+Daniel Vallstrom. *A logical treatment of noise: Solving The Hardest Logic Puzzle Ever and its generalizations*. arXiv:2201.09801. https://arxiv.org/abs/2201.09801
