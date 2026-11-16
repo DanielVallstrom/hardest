@@ -1,6 +1,6 @@
 # hardest — a solver for The Hardest Logic Puzzle Ever and its generalization
 
-📄 **Paper**: [Solving The Hardest Logic Puzzle Ever and its generalizations](https://arxiv.org/abs/2201.09801) ([PDF](https://arxiv.org/pdf/2201.09801.pdf)) by Daniel Vallstrom
+📄 **Paper**: [A logical treatment of noise: Solving The Hardest Logic Puzzle Ever and its generalizations](https://arxiv.org/abs/2201.09801) ([PDF](https://arxiv.org/pdf/2201.09801.pdf)) by Daniel Vallstrom
 
 **hardest** is a solver for the classic Hardest Logic Puzzle Ever and its generalization to arbitrary numbers of gods.
 
